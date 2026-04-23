@@ -1,0 +1,23 @@
+# application-local.yml — overrides for local development
+# Activate with: SPRING_PROFILES_ACTIVE=local
+#
+# Differences from default:
+# - payment-gateway: stripe  (test real Stripe integration locally)
+# - notifications enabled
+# - Redis pointed at local Docker container (default port)
+
+feature:
+  payment-gateway: stripe
+  notifications:
+    enabled: true
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    com.learning.mastery: TRACE
+    org.springframework.data: DEBUG

@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: mastery
+
+  datasource:
+    url: jdbc:h2:mem:masterydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop   # recreate schema on each start (fine for this learning lab)
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console   # browse schema at http://localhost:8080/h2-console
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 4
+          min-idle: 1
+          max-wait: 100ms   # fail fast — don't wait for an unavailable Redis
+
+  mvc:
+    problemdetails:
+      enabled: true   # RFC 9457 ProblemDetail for Spring MVC errors
+
+  cache:
+    type: redis
+
+# Feature flags (drives @ConditionalOnProperty in ConditionalConfig.kt)
+feature:
+  payment-gateway: mock     # "stripe" | "paypal" | "mock"
+  notifications:
+    enabled: false
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.learning.mastery: DEBUG
+    org.springframework.cache: DEBUG
