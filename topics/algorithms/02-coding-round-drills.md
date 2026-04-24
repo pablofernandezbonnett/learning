@@ -13,7 +13,13 @@ Scope of this note:
 - the drills are based on the most common timed coding shapes used in backend practice
 - the business framing is backend-flavored on purpose, but the same underlying prompt may be worded much more generically
 
-Note: every curated drill in this file has a solved Java and Kotlin implementation with explanatory comments. Use the `live-coding-companion/` runnable examples to run and time yourself. If I propose any additional drill, I will include a full, commented Java solution.
+Note: this file is the canonical study note for the drills themselves. Keep the
+focus on recognizing the pattern, explaining the invariant, and tracing edge cases
+cleanly under time pressure.
+
+Runnable companion:
+
+- [labs/algorithms-live-coding/README.md](../../labs/algorithms-live-coding/README.md)
 
 **Strategy for live coding (CoderPad / whiteboard):**
 1. Repeat the problem in your own words before writing anything.
@@ -38,7 +44,30 @@ Before you say "done", check these quickly:
 
 Short rule:
 
-> most timed-coding bugs are not in the main idea, but in the first, last, empty, duplicate, or impossible case
+> most interview bugs are not in the main idea, but in the first, last, empty, duplicate, or impossible case
+
+---
+
+## Pattern-First Drill Map
+
+When you are rusty, do not start from topic names like `HashMap` or
+`ArrayDeque`.
+Start from the shape of the prompt.
+
+| Prompt smell | Core pattern | Usual structure | Start here |
+|---|---|---|---|
+| "group by customer / ID / symbol / date" | group by | `Map<K, List<V>>` | `H3b` |
+| "count occurrences / frequency / duplicates" | frequency map | `Map<K, Integer>` | `H1`, `H1b`, `H3`, `H3c`, `PQ1` |
+| "sum per customer / total per product" | aggregate by key | `Map<K, BigDecimal>` or `Map<K, Integer>` | `H3d` |
+| "highest price per category / latest per key" | max per key | `Map<K, V>` | `H3e` |
+| "first duplicate / have I seen this before?" | seen-set lookup | `Set<T>` | `H1c` |
+| "two numbers in sorted input" | two pointers | `left`, `right` | `TP1` |
+| "contiguous subarray / substring" | sliding window | `left`, `right`, running state | `SW1`, `SW2`, `SW3` |
+| "last opened, first closed" | stack / deque | `ArrayDeque` / `Deque` | `SD1`, `SD2`, `SD3`, `SD4` |
+
+Short rule:
+
+> if the prompt says "per key", first ask whether you need a list, a count, a running total, or just the best-so-far value
 
 ---
 
@@ -46,10 +75,6 @@ Short rule:
 
 Do not try to sample this whole file equally.
 Bias toward this smaller working set and repeat it under time pressure.
-
-Use the runnable companion for executable Java and Kotlin versions:
-
-- [live-coding-companion/README.md](./live-coding-companion/README.md)
 
 ### Recommended 12
 
@@ -71,7 +96,7 @@ Use the runnable companion for executable Java and Kotlin versions:
 - they cover the `4 problems / 70 minutes` shape without turning prep into a puzzle bank
 - they force clean explanation of invariants and data-structure choice
 - they keep one parser exercise as a stack hedge without letting parser work dominate the loop
-- they convert better to backend problem solving than adding more medium/hard DSA just for breadth
+- they convert better to backend interviews than adding more medium/hard DSA just for breadth
 
 ### Recommended mock rounds
 
@@ -126,8 +151,8 @@ For `N = 5`:
 
 Write a program that generates this pyramid for `N = 10`.
 
-**Why it comes up:** This is a useful warm-up for nested loops, spacing
-arithmetic, centering, and off-by-one control.
+**Why it comes up:** This is a small but useful warm-up for nested loops,
+spacing arithmetic, centering, and off-by-one control.
 
 **Pseudo shape:**
 ```text
@@ -281,8 +306,8 @@ Output:
 ["", "", "", "", "true", "true", "true", "true", "true", "true", "false"]
 ```
 
-**Why it comes up:** This is a compact container-design drill. It tests whether
-you notice when a `HashSet` is enough and when duplicates force you to move to a
+**Why it comes up:** This is a compact container-design drill. It tests whether you
+notice when a `HashSet` is enough and when duplicates force you to move to a
 frequency map.
 
 **Level 1 (`ADD` + `EXISTS` only): `HashSet` is enough**
@@ -300,10 +325,10 @@ String[] solution(String[][] queries) {
         String value = queries[i][1];
 
         if (operation.equals("ADD")) {
-            storage.add(value);
+            storage.add(value); // set is enough when we only care about presence
             results[i] = "";
         } else if (operation.equals("EXISTS")) {
-            results[i] = storage.contains(value) ? "true" : "false";
+            results[i] = storage.contains(value) ? "true" : "false"; // constant-time membership check
         }
     }
     return results;
@@ -322,11 +347,11 @@ fun solution(queries: Array<Array<String>>): Array<String> {
 
         when (operation) {
             "ADD" -> {
-                storage.add(value)
+                storage.add(value) // set is enough when we only care about presence
                 results[i] = ""
             }
             "EXISTS" -> {
-                results[i] = if (storage.contains(value)) "true" else "false"
+                results[i] = if (storage.contains(value)) "true" else "false" // constant-time membership check
             }
         }
     }
@@ -377,12 +402,12 @@ fun solution(queries: Array<Array<String>>): Array<String> {
 
         when (operation) {
             "ADD" -> {
-                counts[value] = (counts[value] ?: 0) + 1
+                counts[value] = (counts[value] ?: 0) + 1 // track how many copies of this value exist
                 results[i] = ""
             }
 
             "EXISTS" -> {
-                results[i] = if ((counts[value] ?: 0) > 0) "true" else "false"
+                results[i] = if ((counts[value] ?: 0) > 0) "true" else "false" // present when count is still positive
             }
 
             "REMOVE" -> {
@@ -390,7 +415,7 @@ fun solution(queries: Array<Array<String>>): Array<String> {
                 results[i] = if (current == 0) {
                     "false"
                 } else {
-                    if (current == 1) counts.remove(value) else counts[value] = current - 1
+                    if (current == 1) counts.remove(value) else counts[value] = current - 1 // remove key at zero to keep lookups simple
                     "true"
                 }
             }
@@ -414,19 +439,19 @@ String[] solution(String[][] queries) {
         String value = queries[i][1];
 
         if (operation.equals("ADD")) {
-            counts.put(value, counts.getOrDefault(value, 0) + 1);
+            counts.put(value, counts.getOrDefault(value, 0) + 1); // track multiplicity, not just presence
             results[i] = "";
         } else if (operation.equals("EXISTS")) {
-            results[i] = counts.getOrDefault(value, 0) > 0 ? "true" : "false";
+            results[i] = counts.getOrDefault(value, 0) > 0 ? "true" : "false"; // present when count is still positive
         } else if (operation.equals("REMOVE")) {
             int current = counts.getOrDefault(value, 0);
             if (current == 0) {
                 results[i] = "false";
             } else {
                 if (current == 1) {
-                    counts.remove(value);
+                    counts.remove(value); // remove key entirely once the last copy disappears
                 } else {
-                    counts.put(value, current - 1);
+                    counts.put(value, current - 1); // keep one fewer copy
                 }
                 results[i] = "true";
             }
@@ -451,12 +476,70 @@ String[] solution(String[][] queries) {
 
 ---
 
+### H1c — First Duplicate Event ID
+
+**Prompt:** Given a list of event IDs, return the first ID that appears for the
+second time as you scan from left to right. Return `null` if no duplicate
+exists.
+
+Example:
+
+```text
+["A", "B", "C", "B", "A"] -> "B"
+```
+
+**Why it comes up:** This is the cleanest `HashSet` / `seen` drill. It is the
+smallest version of deduplication and idempotency detection.
+
+**Pseudo shape:**
+```text
+create empty set
+for each ID:
+    if already in set: return it
+    add it to set
+return null
+```
+
+**Kotlin**
+```kotlin
+fun firstDuplicateEventId(ids: List<String>): String? {
+    val seen = mutableSetOf<String>()
+
+    for (id in ids) {
+        if (!seen.add(id)) return id // add(...) returns false when the ID already exists
+    }
+
+    return null
+}
+```
+
+<details>
+<summary>Java version</summary>
+
+```java
+public String firstDuplicateEventId(List<String> ids) {
+    Set<String> seen = new HashSet<>();
+
+    for (String id : ids) {
+        if (!seen.add(id)) return id; // add(...) returns false when the ID already exists
+    }
+
+    return null;
+}
+```
+
+</details>
+
+**Complexity:** O(n) time, O(n) space.
+
+---
+
 ### H2 — Two Products That Sum to a Budget
 
 **Prompt:** Given a list of product prices (Int) and a budget, return the indices
 of two products that sum exactly to the budget. Assume exactly one solution exists.
 
-**Why it comes up:** Two Sum is the canonical hash-map lookup drill.
+**Why it comes up:** Two Sum — the canonical HashMap interview problem.
 
 **Pseudo shape:**
 ```text
@@ -569,13 +652,490 @@ public Map<String, Integer> countByStatusTyped(List<Transaction> transactions) {
 
 ---
 
+### H3b — Summarize CSV Prices by ID
+
+**Prompt:** You receive an array of CSV-like strings such as:
+
+```text
+["APPX,150.00", "AMMZ, 145.00", " APPX, 145.00", "AMMZ, 175.00"]
+```
+
+Each line contains:
+
+```text
+ID, price
+```
+
+Clean surrounding spaces, group rows by `ID`, and return one output line per
+`ID` using this exact shape:
+
+```text
+ID, highest, original-values-in-arrival-order, lowest
+```
+
+That means the highest value is always repeated at the front, the lowest value
+is always repeated at the end, and the values in the middle stay in their
+original arrival order for that `ID`.
+
+Example output for the input above:
+
+```text
+[
+  "APPX,150.00,150.00,145.00,145.00",
+  "AMMZ,175.00,145.00,175.00,145.00"
+]
+```
+
+**Why it comes up:** This is a practical parsing-and-aggregation drill. It tests
+whether you can normalize messy input, preserve insertion order, group with a
+map, and avoid floating-point mistakes for money-like values.
+
+**Pseudo shape:**
+```text
+create LinkedHashMap: ID -> list of BigDecimal values
+for each CSV line:
+    split into ID and value
+    trim both sides
+    append parsed value to that ID's list
+
+for each ID in first-seen order:
+    highest = max(values)
+    lowest = min(values)
+    build: ID, highest, values in original order, lowest
+```
+
+**Kotlin**
+```kotlin
+import java.math.BigDecimal
+
+fun solution(csv: Array<String>): Array<String> {
+    val grouped = linkedMapOf<String, MutableList<BigDecimal>>()
+
+    for (line in csv) {
+        val parts = line.split(",", limit = 2) // split only once: logical shape is always ID,value
+        val id = parts[0].trim()
+        val value = parts[1].trim().toBigDecimal()
+        grouped.computeIfAbsent(id) { mutableListOf() }.add(value) // preserve arrival order inside each ID bucket
+    }
+
+    return grouped.map { (id, values) ->
+        val highest = values.maxOrNull()!! // highest is repeated at the front
+        val lowest = values.minOrNull()!!  // lowest is repeated at the end
+
+        buildString {
+            append(id)
+            append(",")
+            append(highest.toPlainString())
+
+            for (value in values) {
+                append(",") // middle section keeps original arrival order
+                append(value.toPlainString())
+            }
+
+            append(",")
+            append(lowest.toPlainString())
+        }
+    }.toTypedArray()
+}
+```
+
+<details>
+<summary>Java version</summary>
+
+```java
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public String[] solution(String[] csv) {
+    Map<String, List<BigDecimal>> grouped = new LinkedHashMap<>();
+
+    for (String line : csv) {
+        String[] parts = line.split(",", 2); // split only once: logical shape is always ID,value
+        String id = parts[0].trim();
+        BigDecimal value = new BigDecimal(parts[1].trim());
+
+        grouped.computeIfAbsent(id, ignored -> new ArrayList<>()).add(value); // preserve arrival order per ID
+    }
+
+    List<String> result = new ArrayList<>();
+
+    for (Map.Entry<String, List<BigDecimal>> entry : grouped.entrySet()) {
+        String id = entry.getKey();
+        List<BigDecimal> values = entry.getValue();
+
+        BigDecimal highest = Collections.max(values); // highest is repeated at the front
+        BigDecimal lowest = Collections.min(values);  // lowest is repeated at the end
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(id).append(",").append(highest.toPlainString());
+
+        for (BigDecimal value : values) {
+            sb.append(",").append(value.toPlainString()); // middle section keeps original arrival order
+        }
+
+        sb.append(",").append(lowest.toPlainString());
+        result.add(sb.toString());
+    }
+
+    return result.toArray(new String[0]);
+}
+```
+
+</details>
+
+**Study notes:**
+
+- use `LinkedHashMap` / `linkedMapOf` so IDs are emitted in first-seen order
+- keep the middle values in arrival order; do not sort them
+- compute `highest` and `lowest` separately from the preserved original list
+- use `BigDecimal`, not `double`, because the prompt is money-shaped
+- if an ID has only one value, that same value appears as `highest`, the single
+  original middle value, and `lowest`
+
+**Advanced variants:**
+
+If the interviewer asks for a more declarative style, you can keep the same
+logic but express the grouping and rendering with `Streams` in Java or a more
+functional `fold` + `map` shape in Kotlin.
+
+**Java stream-oriented variant**
+```java
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public String[] solution(String[] csv) {
+    Map<String, List<BigDecimal>> grouped = Arrays.stream(csv)
+            .map(line -> line.split(",", 2)) // parse into [id, value] pairs first
+            .collect(Collectors.groupingBy(
+                    parts -> parts[0].trim(),
+                    LinkedHashMap::new,
+                    Collectors.mapping(
+                            parts -> new BigDecimal(parts[1].trim()), // parse as decimal, not double
+                            Collectors.toList()
+                    )
+            ));
+
+    return grouped.entrySet().stream()
+            .map(entry -> {
+                String id = entry.getKey();
+                List<BigDecimal> values = entry.getValue();
+                BigDecimal highest = values.stream().max(BigDecimal::compareTo).orElseThrow(); // repeated at the front
+                BigDecimal lowest = values.stream().min(BigDecimal::compareTo).orElseThrow();  // repeated at the end
+
+                String middle = values.stream()
+                        .map(BigDecimal::toPlainString)
+                        .collect(Collectors.joining(",")); // preserve original arrival order in the middle
+
+                return id + "," + highest.toPlainString() + "," + middle + "," + lowest.toPlainString();
+            })
+            .toArray(String[]::new);
+}
+```
+
+**Kotlin more-functional variant**
+```kotlin
+import java.math.BigDecimal
+
+fun solution(csv: Array<String>): Array<String> {
+    val grouped = csv.fold(linkedMapOf<String, MutableList<BigDecimal>>()) { acc, line ->
+        val parts = line.split(",", limit = 2) // split only once into ID and price
+        val id = parts[0].trim()
+        val value = parts[1].trim().toBigDecimal()
+        acc.computeIfAbsent(id) { mutableListOf() }.add(value) // preserve arrival order per ID
+        acc
+    }
+
+    return grouped.map { (id, values) ->
+        val highest = values.maxOrNull()!! // repeated at the front
+        val lowest = values.minOrNull()!!  // repeated at the end
+        val middle = values.joinToString(",") { it.toPlainString() } // keep original order in the middle
+        "$id,${highest.toPlainString()},$middle,${lowest.toPlainString()}"
+    }.toTypedArray()
+}
+```
+
+**Interview caution:** These variants can look cleaner once the invariant is
+already clear. Under time pressure, the simpler loop version is often easier to
+debug and explain.
+
+**Edge cases to clarify before coding:**
+
+- empty input -> return an empty array
+- one row for an ID -> value appears as `highest`, as the single middle value,
+  and again as `lowest`
+- malformed CSV line -> decide whether to fail fast or skip invalid rows
+- missing ID or missing price -> usually treat as invalid input
+- invalid decimal like `APPX,abc` -> fail fast unless the interviewer asks for
+  best-effort parsing
+
+**Interview-safe rule for malformed input:**
+
+> If the prompt does not say to recover from bad rows, I would normally fail
+> fast with a clear exception. If it is more of a data-cleaning task, I would
+> confirm whether invalid rows should be skipped and logged instead.
+
+**Strict parsing helpers**
+
+Kotlin:
+```kotlin
+private fun parseLine(line: String): Pair<String, BigDecimal> {
+    val parts = line.split(",", limit = 2) // strict 2-column parsing
+    require(parts.size == 2) { "Malformed CSV row: $line" }
+
+    val id = parts[0].trim()
+    val rawValue = parts[1].trim()
+
+    require(id.isNotEmpty()) { "Missing ID: $line" }
+    require(rawValue.isNotEmpty()) { "Missing price: $line" }
+
+    return id to rawValue.toBigDecimal()
+}
+```
+
+Java:
+```java
+private Map.Entry<String, BigDecimal> parseLine(String line) {
+    String[] parts = line.split(",", 2); // strict 2-column parsing
+    if (parts.length != 2) {
+        throw new IllegalArgumentException("Malformed CSV row: " + line);
+    }
+
+    String id = parts[0].trim();
+    String rawValue = parts[1].trim();
+
+    if (id.isEmpty()) {
+        throw new IllegalArgumentException("Missing ID: " + line);
+    }
+    if (rawValue.isEmpty()) {
+        throw new IllegalArgumentException("Missing price: " + line);
+    }
+
+    return Map.entry(id, new BigDecimal(rawValue));
+}
+```
+
+**Complexity:** O(n) time overall and O(n) space, where `n` is the number of
+rows. Each row is parsed once and each grouped value is visited once more while
+building the output.
+
+---
+
+### H3c — Count Words in a Log Message
+
+**Prompt:** Given a string such as:
+
+```text
+"java kotlin java spring"
+```
+
+Return a frequency map:
+
+```text
+{java=2, kotlin=1, spring=1}
+```
+
+**Why it comes up:** This is the plainest frequency-map drill. It is useful
+because many interview problems are just this pattern with different nouns.
+
+**Pseudo shape:**
+```text
+split text into tokens
+create empty counter map
+for each token:
+    increment token count
+return final counts
+```
+
+**Kotlin**
+```kotlin
+fun countWords(text: String): Map<String, Int> {
+    if (text.isBlank()) return emptyMap()
+
+    return text.trim()
+        .split(Regex("\\s+")) // split on one-or-more spaces
+        .groupingBy { it }
+        .eachCount() // Kotlin stdlib builds the frequency map for us
+}
+```
+
+<details>
+<summary>Java version</summary>
+
+```java
+public Map<String, Integer> countWords(String text) {
+    Map<String, Integer> counts = new HashMap<>();
+    if (text == null || text.isBlank()) return counts;
+
+    for (String word : text.trim().split("\\s+")) {
+        counts.put(word, counts.getOrDefault(word, 0) + 1); // one running counter per distinct word
+    }
+
+    return counts;
+}
+```
+
+</details>
+
+**Complexity:** O(n) time, O(u) space, where `u` is the number of distinct
+words.
+
+---
+
+### H3d — Sum Sales by Customer
+
+**Prompt:** Given rows of `(customerId, amount)`, return total sales per
+customer.
+
+Example:
+
+```text
+[("C1", 10.50), ("C2", 20.00), ("C1", 4.50)] -> {C1=15.00, C2=20.00}
+```
+
+**Why it comes up:** This is the `aggregate by key` version of the same map
+pattern. In backend work this appears in reconciliation, reporting, and billing
+flows.
+
+**Pseudo shape:**
+```text
+create totals map
+for each row:
+    add amount into totals[customerId]
+return totals
+```
+
+**Kotlin**
+```kotlin
+import java.math.BigDecimal
+
+data class CustomerSale(val customerId: String, val amount: BigDecimal)
+
+fun sumSalesByCustomer(rows: List<CustomerSale>): Map<String, BigDecimal> {
+    val totals = linkedMapOf<String, BigDecimal>()
+
+    for (row in rows) {
+        totals[row.customerId] = (totals[row.customerId] ?: BigDecimal.ZERO) + row.amount // keep one running total per customer
+    }
+
+    return totals
+}
+```
+
+<details>
+<summary>Java version</summary>
+
+```java
+import java.math.BigDecimal;
+
+record CustomerSale(String customerId, BigDecimal amount) {}
+
+public Map<String, BigDecimal> sumSalesByCustomer(List<CustomerSale> rows) {
+    Map<String, BigDecimal> totals = new LinkedHashMap<>();
+
+    for (CustomerSale row : rows) {
+        totals.put(
+            row.customerId(),
+            totals.getOrDefault(row.customerId(), BigDecimal.ZERO).add(row.amount()) // keep one running total per customer
+        );
+    }
+
+    return totals;
+}
+```
+
+</details>
+
+**Complexity:** O(n) time, O(u) space.
+
+---
+
+### H3e — Highest Price Per Category
+
+**Prompt:** Given rows of `(category, price)`, return the highest price seen for
+each category.
+
+Example:
+
+```text
+[("BOOK", 10), ("GAME", 55), ("BOOK", 12)] -> {BOOK=12, GAME=55}
+```
+
+**Why it comes up:** This is the `best-so-far per key` pattern. It appears in
+questions like highest score per player, latest timestamp per order, or maximum
+price per product family.
+
+**Pseudo shape:**
+```text
+create best-per-key map
+for each row:
+    if key unseen: store value
+    else store max(currentBest, newValue)
+return map
+```
+
+**Kotlin**
+```kotlin
+import java.math.BigDecimal
+
+data class CategoryPrice(val category: String, val price: BigDecimal)
+
+fun highestPricePerCategory(rows: List<CategoryPrice>): Map<String, BigDecimal> {
+    val best = linkedMapOf<String, BigDecimal>()
+
+    for (row in rows) {
+        val current = best[row.category]
+        if (current == null || row.price > current) {
+            best[row.category] = row.price // replace only when the new row beats the current best
+        }
+    }
+
+    return best
+}
+```
+
+<details>
+<summary>Java version</summary>
+
+```java
+import java.math.BigDecimal;
+
+record CategoryPrice(String category, BigDecimal price) {}
+
+public Map<String, BigDecimal> highestPricePerCategory(List<CategoryPrice> rows) {
+    Map<String, BigDecimal> best = new LinkedHashMap<>();
+
+    for (CategoryPrice row : rows) {
+        BigDecimal current = best.get(row.category());
+        if (current == null || row.price().compareTo(current) > 0) {
+            best.put(row.category(), row.price()); // replace only when the new row beats the current best
+        }
+    }
+
+    return best;
+}
+```
+
+</details>
+
+**Complexity:** O(n) time, O(u) space.
+
+---
+
 ### H4 — Explain How HashMap Collisions Are Handled
 
-**Prompt:** In a technical screen or review, you may be asked: "What happens if two keys land in
+**Prompt:** In an interview, you may be asked: "What happens if two keys land in
 the same bucket in a `HashMap`?"
 
 **Why it comes up:** This is a common follow-up when you use `HashMap` in a coding
-round. The goal is to check whether you understand the data structure, not
+round. The interviewer is checking whether you understand the data structure, not
 just the pattern.
 
 **Short answer:**
@@ -610,7 +1170,7 @@ If you use a custom key type, lookup depends on both:
 
 If you forget them, two logically identical keys may not match.
 
-**Short safe sentence:**
+**Interview-safe sentence:**
 
 > A collision means different keys share one internal bucket, not that the same key was inserted twice. If the same key appears again, the value is replaced. If different keys share a bucket, Java compares the real keys with `equals()` to find the right entry.
 
@@ -656,8 +1216,8 @@ return not found
 
 Why linked-list basics still matter:
 
-- you do not need to implement `HashMap` from scratch in most coding rounds
-- but you may still be asked why collisions can make lookup slower
+- you do not need to implement `HashMap` from scratch in interviews
+- but interviewers may still ask why collisions can make lookup slower
 - the answer is that a crowded bucket stops looking like one direct array lookup and starts looking more like walking a short linked structure
 
 That is the real connection:
@@ -668,7 +1228,7 @@ That is the real connection:
 Modern Java note:
 
 - newer JVMs can turn a very crowded bucket into a tree instead of keeping it as a simple linked structure
-- but the practical idea is still the same: collision means extra structure and extra comparisons inside one bucket
+- but the interview-level idea is still the same: collision means extra structure and extra comparisons inside one bucket
 
 ---
 
@@ -878,7 +1438,7 @@ That is why the map stores the last index, not just presence:
 - a `set` tells you **that** a duplicate exists
 - `lastSeen[char] = index` tells you **how far left must move**
 - the `set` version is still valid, but it shrinks the window step by step
-- the index-map version is usually the cleaner answer for this exact problem
+- the index-map version is usually the cleaner interview answer for this exact problem
 
 <details>
 <summary>Java version</summary>
@@ -983,7 +1543,7 @@ public int[] twoSumSorted(List<Integer> amounts, int target) {
     int right = amounts.size() - 1;
 
     while (left < right) {
-        int sum = amounts.get(left) + amounts.get(right);
+        int sum = amounts.get(left) + amounts.get(right); // current candidate built from the outer pair
         if (sum == target) {
             return new int[] { left, right };
         }
@@ -1107,7 +1667,7 @@ keeping the sorted-half invariant straight under pressure.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `rotated-search`
+- revisit this as a binary-search hedge under time pressure
 
 ---
 
@@ -1190,7 +1750,7 @@ public ListNode reverseList(ListNode head) {
 
 **Why this still matters outside pure linked-list questions:**
 - one classic collision strategy in hash tables is `separate chaining`
-- you are usually not asked to implement a full `HashMap`, but you may still be asked why linked structures matter inside buckets
+- you are usually not asked to implement a full `HashMap`, but interviewers may still ask why linked structures matter inside buckets
 - the point is not memorizing internals, but showing that you understand how entries can be traversed safely when many keys share one bucket
 
 ---
@@ -1341,7 +1901,7 @@ public boolean isProperlyNested(String text) {
 
 **Prompt:** Implement a stack that supports `push`, `pop`, and `getMin` in `O(1)` time.
 
-**Why it comes up:** Common follow-up variant once you can already handle a basic stack.
+**Why it comes up:** Common interview variant once the interviewer knows you can use a basic stack.
 Also useful for explaining why one structure can track another in parallel.
 
 **Pseudo shape:**
@@ -1442,7 +2002,7 @@ scan.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `calculator-ii`
+- parser and operator-precedence drills of this shape
 
 ---
 
@@ -1452,7 +2012,7 @@ scan.
 
 **Why it comes up:** This is the stronger parser follow-up after `Calculator II`.
 The arithmetic is simple, but the state management is easier to break during a
-live session.
+live interview.
 
 **Core move:**
 
@@ -1470,7 +2030,7 @@ live session.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `basic-calculator`
+- same family as parentheses and state-stack expression parsing
 
 ---
 
@@ -1480,7 +2040,7 @@ live session.
 
 **Prompt:** Given a list of event types, return the `k` most frequent ones.
 
-**Why it comes up:** This is one of the most common heap-style coding drills.
+**Why it comes up:** This is one of the most common heap-style interview questions.
 
 **Pseudo shape:**
 ```text
@@ -1591,7 +2151,7 @@ coding. It forces you to defend the invariant, not just the API.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `median-stream`
+- same family as running median and two-heap balancing
 
 ---
 
@@ -1624,7 +2184,7 @@ set because it tests both data-structure choice and implementation discipline.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `lru-cache`
+- same family as LRU cache and map-plus-linked-structure design
 
 ---
 
@@ -1652,7 +2212,7 @@ better backend-flavored live-coding discussion than another exotic tree problem.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `rate-limiter`
+- same family as queue/window-based throttling design
 
 ---
 
@@ -1819,7 +2379,7 @@ public Set<String> affectedServices(
         }
     }
 
-    Set<String> affected = new HashSet<>();
+    Set<String> affected = new HashSet<>(); // visited set doubles as the final answer
     dfsAffected(failed, dependedOnBy, affected); // walk outward from the failed dependency
     return affected;
 }
@@ -1987,7 +2547,7 @@ public boolean hasCircularDependency(Map<String, List<String>> graph) {
     Set<String> inStack = new HashSet<>();
 
     for (String node : graph.keySet()) {
-        if (!visited.contains(node) && dfsCycle(node, graph, visited, inStack)) {
+        if (!visited.contains(node) && dfsCycle(node, graph, visited, inStack)) { // cover disconnected components too
             return true;
         }
     }
@@ -2044,7 +2604,7 @@ enough to expose traversal bugs immediately.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `number-of-islands`
+- same family as BFS/DFS island counting and flood fill
 
 ---
 
@@ -2075,7 +2635,7 @@ force to bottom-up reuse clearly.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `coin-change`
+- same family as bottom-up DP change-making
 
 ---
 
@@ -2106,13 +2666,13 @@ puzzle. It tests clean modeling, order of application, and failure handling.
 
 - "The priority order is business logic, so I want it explicit."
 - "I am not over-generalizing this into a framework."
-- "If the discussion pushes further, I can discuss partial rollback, persistence, and idempotency next."
+- "If the interviewer pushes, I can discuss partial rollback, persistence, and idempotency next."
 
 **Complexity:** `O(number of sources)` time, `O(number of allocation steps)` output space.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `payment-priority`
+- same family as greedy allocation under priority rules
 
 ---
 
@@ -2124,7 +2684,7 @@ puzzle. It tests clean modeling, order of application, and failure handling.
 - returns the same result on retries
 - rejects debits that would make balance negative
 
-**Why it comes up:** This is a very high-signal "payments correctness"
+**Why it comes up:** This is a very interview-useful "payments correctness"
 exercise. The coding part is simple; the follow-up discussion is where the value
 is.
 
@@ -2145,7 +2705,7 @@ is.
 
 **Runnable companion:**
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md) -> `wallet-ledger`
+- same family as idempotent ledger and request-key state updates
 
 ---
 
@@ -2217,7 +2777,7 @@ HAVING COUNT(*) = COUNT(CASE WHEN status = 'SHIPPED' THEN 1 END);
 ```
 
 **Pattern:** `NOT EXISTS` subquery or `HAVING COUNT(*) = COUNT(condition)`.
-Know both — a follow-up may ask "can you do it another way?"
+Know both — interviewers sometimes ask "can you do it another way?"
 
 ---
 
@@ -2245,7 +2805,7 @@ HAVING MAX(o.created_at) < NOW() - INTERVAL '90 days'
 ```
 
 **Pattern:** `LEFT JOIN + GROUP BY + HAVING`. The `IS NULL` case (never ordered)
-is a common edge case to check.
+is the edge case interviewers look for.
 
 ---
 
@@ -2350,14 +2910,14 @@ public void deductStock(Long productId, int quantity) {
             "SELECT p FROM Product p WHERE p.id = :id",
             Product.class
         )
-        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+        .setLockMode(LockModeType.PESSIMISTIC_WRITE) // lock the row so concurrent writers cannot oversell
         .setParameter("id", productId)
         .getSingleResult();
 
     if (product.getStock() < quantity) {
         throw new IllegalStateException("Insufficient stock");
     }
-    product.setStock(product.getStock() - quantity);
+    product.setStock(product.getStock() - quantity); // update happens while the row is still locked
 }
 
 @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -2386,7 +2946,7 @@ under high load creates a queue that can timeout.
 
 ---
 
-## Language Tips
+## Interview Tips — Language-Specific
 
 **Kotlin: use stdlib, don't reinvent:**
 
@@ -2419,7 +2979,7 @@ stack.removeLast()      // pop                    — DFS iterative
 
 - `ArrayDeque` is the normal Kotlin default for queue and stack work.
 - Kotlin `ArrayDeque` is not thread-safe.
-- Kotlin does not have a dedicated stdlib linked list for coding drills.
+- Kotlin does not have a dedicated stdlib linked list for interview problems.
 - If the problem is a linked-list problem, define `ListNode` directly instead of trying to force a collection type into it.
 - `groupingBy { }.eachCount()` is Kotlin's short way to build a frequency map.
 - `withIndex()` gives you `(index, value)` pairs while iterating.
@@ -2442,7 +3002,7 @@ linked.add("B");
 // Java LinkedList = doubly linked list, but ArrayDeque is the usual stack/queue default
 ```
 
-- `ArrayDeque` is the normal Java default for stack and queue operations in coding drills.
+- `ArrayDeque` is the normal Java default for stack and queue operations in interviews.
 - `ArrayDeque` does not allow `null`, and it is not thread-safe.
 - `LinkedList` is useful to recognize, but it is usually not the best first choice for stack/queue problems.
 - `Stack` is legacy. Prefer `Deque` / `ArrayDeque`.
@@ -2463,13 +3023,13 @@ minHeap.poll(); // 1 = smallest item first, not first item inserted
 
 - a normal queue is FIFO
 - a priority queue removes by priority, usually smallest-first in Java unless you reverse the comparator
-- `PriorityQueue` is the right default for heap-style drills like `top k`, `merge k sorted lists`, or "always process smallest/earliest next"
+- `PriorityQueue` is the right default for heap-style interview problems like `top k`, `merge k sorted lists`, or "always process smallest/earliest next"
 
 </details>
 
 **Concurrency note for containers:**
 
-- `ArrayDeque`, `LinkedList`, and `PriorityQueue` are normal single-threaded defaults; do not call them thread-safe unless the discussion is about concurrency
+- `ArrayDeque`, `LinkedList`, and `PriorityQueue` are normal single-threaded defaults; do not call them thread-safe in an interview
 - for multi-threaded FIFO work on the JVM, know `ConcurrentLinkedQueue` (`offer`/`poll` are non-blocking)
 - for multi-threaded stack/deque work, know `ConcurrentLinkedDeque`
 - for producer-consumer handoff where threads should wait, know `BlockingQueue` implementations like `LinkedBlockingQueue` or `ArrayBlockingQueue` (`put`/`take` can block)
@@ -2480,4 +3040,4 @@ minHeap.poll(); // 1 = smallest item first, not first item inserted
 - No `new ArrayList<>()` → `mutableListOf()`
 - No `map.getOrDefault(k, 0) + 1` → `(map[k] ?: 0) + 1`
 - No `Collections.min/max` → `.min()` / `.max()`
-- Destructuring, `when`, extension functions: all fair game in live coding
+- Destructuring, `when`, extension functions — all fair game in interviews

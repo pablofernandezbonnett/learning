@@ -26,13 +26,13 @@ of exercises repeatedly.
 
 Use the runnable companion here:
 
-- [live-coding-companion/README.md](./live-coding-companion/README.md)
+- [labs/algorithms-live-coding/README.md](../../labs/algorithms-live-coding/README.md)
 
 Note: this path prioritizes conceptual clarity over implementing low-level structures. For `HashMap` internals (buckets, collisions, load factor, resize behaviour), prefer a concise spoken explanation and the H4 exposition in `02-coding-round-drills.md` rather than coding a full reimplementation under time pressure.
 
 ### Highest-return exercise map
 
-- `Hash map / strings / arrays`: `H1/H2/H3` in [02-coding-round-drills.md](./02-coding-round-drills.md) plus `longest-substring`, `top-k-frequent`, and `event-dedup` in the companion
+- `Hash map / strings / arrays`: `H1/H1c/H2/H3/H3b/H3c/H3d/H3e` in [02-coding-round-drills.md](./02-coding-round-drills.md) plus `longest-substring`, `top-k-frequent`, and `event-dedup` in the companion
 - `Grid BFS / DFS`: `G4` in [02-coding-round-drills.md](./02-coding-round-drills.md) plus `number-of-islands` in the companion
 - `Stack / queue basics`: `calculator-ii` and `producer-consumer` in the companion
 - `Data-structure design`: `lru-cache`, `rate-limiter`, and `cache-aside` in the companion

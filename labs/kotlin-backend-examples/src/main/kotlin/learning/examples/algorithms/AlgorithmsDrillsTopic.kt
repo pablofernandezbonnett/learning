@@ -2,6 +2,7 @@ package learning.examples.algorithms
 
 import learning.examples.common.Console
 import learning.examples.common.Topic
+import java.math.BigDecimal
 import java.util.PriorityQueue
 
 object AlgorithmsDrillsTopic : Topic {
@@ -27,8 +28,42 @@ object AlgorithmsDrillsTopic : Topic {
             firstUniqueOrderId(listOf("A1", "B2", "A1", "C3", "B2")),
         )
         Console.result(
+            "first duplicate event ID",
+            firstDuplicateEventId(listOf("A", "B", "C", "B", "A")),
+        )
+        Console.result(
             "two products within budget 4980",
             twoProductsBudget(listOf(2990, 4990, 1990, 5990), 4980),
+        )
+        Console.result(
+            "count words",
+            countWords("java kotlin java spring"),
+        )
+        Console.result(
+            "sum sales by customer",
+            sumSalesByCustomer(
+                listOf(
+                    CustomerSale("C1", BigDecimal("10.50")),
+                    CustomerSale("C2", BigDecimal("20.00")),
+                    CustomerSale("C1", BigDecimal("4.50")),
+                ),
+            ),
+        )
+        Console.result(
+            "highest price per category",
+            highestPricePerCategory(
+                listOf(
+                    CategoryPrice("BOOK", BigDecimal("10.00")),
+                    CategoryPrice("GAME", BigDecimal("55.00")),
+                    CategoryPrice("BOOK", BigDecimal("12.00")),
+                ),
+            ),
+        )
+        Console.result(
+            "summarize CSV prices by ID",
+            summarizeCsvPricesById(
+                arrayOf("APPX,150.00", "AMMZ, 145.00", " APPX, 145.00", "AMMZ, 175.00"),
+            ).toList(),
         )
     }
 
@@ -117,9 +152,19 @@ object AlgorithmsDrillsTopic : Topic {
 private fun firstUniqueOrderId(orderIds: List<String>): String? {
     val count = linkedMapOf<String, Int>()
     for (id in orderIds) {
-        count[id] = (count[id] ?: 0) + 1
+        count[id] = (count[id] ?: 0) + 1 // preserve insertion order so we can return the first unique item
     }
     return count.entries.firstOrNull { it.value == 1 }?.key
+}
+
+private fun firstDuplicateEventId(ids: List<String>): String? {
+    val seen = mutableSetOf<String>()
+
+    for (id in ids) {
+        if (!seen.add(id)) return id // add(...) returns false once the value was already seen
+    }
+
+    return null
 }
 
 private fun twoProductsBudget(prices: List<Int>, budget: Int): Pair<Int, Int> {
@@ -131,6 +176,66 @@ private fun twoProductsBudget(prices: List<Int>, budget: Int): Pair<Int, Int> {
         seen[price] = index
     }
     error("No solution found")
+}
+
+private fun countWords(text: String): Map<String, Int> {
+    if (text.isBlank()) return emptyMap()
+
+    return text.trim()
+        .split(Regex("\\s+")) // treat repeated spaces as one separator
+        .groupingBy { it }
+        .eachCount()
+}
+
+private data class CustomerSale(
+    val customerId: String,
+    val amount: BigDecimal,
+)
+
+private fun sumSalesByCustomer(rows: List<CustomerSale>): Map<String, BigDecimal> {
+    val totals = linkedMapOf<String, BigDecimal>()
+
+    for (row in rows) {
+        totals[row.customerId] = (totals[row.customerId] ?: BigDecimal.ZERO).add(row.amount) // one running total per customer
+    }
+
+    return totals
+}
+
+private data class CategoryPrice(
+    val category: String,
+    val price: BigDecimal,
+)
+
+private fun highestPricePerCategory(rows: List<CategoryPrice>): Map<String, BigDecimal> {
+    val best = linkedMapOf<String, BigDecimal>()
+
+    for (row in rows) {
+        val current = best[row.category]
+        if (current == null || row.price > current) {
+            best[row.category] = row.price // replace only when the new row beats the current best
+        }
+    }
+
+    return best
+}
+
+private fun summarizeCsvPricesById(csv: Array<String>): Array<String> {
+    val grouped = linkedMapOf<String, MutableList<BigDecimal>>()
+
+    for (line in csv) {
+        val parts = line.split(",", limit = 2) // split only once into ID and price
+        val id = parts[0].trim()
+        val value = parts[1].trim().toBigDecimal()
+        grouped.computeIfAbsent(id) { mutableListOf() }.add(value) // keep original arrival order per ID
+    }
+
+    return grouped.map { (id, values) ->
+        val highest = values.maxOrNull()!! // repeated at the front
+        val lowest = values.minOrNull()!! // repeated at the end
+        val middle = values.joinToString(",") { it.toPlainString() } // keep original order in the middle
+        "$id,${highest.toPlainString()},$middle,${lowest.toPlainString()}"
+    }.toTypedArray()
 }
 
 private fun minTransactionsCoveringRefund(amounts: IntArray, target: Int): Int {
