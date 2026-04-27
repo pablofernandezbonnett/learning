@@ -16,9 +16,10 @@ The focus is reasoning about:
 
 1. [backend-system-principles.md](./backend-system-principles.md): compact principles worth keeping warm
 2. [practical-checkout-design.md](./practical-checkout-design.md): simple, practical way to learn checkout design without starting from jargon
-3. [system-design-guide.md](./system-design-guide.md): a reusable structure for correctness-critical backend design
-4. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): bean lifecycle, transaction lifecycle, and business flows kept separate
-5. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows
+3. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): short decision guide for common architecture choices like SQL vs NoSQL or monolith vs microservices
+4. [system-design-guide.md](./system-design-guide.md): a reusable structure for correctness-critical backend design
+5. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): bean lifecycle, transaction lifecycle, and business flows kept separate
+6. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows
 
 ## Working Rule
 

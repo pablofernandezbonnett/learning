@@ -39,6 +39,7 @@ Licensing details are in `LICENSE`.
 Use one of these entry points depending on what you need:
 
 - `paths/general-refresh.md`: a broad backend refresh path
+- `paths/appsec-for-software-engineers.md`: a practical AppSec path for developers
 - `topics/`: topic-by-topic notes, usually split into `Refresh`, `Required`, and `Growth`
 - `labs/`: runnable companion material
 
