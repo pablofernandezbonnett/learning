@@ -185,6 +185,14 @@ That last point matters.
 The real senior move is not "pick NoSQL".
 The real senior move is "pick the storage model that matches the invariant and access pattern".
 
+In practice, many real systems are hybrid:
+
+- Postgres for transactional truth
+- MongoDB for document-shaped application data where that shape really helps
+- Redis for cache, sessions, counters, or fast coordination
+
+That is often more realistic than trying to make one store fit every access pattern.
+
 ---
 
 ## 8. Interview Conversion
