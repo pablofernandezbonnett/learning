@@ -219,7 +219,26 @@ Short rule:
 
 ---
 
-## 7. Choice By Use Case
+## 7. Quick Comparison
+
+| Question | SQL | Document NoSQL | Redis |
+|---|---|---|---|
+| Data shape | Structured and relational | Flexible, document-shaped | Key-value or simple shared state |
+| Best for | Orders, payments, inventory truth | Catalogs, profiles, content | Cache, sessions, counters, rate limits |
+| Relationships | Strong joins and constraints | Usually denormalized reads | Not a join-oriented store |
+| Consistency | Strong default for critical writes | Varies by model and workflow | Usually not the final truth |
+| Scaling pattern | Start simple, then scale carefully | Often chosen for access-pattern-heavy reads | Added mainly for latency and hot shared state |
+| Main risk | Overusing it for clearly denormalized read models | Using it for cross-entity correctness without enough care | Letting it become accidental source of truth |
+
+Short reading of the table:
+
+- SQL is usually the safest default for business-critical state
+- document NoSQL fits when one whole record is the main unit of read and write
+- Redis usually supports the system rather than owning the main business data
+
+---
+
+## 8. Choice By Use Case
 
 ### Checkout, orders, or payments
 
@@ -251,7 +270,7 @@ Short rule:
 
 ---
 
-## 8. The Big Traps
+## 9. The Big Traps
 
 1. **Choosing NoSQL just because scale sounds impressive**
    Example: a normal order system loses useful constraints and joins for no real gain.
@@ -267,15 +286,23 @@ Short rule:
 
 ---
 
-## 9. 20-Second Answer
+## 10. 20-Second Answer
 
 > I choose storage by the business rule first. For payments, orders, and inventory truth I usually start with SQL because transactions, constraints, and concurrency safety matter most. For highly variable records that are usually read as one object, a document store can fit better. Redis is usually a support layer for cache, sessions, counters, or short-lived coordination, not my main source of truth.
 
 ---
 
-## 10. What To Internalize
+## 11. What To Internalize
 
 - SQL is usually the default for correctness-sensitive write paths
 - document NoSQL fits access-pattern-heavy, denormalized records
 - Redis usually supports the system rather than owning the final truth
 - the real question is not "which database is better?" but "which tradeoff is correct for this domain?"
+
+In practice, many modern systems are hybrid:
+
+- SQL for the transactional core
+- document storage where flexible read shape is the main win
+- Redis for cache, sessions, counters, or other fast shared state
+
+That is often a stronger design than trying to force one store to do every job.
