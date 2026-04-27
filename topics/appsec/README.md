@@ -48,6 +48,12 @@ Focus:
 - [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/): deliberately vulnerable modern web app
 - [OWASP WebGoat](https://owasp.org/www-project-webgoat/): guided insecure training app
 
+## Related Internal Topics
+
+- [../security/README.md](../security/README.md): deeper backend security notes already present in this repo
+- [../spring-boot/16-appsec-authz-lab.md](../spring-boot/16-appsec-authz-lab.md): focused Spring authorization lab
+- [../architecture/04-networking-fundamentals.md](../architecture/04-networking-fundamentals.md): longer networking and HTTP refresher
+
 ## Core Rule
 
 - do not study AppSec as a glossary
