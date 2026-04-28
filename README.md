@@ -65,9 +65,30 @@ Jump directly into a topic entry point:
 - [Dart](./topics/dart/README.md)
 - [Lua](./topics/lua/README.md)
 
-- `Refresh`: fast reopen order for rusty but important topics
-- `Required`: material that matters often in day-to-day backend work
-- `Growth`: deeper topics worth studying once the core feels stable
+## Current Focus
+
+The first migration wave is centered on:
+
+- [Java](./topics/java/README.md)
+- [Kotlin](./topics/kotlin/README.md)
+- [Spring Boot](./topics/spring-boot/README.md)
+- [Databases](./topics/databases/README.md)
+- [API design](./topics/api/README.md)
+- [Architecture](./topics/architecture/README.md)
+- [System design](./topics/system-design/README.md)
+- [Security](./topics/security/README.md)
+- [Cloud](./topics/cloud/README.md)
+- [DevOps](./topics/devops/README.md)
+- [Testing](./topics/testing/README.md)
+- [Algorithms](./topics/algorithms/README.md)
+
+See `docs/migration-status.md` for the current migration scope and cleanup rules.
+
+Most topic folders use the same simple layering:
+
+- `Refresh`: the shortest useful reopen order when you are rusty
+- `Required`: the topics that show up often in real backend work
+- `Growth`: deeper material worth studying once the core feels stable
 
 ## Contributions
 
