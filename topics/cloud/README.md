@@ -2,6 +2,9 @@
 
 Use this folder to learn cloud from the runtime model first, not from provider
 product names alone.
+The practical question is always the same: which part of the system you own,
+which part the platform owns, and what operational tradeoff comes with that
+boundary.
 
 Focus:
 
@@ -13,10 +16,10 @@ Focus:
 
 ## Recommended Order
 
-1. [01-cloud-basics.md](./01-cloud-basics.md)
-2. [02-kubernetes-and-terraform-for-backend-engineers.md](./02-kubernetes-and-terraform-for-backend-engineers.md)
-3. [03-serverless-for-backend-engineers.md](./03-serverless-for-backend-engineers.md)
-4. [04-container-sizing-and-observability.md](./04-container-sizing-and-observability.md)
+1. [01-cloud-basics.md](./01-cloud-basics.md): the shared mental model behind regions, networks, managed services, and responsibility boundaries
+2. [02-kubernetes-and-terraform-for-backend-engineers.md](./02-kubernetes-and-terraform-for-backend-engineers.md): when container orchestration and infrastructure-as-code help, and what they cost
+3. [03-serverless-for-backend-engineers.md](./03-serverless-for-backend-engineers.md): when functions and managed runtimes speed you up and when they become awkward
+4. [04-container-sizing-and-observability.md](./04-container-sizing-and-observability.md): how memory, CPU, request load, and visibility interact once the service is running
 
 ## Refresh
 
