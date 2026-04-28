@@ -43,22 +43,44 @@ Use one of these entry points depending on what you need:
 - `topics/`: topic-by-topic notes, usually split into `Refresh`, `Required`, and `Growth`
 - `labs/`: runnable companion material
 
+## Topic Index
+
+Jump directly into a topic entry point:
+
+- [Java](./topics/java/README.md)
+- [Kotlin](./topics/kotlin/README.md)
+- [Spring Boot](./topics/spring-boot/README.md)
+- [Databases](./topics/databases/README.md)
+- [API Design](./topics/api/README.md)
+- [Architecture](./topics/architecture/README.md)
+- [System Design](./topics/system-design/README.md)
+- [Security](./topics/security/README.md)
+- [AppSec](./topics/appsec/README.md)
+- [Cloud](./topics/cloud/README.md)
+- [DevOps](./topics/devops/README.md)
+- [Testing](./topics/testing/README.md)
+- [Algorithms](./topics/algorithms/README.md)
+- [Go](./topics/go/README.md)
+- [Python](./topics/python/README.md)
+- [Dart](./topics/dart/README.md)
+- [Lua](./topics/lua/README.md)
+
 ## Current Focus
 
 The first migration wave is centered on:
 
-- Java
-- Kotlin
-- Spring Boot
-- Databases
-- API design
-- Architecture
-- System design
-- Security
-- Cloud
-- DevOps
-- Testing
-- Algorithms
+- [Java](./topics/java/README.md)
+- [Kotlin](./topics/kotlin/README.md)
+- [Spring Boot](./topics/spring-boot/README.md)
+- [Databases](./topics/databases/README.md)
+- [API design](./topics/api/README.md)
+- [Architecture](./topics/architecture/README.md)
+- [System design](./topics/system-design/README.md)
+- [Security](./topics/security/README.md)
+- [Cloud](./topics/cloud/README.md)
+- [DevOps](./topics/devops/README.md)
+- [Testing](./topics/testing/README.md)
+- [Algorithms](./topics/algorithms/README.md)
 
 See `docs/migration-status.md` for the current migration scope and cleanup rules.
 Most topic folders preserve the practical layering of:
