@@ -20,7 +20,7 @@ This folder exists so you can also run the exact problem shapes that matter most
 for practical coding practice:
 
 - time-boxed problem solving
-- `heap + stream` questions that need visible invariants
+- `heap + stream` questions where you need to keep one clear rule true while data keeps arriving
 - `calculator / parser` exercises where edge cases matter more than speed
 - `data-structure design` questions that need tradeoff discussion
 - `mini machine-coding` exercises that feel closer to backend work than puzzles
@@ -74,14 +74,14 @@ Run the full curated set:
 9. `event-dedup` -> hash-set dedup for at-least-once delivery
 10. `retry-backoff` -> transient vs permanent failure handling
 11. `pagination-merge` -> two pointers on sorted pages plus duplicate filtering
-12. `producer-consumer` -> blocking queue, FIFO processing, and backpressure
+12. `producer-consumer` -> blocking queue, FIFO processing, and natural slowdown when consumers cannot keep up
 
 ### Supporting hedge (`keep available, not primary`)
 
 13. `ascii-pyramid` -> nested loops, spacing arithmetic, and centered rendering
 14. `container-queries` -> `HashSet` vs frequency-map judgment for `ADD` / `EXISTS` / `REMOVE`
-15. `rotated-search` -> binary-search invariants
-16. `median-stream` -> two heaps and balancing invariants
+15. `rotated-search` -> keeping the "one half is still sorted" rule straight under pressure
+16. `median-stream` -> two heaps and the balancing rule that keeps median lookup cheap
 17. `basic-calculator` -> parentheses, sign handling, state stack
 18. `coin-change` -> bottom-up dynamic programming
 19. `payment-priority` -> prioritized payment-source allocation
@@ -126,6 +126,6 @@ These are worth rehearsing aloud, but they do not need more runnable examples:
 For each exercise:
 
 1. solve it yourself first
-2. say the invariant or state model aloud
+2. say the invariant or state model aloud, meaning the rule your current data structure must keep true
 3. explain the time and space tradeoff
 4. only then compare with the runnable version
