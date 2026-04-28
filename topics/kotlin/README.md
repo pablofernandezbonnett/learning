@@ -20,5 +20,5 @@ and backend service design.
 
 - Kotlin is most valuable when it improves correctness and readability
 - null safety and coroutines are the biggest mindset shifts
-- Kotlin backend code should stay simple, not become DSL theater
+- Kotlin backend code should stay simple; clever DSL-style code is rarely the goal
 - value classes and scope functions are useful, but only with restraint
