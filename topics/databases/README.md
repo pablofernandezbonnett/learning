@@ -2,13 +2,16 @@
 
 Use this folder to refresh the database topics that most often decide backend
 correctness and performance.
+The emphasis is not just on SQL syntax.
+It is on the places where data modeling, transactions, retries, and concurrency
+directly decide whether the business result is correct.
 
 Focus:
 
-- idempotency and transaction safety
-- database concurrency and locking
-- SQL judgment beyond ORM convenience
-- store choice, scaling, and database-specific tradeoffs
+- idempotency and transaction safety, meaning the same request can be retried without creating a second business result by accident
+- database concurrency and locking, meaning what protects you when two writes overlap on the same data
+- SQL judgment beyond ORM convenience, because production behavior still depends on query shape and indexes
+- store choice, scaling, and database-specific tradeoffs instead of one vague "NoSQL vs SQL" debate
 
 ## Recommended Order
 
