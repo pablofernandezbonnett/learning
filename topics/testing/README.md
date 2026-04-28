@@ -1,6 +1,9 @@
 # Testing for Backend Engineers
 
 Use this folder for practical testing strategy, clean code, and review judgment.
+The goal is not to maximize test count.
+The goal is to choose the smallest test surface that gives real confidence for
+the risk you are carrying.
 
 Focus:
 
@@ -10,8 +13,8 @@ Focus:
 
 ## Recommended Order
 
-1. [01-testing-strategies.md](./01-testing-strategies.md)
-2. [02-clean-code-and-code-review.md](./02-clean-code-and-code-review.md)
+1. [01-testing-strategies.md](./01-testing-strategies.md): how to choose unit, integration, and end-to-end tests by failure risk rather than by habit
+2. [02-clean-code-and-code-review.md](./02-clean-code-and-code-review.md): how code shape affects testability, review quality, and long-term change cost
 
 ## Core Rule
 
