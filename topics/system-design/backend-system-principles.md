@@ -2,34 +2,44 @@
 
 > Primary fit: `Shared core`
 
-Keep these warm. They form a compact system-design backbone.
+Keep these warm.
+They form a compact system-design backbone for the rest of the repo.
 
-Use this as a recall card, not as a primary study document.
+Use this as a recall card, not as a primary study document, but it should still
+be readable even when the topic is rusty.
 
 ---
 
 ## 1. Design for Failure
 
-Systems fail.
-Networks fail.
-Dependencies fail.
+Assume that networks time out, dependencies slow down, and workers crash in the
+middle of a flow.
+The important design question is not "can this fail?" but "what does the system
+do next when it fails?"
 
-Always design recovery paths.
+Always design recovery paths, not only happy paths.
 
 ---
 
 ## 2. Idempotency is Mandatory
 
-Distributed systems retry.
-Every critical operation must tolerate duplicates.
+Distributed systems retry because clients retry, workers retry, and providers
+sometimes send the same callback or event more than once.
+An operation is idempotent when repeating the same request does not create a
+second business result by accident.
+
+For money, orders, reservations, and webhooks, duplicate safety is not a nice
+extra. It is part of correctness.
 
 ---
 
 ## 3. Separate Consistency Domains
 
-Inventory != Orders != Payments
-
-Different rules → different boundaries.
+Inventory, orders, and payments do not all need the same rules at the same
+time.
+Each domain has its own write rules, failure modes, and recovery path, so do
+not force the whole workflow into one fake boundary just because the user sees
+one button click.
 
 ---
 
@@ -45,6 +55,10 @@ Writes:
 - locking strategy
 - throughput control
 
+Read traffic is usually about serving data faster and cheaper.
+Write traffic is usually about protecting correctness under contention.
+If you mix those two problems together, you often pick the wrong tool.
+
 ---
 
 ## 5. Cache Improves Performance but Risks Correctness
@@ -57,12 +71,21 @@ Never cache:
 - final payment state
 - order confirmation
 
+Cache is a speed tool, not the final authority on business truth.
+Use it where slightly stale data is acceptable, and stay cautious where one
+wrong read can produce a wrong charge, wrong reservation, or wrong user promise.
+
 ---
 
 ## 6. Source of Truth Must Be Clear
 
-Redis is not a source of truth.
-Databases define consistency.
+The source of truth is the durable place whose final state you trust when
+systems disagree.
+That might be a relational database, a ledger table, or another durable store,
+but it should be explicit.
+
+Redis is often useful for speed or coordination.
+That does not automatically make it the final business authority.
 
 ---
 
@@ -72,7 +95,11 @@ Async communication:
 - improves resilience
 - increases complexity
 
-Use when independence matters.
+Use asynchronous events when independence between components really matters, not
+just because a broker feels more advanced.
+The win is looser coupling.
+The cost is retries, duplicate handling, replay logic, and more operational
+visibility work.
 
 ---
 
@@ -80,6 +107,11 @@ Use when independence matters.
 
 Logs, metrics, tracing:
 If you cannot see it, you cannot operate it.
+
+If a design only works when everything is healthy and everyone guesses from raw
+logs during failure, the design is incomplete.
+You need enough visibility to see slow paths, stuck work, retries, and business
+outcomes such as pending orders or failed payments.
 
 ---
 
@@ -91,6 +123,10 @@ Design decisions must reflect:
 - user experience
 - operational cost
 
+Good architecture is not a technology shopping list.
+It is a set of tradeoffs shaped by what the business cannot afford to get wrong,
+what the user can tolerate, and what the team can realistically operate.
+
 ---
 
 ## 10. Simplicity Scales Better Than Cleverness
@@ -98,6 +134,10 @@ Design decisions must reflect:
 Prefer clarity.
 Prefer predictable systems.
 Avoid premature complexity.
+
+Simple does not mean naive.
+It means every component has a reason to exist, every failure path is legible,
+and the team can explain the system without hand-waving.
 
 ---
 
