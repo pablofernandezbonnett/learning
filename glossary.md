@@ -305,6 +305,54 @@ the broker redelivers the message (at-least-once delivery).
 
 ## Application Patterns & Architecture
 
+### Invariant
+**A business rule that must always stay true.** Not a math word for its own
+sake, but a way to name the rule your system is protecting.
+
+**Practical use:** "The checkout invariant is that one purchase intent must not
+create two final orders. The payment invariant is that we must not capture the
+same payment twice."
+
+### Idempotency
+**A property where repeating the same request does not create a second business
+result by accident.** If a client retries `POST /payments` with the same request
+key, the system should return the same outcome instead of charging again.
+
+**Practical use:** "Webhook handlers must be idempotent because providers can
+redeliver the same event several times."
+
+### Source of Truth
+**The durable system whose final state you trust when several layers disagree.**
+Caches, search indexes, and read models can be useful, but they are often not
+the final authority for business correctness.
+
+**Practical use:** "Postgres is the source of truth for order state. Redis helps
+with speed, but if Redis and Postgres disagree, Postgres wins."
+
+### Delivery Semantics
+**The actual guarantee a queue or broker gives you about message delivery.**
+This is where terms like `at-most-once`, `at-least-once`, ordering, and duplicate
+delivery matter.
+
+**Practical use:** "Kafka gives us at-least-once delivery by default in this
+flow, so consumers must handle duplicates safely."
+
+### Backpressure
+**A form of natural slowing or throttling when a producer is faster than a
+consumer.** Without backpressure, queues grow without bound and latency or
+memory usage can explode.
+
+**Practical use:** "A bounded queue gives the worker pool backpressure: once the
+queue is full, producers slow down instead of flooding the system forever."
+
+### Graceful Degradation
+**A fallback mode where the system still gives a reduced but useful response
+instead of failing completely.** This is different from pretending there is no
+problem.
+
+**Practical use:** "If the recommendation service is down, the product page can
+still load without recommendations. That is graceful degradation."
+
 ### CQRS
 **Command Query Responsibility Segregation.** Separating the write model (Commands — CREATE,
 UPDATE, DELETE) from the read model (Queries — SELECT). The read model can be a denormalized
