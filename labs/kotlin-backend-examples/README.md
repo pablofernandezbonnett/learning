@@ -14,9 +14,9 @@ The docs are good for fast refresh.
 This folder exists so you can also run the ideas and watch the behavior:
 
 - DSA patterns and drills without copy/paste
-- idempotency and locking examples with visible flow
+- idempotency and locking examples where you can see what happens when the same request repeats or two writes overlap
 - JVM concurrency and runtime tradeoffs with actual execution
-- clean-code examples with explicit side effects and boundaries
+- clean-code examples where state changes, external calls, and module boundaries stay easy to see
 
 ## How To Run
 
@@ -52,13 +52,13 @@ Companion for:
 
 Focus:
 
-- hash map lookup
-- sliding window
-- two pointers
-- linked-list basics
-- heap / priority queue
-- BFS / DFS
-- DP / memoization
+- hash map lookup for fast counting, membership checks, and last-seen tracking
+- sliding window for substring and contiguous-range problems where the active range grows and shrinks
+- two pointers for problems that become simpler when you move from both ends or merge two sorted views
+- linked-list basics for pointer updates, traversal, and in-place mutation
+- heap / priority queue for "keep the smallest or largest few items ready" problems
+- BFS / DFS for tree and graph traversal, where you either explore level by level or follow one path deeply first
+- DP / memoization for problems where the same subproblem repeats and cached answers save work
 
 ### `algorithms/drills`
 
@@ -68,8 +68,8 @@ Companion for:
 
 Focus:
 
-- timed coding shapes with edge cases
-- one runnable drill per major pattern family
+- timed coding shapes with the kind of edge cases that usually cause mistakes under interview pressure
+- one runnable drill per major pattern family so the set stays small and repeatable
 
 ### `correctness/idempotency`
 
@@ -79,10 +79,10 @@ Companion for:
 
 Focus:
 
-- natural idempotency
-- request-key deduplication
-- "processing" vs final result
-- local transaction boundary mental model
+- natural idempotency, where repeating the same action is harmless because the final state is already the same
+- request-key deduplication, where the system stores a client or request key to stop the same business action from being applied twice
+- "processing" vs final result, meaning the difference between "work has started" and "the final durable answer is ready"
+- local transaction boundary mental model, meaning what one database transaction can protect and what it cannot protect outside that database
 
 ### `correctness/locking`
 
@@ -92,9 +92,9 @@ Companion for:
 
 Focus:
 
-- lost update
-- optimistic locking
-- pessimistic locking
+- lost update, where one write silently overwrites another because both started from stale data
+- optimistic locking, where you detect a conflicting write at save time and retry or reject it
+- pessimistic locking, where you lock the row early because the business rule is too important to risk concurrent change
 
 ### `jvm/concurrency`
 
@@ -104,12 +104,12 @@ Companion for:
 
 Focus:
 
-- broken shared state
-- `synchronized` vs atomics
-- `volatile`
-- concurrent collections
-- `CompletableFuture`
-- virtual threads
+- broken shared state, where several threads mutate the same data and the result becomes inconsistent
+- `synchronized` vs atomics, meaning when you need a full critical section versus one small thread-safe variable update
+- `volatile`, which gives visibility of the latest value across threads but does not make compound updates atomic
+- concurrent collections that stay safer under multi-threaded access than plain collections
+- `CompletableFuture` for composing asynchronous work without blocking the caller thread the whole time
+- virtual threads for high-concurrency blocking-style code without paying for one heavyweight platform thread per task
 
 ### `integration/async-boundaries`
 
@@ -123,10 +123,10 @@ Companion for:
 
 Focus:
 
-- webhook deduplication
-- at-least-once event handling
-- outbox-style thinking
-- retry and fallback mindset
+- webhook deduplication, meaning a repeated callback from a provider should not trigger the same business action twice
+- at-least-once event handling, meaning the system assumes an event may arrive more than once and still processes it safely
+- outbox-style thinking, meaning "save the business write and the event record together, then publish later"
+- retry and fallback mindset, meaning you decide which failures should be retried, which should stop, and what reduced behavior is acceptable meanwhile
 
 ### `data/cache`
 
@@ -137,10 +137,10 @@ Companion for:
 
 Focus:
 
-- cache-aside
-- hot-read path
-- cache invalidation
-- simple stampede control
+- cache-aside, meaning the app reads from cache first and falls back to the database when the cache misses
+- hot-read path, meaning the request path that is read so often that latency and database load become meaningful
+- cache invalidation, meaning how cached data gets updated or removed when the source data changes
+- simple stampede control, meaning basic protection against many requests all missing cache and hitting the database at once
 
 ### `jvm/modeling`
 
@@ -151,9 +151,9 @@ Companion for:
 Focus:
 
 - Kotlin equivalents of modern JVM modeling ideas
-- data carriers
-- sealed result modeling
-- clearer state space as a design value
+- data carriers, meaning small types whose job is to hold and move data clearly rather than hide behavior
+- sealed result modeling, meaning encode the allowed outcomes explicitly instead of returning vague nulls or generic booleans
+- clearer state space as a design value, meaning the type system should make valid and invalid states easier to tell apart
 
 ### `quality/clean-code`
 
@@ -163,10 +163,10 @@ Companion for:
 
 Focus:
 
-- bad flow vs better flow
-- explicit side effects
-- naming and boundaries
-- code-review-safe structure
+- bad flow vs better flow, meaning compare tangled control flow with versions that are easier to reason about
+- explicit side effects, meaning database writes, network calls, and mutations are visible instead of hidden in surprising places
+- naming and boundaries, meaning each function and module says clearly what it owns and what it changes
+- code-review-safe structure, meaning the code is easy to scan, question, and change without hidden coupling
 
 ## Rule
 
