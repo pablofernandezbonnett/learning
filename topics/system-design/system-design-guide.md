@@ -61,9 +61,16 @@ Good opening:
 
 State early:
 
-- what must never happen twice
+- what must never happen twice or end in an impossible state
 - what final state must remain trustworthy
 - which durable store owns that truth
+
+In this repo, `invariant` means the business rule that must always remain true.
+Examples: "do not charge twice", "do not oversell final stock", or "one purchase
+intent should not create two final orders."
+
+`Source of truth` means the durable place whose final state you trust when a
+cache, worker, or downstream system disagrees.
 
 Examples:
 
