@@ -3,30 +3,33 @@
 This folder is for practical system design study.
 
 The focus is not abstract box-drawing.
-The focus is reasoning about:
+The focus is reasoning about the concrete rules and failure cases that decide
+whether a backend flow is trustworthy.
 
-- invariants
-- source of truth
-- retries and duplicate prevention
-- synchronous versus asynchronous boundaries
-- scale hotspots
-- observability and recovery
+The main ideas you will see repeatedly are:
+
+- invariants: the business rules that must always stay true, such as "do not charge twice" or "do not oversell final stock"
+- source of truth: the durable system whose final state you trust when caches, retries, or downstream systems disagree
+- retries and duplicate prevention: what happens when a client, worker, or provider repeats the same request
+- synchronous versus asynchronous boundaries: what must finish before you answer the user and what can safely complete later
+- scale hotspots: the places where load, contention, hot keys, or hot rows will hurt first
+- observability and recovery: how you detect uncertainty, replay stuck work, and recover from partial failure
 
 ## Recommended Order
 
-1. [backend-system-principles.md](./backend-system-principles.md): compact principles worth keeping warm
-2. [practical-checkout-design.md](./practical-checkout-design.md): simple, practical way to learn checkout design without starting from jargon
-3. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): short decision guide for common architecture choices like SQL vs NoSQL or monolith vs microservices
-4. [system-design-guide.md](./system-design-guide.md): a reusable structure for correctness-critical backend design
-5. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): bean lifecycle, transaction lifecycle, and business flows kept separate
-6. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows
+1. [backend-system-principles.md](./backend-system-principles.md): the core rules behind safe backend design, written as short but fully explained principles
+2. [practical-checkout-design.md](./practical-checkout-design.md): a concrete checkout example that shows how those rules appear in a real flow
+3. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): a decision helper for common architecture choices like SQL vs NoSQL or monolith vs microservices
+4. [system-design-guide.md](./system-design-guide.md): a repeatable answer structure for correctness-critical backend design prompts
+5. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): a way to keep framework lifecycle, transaction lifecycle, and business lifecycle clearly separated
+6. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows, with the write path and failure path in view
 
 ## Working Rule
 
 For any design exercise:
 
-1. define the invariant first
-2. name the source of truth early
+1. define the invariant first, meaning the rule that must never be broken
+2. name the source of truth early, meaning the durable place whose final state you trust
 3. walk the critical write path
 4. say what happens on retries, timeouts, and duplicate delivery
 5. only then add extra components for scale or convenience
