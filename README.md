@@ -23,6 +23,12 @@ This repo is meant to be useful when you want to revisit topics such as:
 - small runnable labs and companion code
 - curated explanations focused on tradeoffs, failure modes, and day-to-day backend decisions
 
+The general writing style is intentionally practical:
+
+- keep the first useful meaning of jargon visible
+- prefer short explanations over shorthand that assumes too much context
+- connect theory back to real backend flows such as checkout, payments, inventory, and integrations
+
 ## Usage
 
 This repository is shared as a curated learning and reference base.
@@ -89,6 +95,9 @@ Most topic folders use the same simple layering:
 - `Refresh`: the shortest useful reopen order when you are rusty
 - `Required`: the topics that show up often in real backend work
 - `Growth`: deeper material worth studying once the core feels stable
+
+When a topic has runnable companion material, the matching `README` should also
+point you to the relevant lab instead of leaving the concept as static notes only.
 
 ## Contributions
 

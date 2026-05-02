@@ -16,6 +16,12 @@ This note follows the same reusable progression:
 - the main fixes
 - how to explain it clearly
 
+Quick terms used here:
+
+- `stale state` = the request is making a decision from data that was true a moment ago but is no longer current
+- `contention` = several requests want the same row or business key at the same time
+- `isolation level` = the database rulebook for what concurrent transactions may observe
+
 ---
 
 ## 1. What Problem Concurrency Actually Creates
@@ -44,6 +50,9 @@ Other anomalies worth knowing:
 - **dirty read**: you read data another transaction has not committed yet
 - **non-repeatable read**: you read the same row twice and get different committed values
 - **phantom read**: you rerun a query and extra matching rows appear or disappear
+
+These terms matter, but the first useful mental model is still the lost update:
+two writers start from the same old fact and one silently overwrites the other.
 
 The lost update problem is the one to explain first.
 The other terms matter, but they only help if you can already explain the basic race in plain English.
@@ -127,6 +136,9 @@ Important nuance:
 
 > optimistic locking does not prevent conflicts, it detects them.
 
+That is why optimistic locking is usually paired with explicit retry logic or a
+clear "please try again" response to the caller.
+
 That means the application must decide what happens next:
 
 - retry
@@ -192,6 +204,9 @@ Tradeoff:
 - lower throughput
 - deadlock risk if you lock multiple rows in inconsistent order
 
+`Serialization` here means you are deliberately forcing one writer to finish
+before another writer can continue on the same protected row or range.
+
 ---
 
 ## 4. How To Choose Between Optimistic And Pessimistic
@@ -232,6 +247,9 @@ Practical rule:
 - stronger isolation helps, but it is not free
 - you still need to understand lock scope, retries, and transaction length
 
+`Lock scope` means exactly which rows, keys, or ranges are being protected and
+for how long the transaction keeps them.
+
 Typical failure cases to connect back to business behavior:
 
 - overselling stock
@@ -258,6 +276,9 @@ What that means in practice:
 - reads do not always block writes, and writes do not always block reads
 
 Why it matters:
+
+`MVCC` means `Multi-Version Concurrency Control`: the database keeps several row
+versions around so readers can often continue without waiting for a writer to finish.
 
 - better read concurrency
 - less blocking than old lock-heavy mental models

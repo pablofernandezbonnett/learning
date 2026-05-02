@@ -2,12 +2,21 @@
 
 Use this folder for practical application security study from a developer's point of view.
 
+The emphasis is not on memorizing vulnerability names in isolation.
+It is on understanding how normal product and backend features become unsafe.
+
 Focus:
 
 - web and browser basics that security builds on
 - authentication, sessions, tokens, and delegated access
 - common web vulnerabilities and how they show up in code
 - practical review habits for APIs and backend features
+
+Working style:
+
+- explain security jargon before relying on it
+- keep examples close to browser, API, and backend implementation details
+- prefer "how it breaks and how to build it safely" over glossary-style study
 
 ## Recommended Order
 

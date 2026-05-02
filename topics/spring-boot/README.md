@@ -11,6 +11,12 @@ Focus:
 - JPA and Hibernate tradeoffs
 - platform wiring, configuration, and Spring cloud-facing concerns
 
+Working style:
+
+- explain the runtime meaning behind Spring annotations instead of stopping at syntax
+- keep bean lifecycle, proxy behavior, transactions, and persistence connected as one mental model
+- connect framework features back to correctness, latency, and production behavior
+
 ## Recommended Order
 
 1. [01-spring-boot-fast-review.md](./01-spring-boot-fast-review.md): compact map of the main Spring Boot areas

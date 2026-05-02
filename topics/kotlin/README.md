@@ -3,6 +3,9 @@
 Use this folder as a Kotlin bridge for someone who already knows Java, Spring,
 and backend service design.
 
+The goal is not to relearn backend fundamentals from zero.
+The goal is to translate strong Java and Spring instincts into idiomatic Kotlin without overcomplicating the code.
+
 ## Recommended Order
 
 1. [01-kotlin-for-backend-vs-java.md](./01-kotlin-for-backend-vs-java.md): translate Java and Spring instincts into Kotlin
@@ -15,6 +18,9 @@ and backend service design.
 2. run the small labs selectively
 3. keep mapping Kotlin features back to Java and Spring use cases
 4. stop once the new syntax stops feeling like the main challenge
+
+If a Kotlin feature feels clever but does not improve clarity or correctness,
+this repo treats that as a warning sign rather than a style goal.
 
 ## Core Rule
 

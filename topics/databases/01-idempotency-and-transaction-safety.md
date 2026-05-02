@@ -9,6 +9,12 @@ order twice, or apply the same stock change multiple times.
 This note starts from the smallest possible idea of idempotency, then moves toward the
 real implementation shape used in backend production systems.
 
+Quick terms used here:
+
+- `idempotency key` = a stable client or business request identifier used to recognize retries
+- `durable` = persisted in storage that survives process restart
+- `claim the key` = reserve that request identity so only the first valid execution may proceed
+
 ---
 
 ## 1. What Idempotency Actually Means
@@ -41,6 +47,9 @@ Important rule:
 
 > If you want to deduplicate an external side effect, you need state somewhere.
 > There is no stateless way to know that a previous request already changed the system.
+
+`External side effect` means something like charging a card, creating an order,
+reserving inventory, or publishing an event that another system will react to.
 
 Another plain-English distinction that helps:
 
@@ -185,6 +194,9 @@ Why this is still only a teaching example:
 That last point is important: the minimal idea is simple, but production
 correctness needs durable state and better failure handling.
 
+`Multiple application instances` means several copies of the same service are
+running at once, so in-memory deduplication inside only one process is not enough.
+
 ---
 
 ## 3. HTTP: Why PUT Is Idempotent And POST Usually Is Not
@@ -212,6 +224,9 @@ Important nuance:
 
 > Idempotent does not mean identical response every time.
 
+That distinction matters because the business effect can stay safely the same
+even if a later retry returns a different HTTP status or a reused cached result.
+
 Example:
 
 - first `DELETE /users/42` returns `204 No Content`
@@ -229,6 +244,9 @@ For Spring, this is usually the minimum practical answer:
 - accept an `Idempotency-Key`
 - claim it before doing the business action
 - if the key already exists, return the stored result or reject the duplicate
+
+`Stored result` means the first durable business answer or response body that
+belongs to that key, not just a boolean saying "I saw this once."
 
 ```kotlin
 import org.springframework.http.HttpStatus

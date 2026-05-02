@@ -13,6 +13,10 @@ This note keeps the topic practical:
 - the few Java tools that matter most
 - how to explain it clearly
 
+Production follow-up:
+
+- [05-concurrency-in-production.md](./05-concurrency-in-production.md)
+
 Reading rule:
 
 - use the Kotlin sketch as the fast mental anchor

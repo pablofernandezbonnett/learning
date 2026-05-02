@@ -27,6 +27,10 @@ This helps with questions like:
 - do I need webhooks or polling
 - is serverless actually a good fit
 
+When terms such as `modular monolith`, `read replica`, or `eventual consistency`
+appear here, the goal is not to assume the jargon is already warm.
+The goal is to explain the smallest practical meaning before turning it into a choice.
+
 ---
 
 ## 1. How To Use This Cheat Sheet

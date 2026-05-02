@@ -35,8 +35,10 @@ Run one topic:
 ./run-topic.sh correctness/idempotency
 ./run-topic.sh correctness/locking
 ./run-topic.sh integration/async-boundaries
+./run-topic.sh integration/kafka-patterns
 ./run-topic.sh data/cache
 ./run-topic.sh jvm/concurrency
+./run-topic.sh jvm/concurrency-production
 ./run-topic.sh jvm/modeling
 ./run-topic.sh quality/clean-code
 ./run-topic.sh all
@@ -111,6 +113,20 @@ Focus:
 - `CompletableFuture` for composing asynchronous work without blocking the caller thread the whole time
 - virtual threads for high-concurrency blocking-style code without paying for one heavyweight platform thread per task
 
+### `jvm/concurrency-production`
+
+Companion for:
+
+- `../../topics/java/05-concurrency-in-production.md`
+- `../../topics/databases/02-database-locks-and-concurrency.md`
+
+Focus:
+
+- pool saturation, meaning a small worker pool can quietly turn blocking calls into queueing latency
+- admission control, meaning you bound expensive work instead of letting every request pile up
+- request budgets, meaning the whole fan-out has one timeout budget rather than several unrelated waits
+- local lock vs shared truth, meaning one JVM mutex does not protect a database row across several app instances
+
 ### `integration/async-boundaries`
 
 Companion for:
@@ -127,6 +143,20 @@ Focus:
 - at-least-once event handling, meaning the system assumes an event may arrive more than once and still processes it safely
 - outbox-style thinking, meaning "save the business write and the event record together, then publish later"
 - retry and fallback mindset, meaning you decide which failures should be retried, which should stop, and what reduced behavior is acceptable meanwhile
+
+### `integration/kafka-patterns`
+
+Companion for:
+
+- `../../topics/api/06-kafka-practical-foundations.md`
+- `../../topics/api/02-message-brokers-and-delivery-semantics.md`
+
+Focus:
+
+- partitioning by key, meaning the key decides where local ordering is preserved
+- consumer-group assignment, meaning partitions are shared across consumers rather than every consumer reading everything in one group
+- duplicate delivery after crash-before-commit, meaning the same event can be observed again after restart
+- retry and DLT flow, meaning not every failure should be retried forever
 
 ### `data/cache`
 

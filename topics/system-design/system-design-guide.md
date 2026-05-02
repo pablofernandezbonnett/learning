@@ -5,6 +5,10 @@
 Use this when you want a repeatable structure for a real backend or system
 design prompt.
 
+Practice next:
+
+- [system-design-drills.md](./system-design-drills.md)
+
 This is not a company-specific playbook.
 It is the shared execution guide for questions such as:
 

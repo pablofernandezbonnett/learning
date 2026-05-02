@@ -20,4 +20,4 @@ Current labs include:
 - Kotlin basics
 - Spring Boot sample code
 - algorithm practice companions in Java and Kotlin
-- Kotlin backend examples for correctness, async boundaries, caching, and JVM behavior
+- Kotlin backend examples for correctness, async boundaries, Kafka-style delivery, caching, and JVM behavior

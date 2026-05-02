@@ -14,6 +14,12 @@ That means using Python for:
 
 not as a replacement for every Spring Boot service.
 
+Working style:
+
+- keep the Python discussion pragmatic rather than ideological
+- explain the tradeoff between speed and discipline instead of treating Python as "easy by default"
+- connect Python back to the same backend quality standards used elsewhere in the repo
+
 ---
 
 ## What Python Actually Changes For A JVM Developer

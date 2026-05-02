@@ -9,6 +9,9 @@ It is not a full Go roadmap.
 It is meant to help you understand the runtime and language ideas that most
 often come up when comparing Go with Java or Kotlin in backend contexts.
 
+The goal is not to turn this repo into a full Go curriculum.
+It is to make the comparison practical enough that Go runtime and service-shape decisions stop feeling vague.
+
 ---
 
 ## Recommended Order

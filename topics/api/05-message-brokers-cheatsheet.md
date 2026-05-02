@@ -39,13 +39,17 @@ Use when:
 
 - one consumer or one worker group handles the task
 - the message is processed, acknowledged, and effectively gone
-- the problem is background work, not event replay
+- the problem is background work, not event replay or durable event history
 
 Good fits:
 
 - email jobs
 - webhook follow-up work
 - image processing
+
+Short explanation:
+
+> a queue is mainly about handing one unit of work to one processing path later
 
 ### Distributed Log
 
@@ -66,6 +70,11 @@ Good fits:
 - analytics streams
 - event-driven microservice integration
 
+Short explanation:
+
+> a distributed log keeps the event around for a retention period, so different
+> consumers can read it independently and even replay it later
+
 ---
 
 ## The 5 Things To Remember
@@ -73,13 +82,15 @@ Good fits:
 1. **SQS/RabbitMQ for tasks. Kafka for event streams.**
 
 2. **At-least-once is the default practical model.**
-   Duplicates are normal.
+   Duplicates are normal, which is why the consumer must tolerate seeing the same event again.
 
 3. **Idempotent consumers matter more than heroic broker claims.**
 
 4. **Partition key decides ordering and parallelism in Kafka.**
+   The key is what decides which partition receives the event, so it also decides the local ordering boundary.
 
 5. **`DLQ` / `DLT` (`dead-letter queue` / `dead-letter topic`) is part of the design, not an afterthought.**
+   This is where messages go when normal retry should stop and a human or later replay flow must take over.
 
 ---
 
@@ -94,11 +105,11 @@ Good fits:
 
 ## Common Traps
 
-- using Kafka for a simple worker queue
-- assuming "exactly once" removes all duplicate concerns
-- bad partition-key choice
-- no `DLQ`
-- no consumer idempotency
+- using Kafka for a simple worker queue when no replay or multi-consumer history is needed
+- assuming "exactly once" removes all duplicate concerns at the business layer
+- bad partition-key choice, so ordering lands on the wrong boundary
+- no `DLQ`, so poison messages just retry forever
+- no consumer idempotency, so crash-and-retry turns into duplicate side effects
 
 ---
 

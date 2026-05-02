@@ -3,11 +3,20 @@
 Use this folder for practical application security refresh in backend and
 product systems.
 
+This folder overlaps with AppSec, but the emphasis here is a little more backend-architecture oriented:
+trust boundaries, auth models, payment-adjacent correctness, and operational security habits.
+
 Focus:
 
 - authentication patterns for web, mobile, and APIs
 - web and API abuse cases
 - Spring and JVM security basics
+
+Working style:
+
+- explain security jargon before relying on it
+- keep examples close to product and backend flows
+- connect auth, trust boundaries, rate limits, and workflow abuse back to real system behavior
 
 ## Recommended Order
 

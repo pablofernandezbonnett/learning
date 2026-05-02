@@ -39,7 +39,7 @@ Focus:
 
 ## Growth
 
-- [08-concurrency-models-comparison.md](./08-concurrency-models-comparison.md): threads, event loops, coroutines, and goroutines in practical backend terms
+- [08-concurrency-models-comparison.md](./08-concurrency-models-comparison.md): shared-memory threads, goroutines, coroutines, and virtual threads in practical backend terms
 - [10-consistent-hashing.md](./10-consistent-hashing.md): how distributed caches and partitioned systems spread load without reshuffling everything
 - [12-consensus-and-leader-election.md](./12-consensus-and-leader-election.md): how one instance becomes the active coordinator safely, and why this is harder than a plain lock
 - [13-enterprise-integration-patterns.md](./13-enterprise-integration-patterns.md): practical message and integration patterns without turning the topic into acronym soup

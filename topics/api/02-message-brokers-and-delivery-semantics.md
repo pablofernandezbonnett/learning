@@ -16,6 +16,10 @@ Quick review version:
 
 - [05-message-brokers-cheatsheet.md](./05-message-brokers-cheatsheet.md)
 
+Kafka-specific follow-up:
+
+- [06-kafka-practical-foundations.md](./06-kafka-practical-foundations.md)
+
 ---
 
 ## 1. What Problem A Broker Actually Solves

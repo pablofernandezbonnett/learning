@@ -15,14 +15,21 @@ The main ideas you will see repeatedly are:
 - scale hotspots: the places where load, contention, hot keys, or hot rows will hurt first
 - observability and recovery: how you detect uncertainty, replay stuck work, and recover from partial failure
 
+Working style:
+
+- explain the first practical meaning of design jargon before layering on patterns
+- keep answers close to write paths, state transitions, and recovery behavior
+- prefer a small defensible design over a large diagram with vague correctness
+
 ## Recommended Order
 
 1. [backend-system-principles.md](./backend-system-principles.md): the core rules behind safe backend design, written as short but fully explained principles
 2. [practical-checkout-design.md](./practical-checkout-design.md): a concrete checkout example that shows how those rules appear in a real flow
-3. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): a decision helper for common architecture choices like SQL vs NoSQL or monolith vs microservices
-4. [system-design-guide.md](./system-design-guide.md): a repeatable answer structure for correctness-critical backend design prompts
-5. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): a way to keep framework lifecycle, transaction lifecycle, and business lifecycle clearly separated
-6. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows, with the write path and failure path in view
+3. [system-design-guide.md](./system-design-guide.md): a repeatable answer structure for correctness-critical backend design prompts
+4. [system-design-drills.md](./system-design-drills.md): small practice prompts plus a rubric so design work does not stay passive
+5. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): a decision helper for common architecture choices like SQL vs NoSQL or monolith vs microservices
+6. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): a way to keep framework lifecycle, transaction lifecycle, and business lifecycle clearly separated
+7. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows, with the write path and failure path in view
 
 ## Working Rule
 

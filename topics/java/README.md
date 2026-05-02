@@ -9,6 +9,7 @@ in Java `8` or `11` and needs updating for modern backend work.
 2. [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md): race conditions, visibility, `volatile`, locks, atomics, executors, and virtual threads
 3. [03-modern-java-for-backend-engineers.md](./03-modern-java-for-backend-engineers.md): records, sealed types, pattern matching, and modern backend-friendly language features
 4. [04-modern-java-21-plus-notes.md](./04-modern-java-21-plus-notes.md): structured concurrency, scoped values, and newer post-21 awareness
+5. [05-concurrency-in-production.md](./05-concurrency-in-production.md): pool saturation, admission control, request budgets, and when local locks stop being enough
 
 ## Working Loop
 
@@ -28,6 +29,10 @@ If time is limited:
 Use [../../labs/java-modern-features/README.md](../../labs/java-modern-features/README.md)
 for a small Java `21` example focused on records, sealed types, pattern
 matching, and virtual threads.
+
+For concurrency drills with runnable output, also use
+[../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md)
+topics `jvm/concurrency` and `jvm/concurrency-production`.
 
 ## Core Rule
 

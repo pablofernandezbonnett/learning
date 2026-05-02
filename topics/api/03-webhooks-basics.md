@@ -21,6 +21,12 @@ This note exists to separate the concept cleanly from:
 - Kafka or RabbitMQ
 - WebFlux and reactive style
 
+Quick terms used here:
+
+- `dedupe` = deduplication, meaning "recognize that this event already arrived earlier"
+- `idempotency` = repeating the same request or event does not create a second business effect
+- `replay` = the provider or your own system sends or processes the same event again later
+
 ---
 
 ## 1. What A Webhook Actually Is
@@ -65,6 +71,9 @@ Practical rule:
 - use polling when you need occasional or on-demand reads
 - use webhooks when event-driven updates and integration latency matter
 
+`Integration latency` here just means how quickly your system hears about the
+external event after it happens.
+
 ---
 
 ## 3. Webhooks Are Not New
@@ -108,6 +117,9 @@ These concepts get mixed together too easily.
 Typical real pattern:
 
 `provider webhook -> your HTTP endpoint -> verification/dedupe -> queue or worker -> business processing`
+
+That pattern matters because the webhook endpoint is usually the fast intake
+boundary, not the place where all heavy business work should happen.
 
 ---
 
@@ -178,6 +190,9 @@ Important point:
 - the interesting part is not whether the return type is `ResponseEntity` or `Mono<ResponseEntity<...>>`
 - the interesting part is what you do around correctness and security
 
+That is why this note treats MVC versus WebFlux as a secondary implementation
+choice rather than the main design question.
+
 ---
 
 ## 7. The Real Production Checklist
@@ -201,6 +216,9 @@ For a serious webhook endpoint, always think about:
 Short rule:
 
 > webhook handling is mainly a correctness and security problem, not an endpoint syntax problem
+
+`Authenticity` here means "did this request really come from the provider?"
+That is usually checked with a signature, shared secret, or both.
 
 ---
 

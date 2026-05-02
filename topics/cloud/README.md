@@ -14,6 +14,12 @@ Focus:
 - serverless tradeoffs
 - container sizing and observability
 
+Working style:
+
+- explain provider or platform jargon in practical terms before going deeper
+- keep the focus on ownership and runtime behavior, not product-catalog memorization
+- connect cloud choices back to deployment risk, operability, and service shape
+
 ## Recommended Order
 
 1. [01-cloud-basics.md](./01-cloud-basics.md): the shared mental model behind regions, networks, managed services, and responsibility boundaries
@@ -33,9 +39,9 @@ Focus:
 
 ## Growth
 
-- [05-local-kubernetes-lab.md](./05-local-kubernetes-lab.md)
-- [06-container-sizing-cheatsheet.md](./06-container-sizing-cheatsheet.md)
-- [07-serverless-cheatsheet.md](./07-serverless-cheatsheet.md)
+- [05-local-kubernetes-lab.md](./05-local-kubernetes-lab.md): a hands-on local cluster setup when the basic concepts are already clear
+- [06-container-sizing-cheatsheet.md](./06-container-sizing-cheatsheet.md): a compact reopen sheet for memory, CPU, and runtime sizing judgment
+- [07-serverless-cheatsheet.md](./07-serverless-cheatsheet.md): a short decision sheet for function-shaped workloads, async boundaries, and serverless tradeoffs
 
 ## Core Rule
 

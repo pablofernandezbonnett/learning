@@ -13,6 +13,12 @@ Focus:
 - SQL judgment beyond ORM convenience, because production behavior still depends on query shape and indexes
 - store choice, scaling, and database-specific tradeoffs instead of one vague "NoSQL vs SQL" debate
 
+Working style:
+
+- explain the first useful meaning of the jargon before going deeper
+- prefer short practical definitions over telegraphic shorthand
+- connect DB mechanics back to checkout, payments, orders, and inventory
+
 ## Recommended Order
 
 1. [01-idempotency-and-transaction-safety.md](./01-idempotency-and-transaction-safety.md): request identity, deduplication, and transaction boundaries
@@ -45,3 +51,9 @@ Focus:
 - local transactions solve the local database boundary, not the whole workflow
 - concurrency bugs come from stale reads plus overlapping writes
 - ORM convenience never removes the need for SQL judgment
+
+## Companion Lab
+
+Use [../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md)
+topics `correctness/idempotency` and `correctness/locking` after the first two
+core notes.

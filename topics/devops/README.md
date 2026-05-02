@@ -12,6 +12,12 @@ Focus:
 - observability
 - practical Kubernetes concepts
 
+Working style:
+
+- explain ops jargon in terms of runtime behavior and release risk
+- prefer "what fails and how you recover" over tool-name memorization
+- keep the topic close to what a backend engineer actually owns in production
+
 ## Recommended Order
 
 1. [01-infrastructure-and-devops-basics.md](./01-infrastructure-and-devops-basics.md): what DevOps changes in practice for a backend engineer who owns code in production

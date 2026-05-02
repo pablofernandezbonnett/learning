@@ -59,6 +59,11 @@ Read traffic is usually about serving data faster and cheaper.
 Write traffic is usually about protecting correctness under contention.
 If you mix those two problems together, you often pick the wrong tool.
 
+Short explanation:
+
+> read scale is usually a speed problem; write scale is usually a correctness
+> problem first and only then a throughput problem
+
 ---
 
 ## 5. Cache Improves Performance but Risks Correctness
@@ -74,6 +79,9 @@ Never cache:
 Cache is a speed tool, not the final authority on business truth.
 Use it where slightly stale data is acceptable, and stay cautious where one
 wrong read can produce a wrong charge, wrong reservation, or wrong user promise.
+
+`Slightly stale` means the cached value may be a little behind the latest
+database state, but still acceptable for that use case.
 
 ---
 
@@ -101,6 +109,9 @@ The win is looser coupling.
 The cost is retries, duplicate handling, replay logic, and more operational
 visibility work.
 
+`Replay` here means reading an old event again later so a new or recovering
+consumer can rebuild or catch up safely.
+
 ---
 
 ## 8. Observability Is Architecture
@@ -112,6 +123,9 @@ If a design only works when everything is healthy and everyone guesses from raw
 logs during failure, the design is incomplete.
 You need enough visibility to see slow paths, stuck work, retries, and business
 outcomes such as pending orders or failed payments.
+
+`Tracing` means following one request or event across several services so you
+can see where the latency or failure actually happened.
 
 ---
 

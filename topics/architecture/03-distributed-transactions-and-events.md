@@ -17,6 +17,14 @@ Plain-English version:
 - now the system is in a half-finished business state
 - the real job is making that state safe and recoverable
 
+Quick terms used here:
+
+- `eventual consistency` = different parts of the system may agree a little later instead of all at once
+- `compensation` = a new business action that semantically undoes an earlier step
+- `choreography` = services react to each other's events without one central coordinator
+- `orchestration` = one central workflow component tells the other services what step to run next
+- `projection` = a read-optimized view built from source data or events
+
 ---
 
 ## 0. Quick Pattern Choice
@@ -27,6 +35,13 @@ Use this mental model:
 - **Outbox Pattern:** one service must both save state and publish an event reliably
 - **CQRS:** writes and reads behave very differently, so one model no longer serves both well
 - **Event Sourcing:** the event history itself is part of the product, audit, or compliance value
+
+If these names feel abstract, the practical translation is:
+
+- saga = workflow recovery problem
+- outbox = dual-write safety problem
+- CQRS = write model and read model have diverged
+- event sourcing = history itself matters, not only latest state
 
 These patterns are related, but they solve different problems.
 
@@ -76,6 +91,10 @@ Practical explanation:
 
 > We cannot keep one ACID transaction across several services without hurting availability badly, so the safer model is local transactions plus compensation and eventual consistency.
 
+`ACID` here means the usual local database guarantees around atomicity,
+consistency, isolation, and durability.
+The important limit is that those guarantees stop at the local database boundary.
+
 Visual anchor:
 
 ```mermaid
@@ -114,7 +133,7 @@ There is no central coordinator. Each service listens for events from other serv
 *   *If Payment Authorization Fails:* Payment Service publishes `PaymentAuthorizationFailedEvent`. Order Service listens, and marks Order as *Cancelled*.
 *   *If Inventory Fails Before Capture:* Inventory Service publishes `OutOfStockEvent`. Payment Service or Order Service triggers `CancelAuthorization`, and the Order becomes *Cancelled*.
 *   *Pros:* Simple for 2 or 3 services. No single point of failure.
-*   *Cons:* "Spaghetti Architecture". Hard to track the overall status of an order. Cyclic dependencies can occur.
+*   *Cons:* The workflow can become hard to follow because the state machine is spread across several services.
 *   *Use it when:* The workflow is still small, the event chain is easy to explain, and a central coordinator would add more machinery than value.
 *   *Avoid it when:* The flow is long or nobody can easily answer "what step is this order in right now?"
 ### B. Saga Orchestration (Centralized)
@@ -128,7 +147,7 @@ A central coordinator (the Orchestrator) tells the participating services what l
 7.  If some later step fails after capture already happened, compensation becomes `RefundPayment` instead of `CancelAuthorization`.
 
 *   *Pros:* Best for complex workflows (4+ steps). Centralized logic is easy to test and monitor. No cyclic dependencies.
-*   *Cons:* Requires building/maintaining complex state machine infrastructure (or using tools like Temporal, AWS Step Functions, or Camunda).
+*   *Cons:* Requires building or adopting explicit workflow infrastructure such as Temporal, AWS Step Functions, or Camunda.
 *   *Use it when:* The workflow is long-lived, business-critical, and needs one place to reason about the whole state machine.
 *   *Avoid it when:* The flow is simple enough that a central orchestrator would mostly add extra machinery.
 ### Example domains
@@ -154,6 +173,9 @@ In traditional CRUD systems, you use the same database model to write data (Comm
 
 **The Problem:** In complex domains, the way you write data (e.g., validating complex business rules before inserting an Order) is very different from how you query it (e.g., generating a massive join-heavy dashboard for the sales team). The database gets locked by heavy read queries, starving the write queries.
 
+`Command path` means the side that validates and commits business changes.
+`Query path` means the side optimized for reading, searching, or reporting.
+
 **The Solution (CQRS):**
 Separate the read and write models completely, often into different databases.
 
@@ -161,7 +183,11 @@ Separate the read and write models completely, often into different databases.
 2.  **Synchronization:** When data is written to the Postgres DB, an event is fired (e.g., via Debezium CDC or an Outbox pattern) to Kafka.
 3.  **Query Path:** A separate service consumes the Kafka event and builds a highly denormalized, read-optimized view of the data in a different database (e.g., Elasticsearch for search, or MongoDB for fast document retrieval). The UI queries *this* database.
 
-*   *Trade-off:* High architectural complexity and introduces Eventual Consistency. Users might write data but not see it immediately on their dashboard for a few milliseconds.
+`CDC` means `Change Data Capture`: copying committed database changes into another
+system so downstream consumers can react without the write path making a fragile
+direct call to every dependency.
+
+*   *Trade-off:* High architectural complexity and introduces eventual consistency. That means the read side may be a little behind the write side for a short time.
 *   *Pros:* The write side and the read side can each be optimized for their real job. Heavy reads stop competing directly with critical writes.
 *   *Cons:* More infrastructure, more synchronization logic, and the read side may be a little behind the write side.
 *   *Use it when:* The write model and read model are genuinely different, especially when heavy reads would otherwise compete with critical writes.
@@ -191,7 +217,10 @@ Instead of storing the *current state* of an entity, you store a sequence of *st
     1.  `AccountOpenedEvent($0)`
     2.  `DepositedEvent($200)`
     3.  `WithdrawnEvent($100)`
-    *(The current balance is calculated by replaying the events).*
+    *(The current balance is calculated by replaying the events.)*
+
+`Replay` here means reading the historical events again in order to rebuild the
+current state or a derived view.
 
 *   *Pros:* 100% reliable audit log (Financial systems love this). "Time travel" debugging—you can recreate the state of the system at any given second in the past.
 *   *Cons:* Extremely steep learning curve. Querying is hard (you usually combine Event Sourcing with CQRS to build read projections).
@@ -243,6 +272,9 @@ reserved. The payment is never captured. **The order is a ghost.**
 
 Insert the event into an `outbox` table in the **same local database transaction** as the
 business write. A separate relay process reads the outbox and publishes to Kafka.
+
+`Relay` here means the small background component that turns an unpublished
+outbox row into a broker event later.
 
 Visual anchor:
 

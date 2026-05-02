@@ -2,6 +2,9 @@
 
 Use this path when you want a broad backend refresh rather than a single-topic deep dive.
 
+The point is not to complete every document in one pass.
+The point is to reopen the core mental models until they feel usable again.
+
 ## Recommended Order
 
 1. Java
@@ -31,3 +34,6 @@ Once you finish the broad pass, use each topic folder in this order:
 1. `Refresh`
 2. `Required`
 3. `Growth`
+
+If a topic already feels warm, skim the `Refresh` layer and move on.
+The path works best when it keeps momentum instead of turning into a checklist marathon.

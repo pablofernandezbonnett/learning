@@ -6,7 +6,9 @@ import learning.examples.correctness.IdempotencyTopic
 import learning.examples.correctness.LockingTopic
 import learning.examples.data.CacheTopic
 import learning.examples.integration.AsyncBoundariesTopic
+import learning.examples.integration.KafkaPatternsTopic
 import learning.examples.jvm.JvmConcurrencyTopic
+import learning.examples.jvm.JvmConcurrencyProductionTopic
 import learning.examples.jvm.JvmModelingTopic
 import learning.examples.quality.CleanCodeTopic
 
@@ -17,8 +19,10 @@ object TopicRegistry {
         IdempotencyTopic,
         LockingTopic,
         AsyncBoundariesTopic,
+        KafkaPatternsTopic,
         CacheTopic,
         JvmConcurrencyTopic,
+        JvmConcurrencyProductionTopic,
         JvmModelingTopic,
         CleanCodeTopic,
     )
