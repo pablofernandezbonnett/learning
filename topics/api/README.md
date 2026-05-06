@@ -20,6 +20,7 @@ Focus:
 4. [06-kafka-practical-foundations.md](./06-kafka-practical-foundations.md): partition keys, consumer groups, offsets, idempotent consumers, and `DLT` thinking, meaning what to do with messages that keep failing and should leave the main retry path
 5. [03-webhooks-basics.md](./03-webhooks-basics.md): webhook intake, signature checks, deduplication, and safe asynchronous follow-up work
 6. [04-graphql-in-depth.md](./04-graphql-in-depth.md): schema design, resolvers, `DataLoader`, meaning a batching helper that avoids one query per nested item, and how to stop flexible queries from becoming expensive or unsafe
+7. [07-sync-vs-async-integration-choice.md](./07-sync-vs-async-integration-choice.md): how to choose the boundary between immediate response and later async processing
 
 ## Refresh
 
@@ -27,6 +28,7 @@ Focus:
 - [02-message-brokers-and-delivery-semantics.md](./02-message-brokers-and-delivery-semantics.md)
 - [06-kafka-practical-foundations.md](./06-kafka-practical-foundations.md)
 - [03-webhooks-basics.md](./03-webhooks-basics.md)
+- [07-sync-vs-async-integration-choice.md](./07-sync-vs-async-integration-choice.md)
 
 ## Required
 

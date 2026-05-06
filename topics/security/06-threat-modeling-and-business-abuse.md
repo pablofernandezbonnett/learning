@@ -8,6 +8,57 @@ real workflow, the real data, and the real failure modes.
 
 ---
 
+## Why This Matters
+
+Threat modeling is one of the fastest ways to make security practical before an
+incident happens. It turns vague security concerns into specific questions about
+assets, trust boundaries, state transitions, and abuse paths.
+
+This matters because strong product security work usually comes from catching a
+bad design early, not from discovering it later in production.
+
+## Smallest Mental Model
+
+Treat threat modeling as a structured way to ask:
+
+- what are we protecting
+- where are the boundaries
+- how could this flow be abused or broken
+- which control or test would reduce that risk
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- threat modeling is a heavyweight enterprise ritual
+- it only matters for infrastructure or crypto-heavy systems
+- vulnerability lists are enough
+
+Better mental model:
+
+- threat modeling is a lightweight design review habit
+- product and workflow abuse often matter more than low-level exploit theory
+- the goal is to turn risks into explicit controls, tests, and alerts
+
+Small concrete example:
+
+- weak approach: "checkout needs auth and input validation"
+- better approach: "checkout must prevent step skipping, inventory hoarding,
+  webhook replay, and duplicate payment actions, so we add state validation,
+  rate limits, replay protection, and monitoring"
+
+Strong default:
+
+- for any important flow, identify the asset, boundary, dangerous state
+  transition, and likely abuse path before implementation gets too far
+
+Interview-ready takeaway:
+
+> I use threat modeling as a lightweight way to map assets, boundaries, and
+> abuse paths, then convert them into explicit controls and tests.
+
+---
+
 ## 1. What Threat Modeling Is
 
 Threat modeling is a structured way to answer four questions:

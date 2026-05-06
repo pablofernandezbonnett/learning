@@ -10,6 +10,28 @@ This is the short version to retain and reopen quickly.
 
 ---
 
+## Why This Matters
+
+Sizing mistakes often masquerade as random latency, flaky deploys, or
+unexplained restarts. This sheet matters because a short, correct sizing loop is
+more useful than memorizing a default CPU or memory number.
+
+## Smallest Mental Model
+
+Container sizing is a feedback loop, not a one-time guess.
+
+- start from workload shape
+- measure real behavior
+- refine requests, limits, and runtime settings from evidence
+
+## Bad Mental Model vs Better Mental Model
+
+- bad: pick the same size every time and tweak only when the service crashes
+- better: size from workload, confirm with load and telemetry, and diagnose the
+  real bottleneck before changing CPU or memory
+
+---
+
 ## The Core Idea
 
 Do not guess a fixed number.

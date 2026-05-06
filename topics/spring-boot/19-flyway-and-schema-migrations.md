@@ -9,6 +9,63 @@ versioned, repeatable, and reviewable.
 
 ---
 
+## Why This Matters
+
+Many production issues do not come from bad ORM mappings. They come from unsafe
+schema evolution: destructive changes, hidden startup mutations, or releases
+where old and new code cannot survive the same schema.
+
+This matters because schema migration is part of normal backend engineering, not
+just a DBA task, and it strongly affects rollout safety.
+
+## Smallest Mental Model
+
+Treat Flyway as the mechanism that makes schema change explicit and repeatable,
+and treat expand-and-contract as the pattern that keeps schema change safe under
+real deployments.
+
+That means:
+
+- migration files live in Git
+- execution order is controlled
+- environments move forward consistently
+- destructive change is delayed until compatibility is proven
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- schema change is mostly a local dev convenience problem
+- Hibernate can keep production schemas aligned automatically
+- adding a migration file is enough even if app versions and schema cannot
+  coexist
+
+Better mental model:
+
+- schema change is a release-safety problem
+- production changes should be explicit, reviewable, and operationally planned
+- migration tooling and rollout compatibility are both required
+
+Small concrete example:
+
+- weak approach: rename a column, rely on `ddl-auto=update`, and deploy the app
+- better approach: add the new column with Flyway, dual-write while versions
+  overlap, backfill safely, then drop the old column later
+
+Strong default:
+
+- use Flyway as the single source of truth for schema evolution in a Spring Boot
+  service
+- treat destructive schema change as a later cleanup step, not the first move
+
+Interview-ready takeaway:
+
+> I use Flyway to make schema change explicit and reviewable, but the key safety
+> rule is expand-and-contract so old and new app versions can coexist during a
+> rollout.
+
+---
+
 ## 1. What Flyway Is
 
 Flyway is a database migration tool.

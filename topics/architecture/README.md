@@ -21,6 +21,7 @@ Focus:
 4. [04-networking-fundamentals.md](./04-networking-fundamentals.md): HTTP, gRPC, DNS, load balancing, and the network-level realities behind service-to-service calls
 5. [05-distributed-tracing.md](./05-distributed-tracing.md): how to follow one request across several hops without guessing from logs alone
 6. [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md): when asynchronous flows help and when they mainly add complexity
+7. [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md): how to choose between queue, event stream, outbox, saga, and `CQRS` based on the real coordination problem
 
 ## Refresh
 
@@ -30,6 +31,7 @@ Focus:
 - [04-networking-fundamentals.md](./04-networking-fundamentals.md)
 - [05-distributed-tracing.md](./05-distributed-tracing.md)
 - [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md)
+- [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md)
 
 ## Required
 

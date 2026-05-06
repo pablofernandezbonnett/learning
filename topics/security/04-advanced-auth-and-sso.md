@@ -8,6 +8,70 @@ Here is the breakdown of advanced authentication mechanisms.
 
 ---
 
+## Why This Matters
+
+Authentication design gets messy when the caller is no longer just "a user in a
+browser." Real systems also need machine-to-machine access, partner APIs,
+enterprise identity providers, and token handling choices that change the risk
+profile of the whole system.
+
+This matters because many weak auth answers name OAuth or SSO correctly but do
+not explain where trust lives, where tokens live, or which pattern fits which
+caller.
+
+## Smallest Mental Model
+
+Start by asking who the caller is:
+
+- machine or script
+- internal service
+- browser user
+- mobile app
+- enterprise user coming from a customer identity provider
+
+Then choose the auth pattern that matches that caller and the trust boundary.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- one auth mechanism should fit all callers
+- OAuth, OIDC, SAML, API keys, and sessions are mostly interchangeable names
+- saying "we use JWT" is enough explanation
+
+Better mental model:
+
+- different callers need different trust shapes
+- the key decision is where credentials or tokens live and who can safely hold
+  secrets
+- enterprise SSO is often a platform integration decision, not just a login UI
+  feature
+
+Small concrete example:
+
+- weak approach: a browser SPA stores long-lived tokens and the design stops at
+  "OIDC login"
+- better approach: the team explains whether the app is a confidential web app,
+  BFF, SPA, or mobile client, then chooses server-side exchange or PKCE
+  accordingly
+
+Strong default:
+
+- API keys for external machine clients when that is enough
+- client credentials for service-to-service trust
+- authorization code flow with PKCE for public clients
+- server-side code exchange plus secure session for confidential web clients or
+  BFFs
+
+Interview-ready takeaway:
+
+> I choose auth by caller type and token location: API keys for external machine
+> access, client credentials for service-to-service trust, and OIDC code flow
+> with either server-side exchange or PKCE depending on whether the client can
+> safely hold a secret.
+
+---
+
 ## 1. Basic Auth vs. API Keys (Machine-to-Machine)
 
 When a script, a cron job, or an external partner system needs to talk to your API, you do not use a web login screen.

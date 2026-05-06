@@ -11,6 +11,28 @@ This is the short version to retain and reopen quickly.
 
 ---
 
+## Why This Matters
+
+Incidents rarely announce their root cause clearly. This sheet matters because
+the shortest useful observability model should help you move from symptom to
+explanation fast, not just remember tool names.
+
+## Smallest Mental Model
+
+Use three views together:
+
+- traces for one request path
+- metrics for trend and alerting
+- logs for exact event detail
+
+## Bad Mental Model vs Better Mental Model
+
+- bad: observability means dashboards plus log search after the fact
+- better: observability is the signal set that lets you explain which request,
+  dependency, or business flow is actually failing
+
+---
+
 ## What This Solves
 
 Monitoring tells you that the system is unhealthy.

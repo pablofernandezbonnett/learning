@@ -7,6 +7,62 @@ If you have Redis experience, you must be able to explain these three main strat
 
 ---
 
+## Why This Matters
+
+Caching is one of the easiest ways to improve latency and one of the easiest
+ways to quietly damage correctness.
+
+This topic matters because many backend and interview answers treat Redis as a
+free performance button. In real systems, the hard part is not adding a cache.
+It is knowing what can be stale, what must stay authoritative, and what failure
+mode each cache pattern introduces.
+
+## Smallest Mental Model
+
+Cache is a speed layer in front of a primary source of truth.
+
+The main decision is not "should we use Redis?" but:
+
+- who owns final truth
+- when cache entries appear or disappear
+- how stale data can be
+- what happens under misses, bursts, and write races
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Redis makes reads fast, so the system is better
+- once data is in cache, the hard part is solved
+- cache consistency is a small implementation detail
+
+Better mental model:
+
+- Redis trades simpler reads for coherence risk
+- every cache pattern is really a policy for handling stale data and failure
+- the source of truth must remain explicit even when Redis is hot
+
+Small concrete example:
+
+- weak approach: product stock lives in Postgres, but the app trusts cached
+  availability during checkout
+- better approach: cache helps product browsing, while final reservation still
+  checks the authoritative write path
+
+Strong default:
+
+- cache read-heavy data whose slight staleness is acceptable
+- do not let cache become the final authority for money, final order state, or
+  high-contention write decisions unless that is a deliberate system design
+
+Interview-ready takeaway:
+
+> I treat caching as a latency optimization over a clear source of truth. The
+> real decision is how much staleness the business can tolerate and how the
+> system behaves on misses, races, and bursty traffic.
+
+---
+
 ## 1. Pattern: Cache-Aside (Lazy Loading)
 
 The most common pattern. The application (your Spring Boot / Kotlin code) acts as the

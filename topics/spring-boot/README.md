@@ -2,6 +2,14 @@
 
 Use this folder for practical Spring and Spring Boot refresh.
 
+Why this folder matters:
+
+- Spring knowledge goes stale fastest where runtime behavior is hidden behind
+  convenience
+- many real issues come from misunderstanding proxies, persistence behavior,
+  configuration, or boundary placement rather than from missing syntax
+- this folder keeps the refresh anchored in production-minded Spring behavior
+
 Focus:
 
 - container and proxy behavior
@@ -16,6 +24,13 @@ Working style:
 - explain the runtime meaning behind Spring annotations instead of stopping at syntax
 - keep bean lifecycle, proxy behavior, transactions, and persistence connected as one mental model
 - connect framework features back to correctness, latency, and production behavior
+
+Smallest mental model:
+
+- Spring Framework owns the container and runtime behavior
+- Spring Boot adds defaults, packaging, and wiring conventions
+- the useful refresh is about boundaries: web, transaction, proxy, data, and
+  configuration boundaries
 
 ## Recommended Order
 

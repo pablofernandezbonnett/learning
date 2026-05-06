@@ -12,6 +12,63 @@ strategies — plus one hard problem: the database.
 
 ---
 
+## Why This Matters
+
+Deployment strategy is not just an operations detail. It directly affects user
+experience, rollback safety, and whether a schema or application change becomes
+an incident.
+
+This matters because many systems can deploy new containers easily but still
+cause downtime through incompatible versions, bad health checks, or destructive
+database changes.
+
+## Smallest Mental Model
+
+Zero-downtime deployment means old and new versions can overlap safely while
+traffic keeps flowing.
+
+That usually depends on two things:
+
+- traffic moves gradually or safely between versions
+- the application and database stay compatible during the rollout window
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- zero downtime means Kubernetes restarts pods one by one
+- once the rollout strategy is configured, the problem is mostly solved
+- database migration is separate from deployment strategy
+
+Better mental model:
+
+- zero downtime is a compatibility problem first and a rollout-tooling problem
+  second
+- old and new versions often coexist, so contracts and schemas must survive
+  overlap
+- the database is usually the sharpest edge in the whole release
+
+Small concrete example:
+
+- weak approach: rename a column and deploy new code in one release because the
+  app rollout is "rolling"
+- better approach: expand the schema first, let both app versions coexist,
+  backfill safely, and only contract later
+
+Strong default:
+
+- use rolling updates as the normal default
+- use canary or blue/green when blast radius or rollback speed matters more
+- always treat destructive schema change as a multi-step rollout
+
+Interview-ready takeaway:
+
+> I treat zero-downtime release as a compatibility problem. The app rollout
+> strategy matters, but the critical question is whether old and new code can
+> safely coexist with the database during the rollout window.
+
+---
+
 ## 1. Rolling Updates
 
 The default Kubernetes strategy. Simple, no extra cost.

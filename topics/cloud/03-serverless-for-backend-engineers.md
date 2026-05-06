@@ -39,6 +39,67 @@ If you only keep the shortest retention layer:
 
 ---
 
+## Why This Matters
+
+Serverless is easy to oversell and easy to dismiss. In practice, it is just one
+runtime model with a specific tradeoff shape: less server management, but still
+real distributed-systems, cost, and operational decisions.
+
+This matters because many teams choose serverless for the wrong reason, then
+discover too late that the workload, latency profile, or connection model did
+not fit.
+
+## Smallest Mental Model
+
+Treat serverless as event-driven or request-driven compute that the platform
+runs for you.
+
+The real decision is not "is serverless modern?" It is:
+
+- what triggers the work
+- how stateful the work is
+- how sensitive the latency is
+- how much operational control you actually need
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- serverless means no operations
+- all backend workloads can be decomposed into functions if we try hard enough
+- using a provider-managed runtime automatically simplifies the whole system
+
+Better mental model:
+
+- serverless removes server ownership, not architecture ownership
+- it works best for stateless, bursty, event-driven, or naturally decoupled
+  workloads
+- the cost model, runtime limits, and cold-start profile must still match the
+  business need
+
+Small concrete example:
+
+- weak approach: move a latency-sensitive always-busy public API into JVM
+  functions because "Lambda scales automatically"
+- better approach: use functions for webhook intake or scheduled jobs, and keep
+  a steady low-latency API in a container runtime if that fits the traffic
+  better
+
+Strong default:
+
+- choose serverless first for bursty jobs, queue consumers, scheduled work, or
+  event intake
+- be skeptical when the workload is always hot, long-lived, highly stateful, or
+  extremely latency-sensitive
+
+Interview-ready takeaway:
+
+> I treat serverless as a runtime tradeoff, not a maturity badge. It fits
+> stateless and event-driven workloads well, but I still need to reason about
+> retries, idempotency, cold starts, limits, and cost shape.
+
+---
+
 ## 1. What Serverless Actually Means
 
 Serverless does **not** mean "there are no servers."

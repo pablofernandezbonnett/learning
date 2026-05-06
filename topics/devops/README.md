@@ -5,6 +5,15 @@ for backend ownership.
 This is less about tooling fashion and more about the mechanics that decide
 whether a release is safe, observable, and recoverable.
 
+Why this folder matters:
+
+- many backend teams write code responsibly but still release or operate it
+  weakly
+- the biggest runtime problems are often rollout, visibility, or recovery
+  problems rather than pure coding problems
+- this folder keeps the focus on the operational mechanics a backend engineer
+  can actually own
+
 Focus:
 
 - containerization and delivery pipelines
@@ -17,6 +26,12 @@ Working style:
 - explain ops jargon in terms of runtime behavior and release risk
 - prefer "what fails and how you recover" over tool-name memorization
 - keep the topic close to what a backend engineer actually owns in production
+
+Smallest mental model:
+
+- packaging, rollout, visibility, and recovery are all part of the product path
+- if a service cannot be deployed safely or debugged under failure, the job is
+  still unfinished
 
 ## Recommended Order
 

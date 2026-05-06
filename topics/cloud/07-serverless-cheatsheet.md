@@ -10,6 +10,28 @@ This is the short version to retain and reopen quickly.
 
 ---
 
+## Why This Matters
+
+Serverless is a good fit only when its runtime shape matches the workload.
+This sheet matters because the common mistake is answering from hype or from
+rejection, instead of from trigger shape, latency sensitivity, and retry model.
+
+## Smallest Mental Model
+
+Serverless is managed compute around a trigger.
+
+- the trigger defines the boundary
+- statelessness keeps the runtime simple
+- retries and async work shape correctness
+
+## Bad Mental Model vs Better Mental Model
+
+- bad: serverless means the platform will somehow absorb the architecture work
+- better: serverless removes server ownership, but handler design, retries,
+  idempotency, and observability still decide whether the flow is safe
+
+---
+
 ## The Core Idea
 
 Serverless does not mean "no servers."

@@ -8,6 +8,59 @@ implement business workflows, these are the risks that matter most.
 
 ---
 
+## Why This Matters
+
+Most backend security bugs do not look like "advanced hacking." They look like
+normal product code making the wrong trust decision: trusting the client too
+much, trusting a partner payload too much, or exposing a dangerous workflow
+step without enough checks.
+
+This topic matters because these are the issues that appear in day-to-day API
+work, code reviews, incidents, and strong security interview answers.
+
+## Smallest Mental Model
+
+Treat backend security as a set of trust and abuse questions:
+
+- who is calling this
+- what are they allowed to do
+- what input or callback are we trusting
+- what expensive or dangerous action could be abused
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- security is mostly crypto, passwords, and framework defaults
+- if the endpoint requires login, it is probably safe
+- partner systems and internal tools are mostly trusted
+
+Better mental model:
+
+- security is mostly about correct authorization, safe state transitions, and
+  careful trust boundaries
+- authenticated requests can still be dangerous
+- third-party systems, internal tools, and expensive endpoints all need explicit
+  controls
+
+Small concrete example:
+
+- weak approach: `POST /refunds/{id}` only checks that the user is logged in
+- better approach: the backend verifies object-level access, valid workflow
+  state, replay safety, and rate or abuse limits before allowing the refund
+
+Strong default:
+
+- start security reviews from authorization, workflow abuse, resource limits,
+  and external trust boundaries before worrying about rarer edge cases
+
+Interview-ready takeaway:
+
+> For backend security, I start with who can do what, which state transitions
+> must stay protected, and which inputs or callbacks cross a trust boundary.
+
+---
+
 ## 1. The Core Idea
 
 Most serious backend security issues are not "hackers breaking crypto".

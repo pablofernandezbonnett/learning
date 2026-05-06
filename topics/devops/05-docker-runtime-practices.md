@@ -13,6 +13,59 @@ environments.
 
 ---
 
+## Why This Matters
+
+Docker is easy to reduce to "it runs on my machine," but the real value is
+making build, runtime, packaging, and environment assumptions explicit before
+the service reaches Kubernetes or production.
+
+This matters because weak container habits create larger images, noisier
+security posture, brittle config handling, and confusing runtime behavior later.
+
+## Smallest Mental Model
+
+Treat a container as a packaged runtime boundary:
+
+- build artifacts go in
+- only the runtime dependencies stay
+- config arrives from outside
+- the process should run with minimal privilege and clear lifecycle behavior
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Docker is mainly for local startup convenience
+- if the container launches, the image is good enough
+- the runtime and the build environment can be mixed freely
+
+Better mental model:
+
+- Docker is part of the production contract
+- image size, privilege level, config injection, and lifecycle behavior all
+  affect operability and security
+- good container discipline makes later platform work much simpler
+
+Small concrete example:
+
+- weak approach: one large image builds and runs as root with hardcoded
+  environment values
+- better approach: multi-stage build, slim runtime image, non-root user, and
+  environment-specific config injected at runtime
+
+Strong default:
+
+- separate build from runtime, run as non-root, keep config external, and
+  understand networking and persistence boundaries clearly
+
+Interview-ready takeaway:
+
+> I treat Docker as part of the production runtime contract, not just local
+> tooling. I care about build/runtime separation, non-root execution, config
+> discipline, and clear networking and persistence behavior.
+
+---
+
 ## 1. Multi-Stage Builds
 
 This is one of the highest-value Docker skills for Java and Spring Boot.

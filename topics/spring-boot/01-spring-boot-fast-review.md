@@ -8,12 +8,38 @@ Spring Boot folder.
 Use it when you want a short refresh of what matters most in production-minded
 Spring work.
 
+Why this matters:
+
+- Spring knowledge decays unevenly
+- people remember annotations longer than runtime behavior
+- production bugs usually come from proxies, transactions, query shape, config,
+  or persistence tradeoffs, not from forgetting an annotation name
+
+Smallest mental model:
+
+- Spring is mainly a managed runtime and wiring model
+- Spring Boot is mainly a defaulting and packaging layer on top
+- most production surprises come from proxy boundaries, persistence behavior, or
+  configuration shape
+
+Bad refresh instinct vs better refresh instinct:
+
+- weak refresh: reopen random annotations until things feel familiar
+- better refresh: reopen the runtime boundaries, data boundaries, and security
+  boundaries that usually decide real production behavior
+
 If you only want the retention layer, keep these four ideas in your head:
 
 - Spring behavior is often proxy-driven, so transaction and caching behavior has boundaries
 - query shape and transaction boundaries still matter more than repository convenience
 - Redis, Mongo, and Postgres should not be treated as interchangeable persistence layers
 - hot production paths usually fail because of correctness, query cost, or runtime behavior, not because you forgot an annotation
+
+Reusable takeaway:
+
+> The fastest useful Spring refresh is not annotation recall. It is remembering
+> how the container, proxies, persistence model, and configuration shape real
+> runtime behavior.
 
 ---
 

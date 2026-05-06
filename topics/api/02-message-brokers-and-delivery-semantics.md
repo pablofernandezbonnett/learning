@@ -20,6 +20,10 @@ Kafka-specific follow-up:
 
 - [06-kafka-practical-foundations.md](./06-kafka-practical-foundations.md)
 
+Boundary-choice follow-up:
+
+- [07-sync-vs-async-integration-choice.md](./07-sync-vs-async-integration-choice.md)
+
 ---
 
 ## 1. What Problem A Broker Actually Solves
