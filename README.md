@@ -47,6 +47,7 @@ Use one of these entry points depending on what you need:
 - `paths/general-refresh.md`: a broad backend refresh path
 - `paths/appsec-for-software-engineers.md`: a practical AppSec path for developers
 - `paths/sre-from-backend-engineers.md`: a practical path from backend ownership to reliability ownership
+- `paths/solutions-architect-from-backend.md`: a practical path from backend depth to end-to-end solution design
 - `topics/`: topic-by-topic notes, usually split into `Refresh`, `Required`, and `Growth`
 - `labs/`: runnable companion material
 
@@ -64,6 +65,7 @@ Jump directly into a topic entry point:
 - [Security](./topics/security/README.md)
 - [AppSec](./topics/appsec/README.md)
 - [SRE](./topics/sre/README.md)
+- [Solutions Architecture](./topics/solutions-architecture/README.md)
 - [Cloud](./topics/cloud/README.md)
 - [DevOps](./topics/devops/README.md)
 - [Testing](./topics/testing/README.md)
@@ -86,6 +88,7 @@ The first migration wave is centered on:
 - [System design](./topics/system-design/README.md)
 - [Security](./topics/security/README.md)
 - [SRE](./topics/sre/README.md)
+- [Solutions Architecture](./topics/solutions-architecture/README.md)
 - [Cloud](./topics/cloud/README.md)
 - [DevOps](./topics/devops/README.md)
 - [Testing](./topics/testing/README.md)
