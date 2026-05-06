@@ -57,6 +57,12 @@ Working style:
 - [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/): deliberately vulnerable modern web app
 - [OWASP WebGoat](https://owasp.org/www-project-webgoat/): guided insecure training app
 
+## Related Path
+
+If you want a structured first-pass study order instead of a topic-only entrypoint, start with:
+
+- [../../paths/appsec-for-software-engineers.md](../../paths/appsec-for-software-engineers.md)
+
 ## Related Internal Topics
 
 - [../security/README.md](../security/README.md): deeper backend security notes already present in this repo

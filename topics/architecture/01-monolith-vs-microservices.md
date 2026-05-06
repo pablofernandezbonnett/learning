@@ -537,4 +537,4 @@ throughput boundaries justify it," the answer is usually much stronger.
 - [04-networking-fundamentals.md](./04-networking-fundamentals.md)
 - [05-distributed-tracing.md](./05-distributed-tracing.md)
 - [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md)
-- [11-fast-retailing-scale-vs-hybris.md](./11-fast-retailing-scale-vs-hybris.md)
+- [15-retail-inventory-and-fulfillment-systems.md](./15-retail-inventory-and-fulfillment-systems.md)

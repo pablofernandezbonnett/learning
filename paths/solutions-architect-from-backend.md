@@ -35,19 +35,19 @@ It is "expand technical judgment to wider business and solution boundaries".
 
 The new layer is mostly about shaping decisions before code exists everywhere:
 
-- requirement discovery and `NFR` ranking
+- requirement discovery and ranking `NFRs` (`non-functional requirements`, meaning qualities and constraints such as latency, isolation, audit, residency, or cost)
 - build-vs-buy judgment
 - tenant, trust, and data boundaries
 - migration and modernization strategy
 - compliance, residency, and operating constraints
-- `ADR` writing and stakeholder communication
+- writing `ADRs` (`Architecture Decision Records`, meaning short written records of important architecture decisions and tradeoffs) and communicating clearly with stakeholders
 
 ## Working Rule
 
 For each topic:
 
 1. define the business flow and the invariant first
-2. name the main `NFRs` and constraints
+2. name the main quality constraints (`NFRs`) and other hard constraints
 3. explain the solution options and tradeoffs
 4. explain the migration path from the current state
 5. explain who will operate or own the consequences of the decision

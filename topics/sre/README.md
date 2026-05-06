@@ -46,6 +46,12 @@ Working style:
 
 - [06-postmortems-and-operational-review.md](./06-postmortems-and-operational-review.md)
 
+## Related Path
+
+If your goal is the role transition from backend engineer to `SRE`, start with:
+
+- [../../paths/sre-from-backend-engineers.md](../../paths/sre-from-backend-engineers.md)
+
 ## Related Internal Topics
 
 - [../devops/03-observability-and-monitoring.md](../devops/03-observability-and-monitoring.md): logs, metrics, traces, and baseline `SLI` / `SLO` vocabulary

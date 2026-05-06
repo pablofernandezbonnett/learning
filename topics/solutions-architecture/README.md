@@ -50,6 +50,12 @@ Short rule:
 
 - [06-adrs-and-stakeholder-communication.md](./06-adrs-and-stakeholder-communication.md)
 
+## Related Path
+
+If your goal is the role transition from backend engineer to `Solutions Architect`, start with:
+
+- [../../paths/solutions-architect-from-backend.md](../../paths/solutions-architect-from-backend.md)
+
 ## Related Internal Topics
 
 - [../system-design/README.md](../system-design/README.md): correctness, invariants, source of truth, and defensible design shape

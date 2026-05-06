@@ -789,4 +789,4 @@ Senior rule:
 - Spring transaction management:
   https://docs.spring.io/spring-framework/reference/data-access/transaction.html
 - Spring web annotations refresher:
-  [07-web-annotations.md](./07-web-annotations.md)
+  [11-web-annotations.md](./11-web-annotations.md)

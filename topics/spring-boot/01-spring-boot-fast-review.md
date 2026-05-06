@@ -52,12 +52,12 @@ Short answer:
 
 Reopen these if you need to refresh how Spring really behaves:
 
-- [01-ioc-deep-dive.md](./01-ioc-deep-dive.md)
-- [02-bean-lifecycle.md](./02-bean-lifecycle.md)
-- [03-proxies-and-aop.md](./03-proxies-and-aop.md)
-- [04-autoconfiguration.md](./04-autoconfiguration.md)
-- [05-conditional-beans.md](./05-conditional-beans.md)
-- [06-profiles.md](./06-profiles.md)
+- [05-ioc-deep-dive.md](./05-ioc-deep-dive.md)
+- [06-bean-lifecycle.md](./06-bean-lifecycle.md)
+- [07-proxies-and-aop.md](./07-proxies-and-aop.md)
+- [08-auto-configuration.md](./08-auto-configuration.md)
+- [09-conditional-beans.md](./09-conditional-beans.md)
+- [10-profiles.md](./10-profiles.md)
 
 Main points:
 
@@ -126,8 +126,8 @@ Short line:
 
 Reopen:
 
-- [07-web-annotations.md](./07-web-annotations.md)
-- [08-exception-handling.md](./08-exception-handling.md)
+- [11-web-annotations.md](./11-web-annotations.md)
+- [02-exception-handling.md](./02-exception-handling.md)
 
 Main points:
 
@@ -141,10 +141,10 @@ Main points:
 
 For the practical data refresh, reopen:
 
-- [10-spring-data.md](./10-spring-data.md)
-- [16-flyway-and-schema-migrations.md](./16-flyway-and-schema-migrations.md)
-- [17-transactions-and-isolation.md](./17-transactions-and-isolation.md)
-- [18-jpa-hibernate-performance-traps.md](./18-jpa-hibernate-performance-traps.md)
+- [13-spring-data.md](./13-spring-data.md)
+- [19-flyway-and-schema-migrations.md](./19-flyway-and-schema-migrations.md)
+- [03-transactions-and-isolation.md](./03-transactions-and-isolation.md)
+- [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md)
 
 Main points:
 
@@ -175,7 +175,7 @@ Typical real decisions:
 
 Reopen:
 
-- [13-appsec-authz-lab.md](./13-appsec-authz-lab.md)
+- [16-appsec-authz-lab.md](./16-appsec-authz-lab.md)
 - [01-auth-sessions-vs-jwt.md](../../topics/security/01-auth-sessions-vs-jwt.md)
 - [03-spring-and-jvm-appsec.md](../../topics/security/03-spring-and-jvm-appsec.md)
 
@@ -378,9 +378,9 @@ Operational note:
 
 Reopen:
 
-- [09-caching-redis.md](./09-caching-redis.md)
-- [10-spring-data.md](./10-spring-data.md)
-- [11-nosql-redis-mongo.md](./11-nosql-redis-mongo.md)
+- [12-caching-and-redis.md](./12-caching-and-redis.md)
+- [13-spring-data.md](./13-spring-data.md)
+- [14-datastore-choice-postgres-mongo-redis.md](./14-datastore-choice-postgres-mongo-redis.md)
 
 Main points:
 
@@ -401,7 +401,7 @@ Practical rule:
 
 Reopen:
 
-- [12-kotlin-spring-idioms.md](./12-kotlin-spring-idioms.md)
+- [15-kotlin-spring-idioms.md](./15-kotlin-spring-idioms.md)
 
 Main points:
 
@@ -418,8 +418,8 @@ Main points:
 
 Reopen:
 
-- [06-profiles.md](./06-profiles.md)
-- [19-spring-cloud-and-service-integration.md](./19-spring-cloud-and-service-integration.md)
+- [10-profiles.md](./10-profiles.md)
+- [20-spring-cloud-and-service-integration.md](./20-spring-cloud-and-service-integration.md)
 
 Main points:
 
@@ -466,23 +466,23 @@ That is a better refresh than reopening annotations in isolation.
 
 If you have limited time:
 
-1. [03-proxies-and-aop.md](./03-proxies-and-aop.md)
-2. [07-web-annotations.md](./07-web-annotations.md)
-3. [10-spring-data.md](./10-spring-data.md)
-4. [17-transactions-and-isolation.md](./17-transactions-and-isolation.md)
-5. [18-jpa-hibernate-performance-traps.md](./18-jpa-hibernate-performance-traps.md)
-6. [13-appsec-authz-lab.md](./13-appsec-authz-lab.md)
+1. [07-proxies-and-aop.md](./07-proxies-and-aop.md)
+2. [11-web-annotations.md](./11-web-annotations.md)
+3. [13-spring-data.md](./13-spring-data.md)
+4. [03-transactions-and-isolation.md](./03-transactions-and-isolation.md)
+5. [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md)
+6. [16-appsec-authz-lab.md](./16-appsec-authz-lab.md)
 7. [01-auth-sessions-vs-jwt.md](../../topics/security/01-auth-sessions-vs-jwt.md)
 
 That gets you most of the practical value quickly.
 
 If your next project is more data-heavy, use this order instead:
 
-1. [10-spring-data.md](./10-spring-data.md)
-2. [18-jpa-hibernate-performance-traps.md](./18-jpa-hibernate-performance-traps.md)
-3. [17-transactions-and-isolation.md](./17-transactions-and-isolation.md)
-4. [09-caching-redis.md](./09-caching-redis.md)
-5. [11-nosql-redis-mongo.md](./11-nosql-redis-mongo.md)
+1. [13-spring-data.md](./13-spring-data.md)
+2. [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md)
+3. [03-transactions-and-isolation.md](./03-transactions-and-isolation.md)
+4. [12-caching-and-redis.md](./12-caching-and-redis.md)
+5. [14-datastore-choice-postgres-mongo-redis.md](./14-datastore-choice-postgres-mongo-redis.md)
 
 ---
 

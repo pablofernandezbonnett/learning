@@ -1,18 +1,20 @@
 # Python for Java and Kotlin Backend Engineers
 
+Use this folder when you want to use Python as a practical tool from a JVM
+backend background.
+
 Python in this repo is not positioned as a primary backend stack.
-It is also not part of the main backend refresh path.
+It is positioned as a high-leverage language for tasks where speed,
+data tooling, or library reach matter more than the stronger compile-time
+guardrails of Java or Kotlin.
 
-It is positioned as a high-leverage tool for a JVM backend engineer.
-
-That means using Python for:
+Focus:
 
 - data scripts
 - automation
 - lightweight internal APIs
 - ML or AI-adjacent integration
-
-not as a replacement for every Spring Boot service.
+- not as a replacement for every Spring Boot service
 
 Working style:
 
@@ -20,11 +22,15 @@ Working style:
 - explain the tradeoff between speed and discipline instead of treating Python as "easy by default"
 - connect Python back to the same backend quality standards used elsewhere in the repo
 
----
+## Smallest Mental Model
 
-## What Python Actually Changes For A JVM Developer
+Python changes the shape of day-to-day work more than it changes the backend
+principles underneath it.
+You still need clear contracts, safe data handling, and testing discipline.
+What changes is that the language lets you move faster, but it also asks you to
+add more discipline on purpose.
 
-The biggest differences are:
+The biggest differences for a JVM developer are:
 
 - much less ceremony
 - dynamic runtime by default
@@ -42,9 +48,7 @@ Short rule:
 
 > Python is most valuable here as a speed tool, not as a place to forget backend rigor
 
----
-
-## The Smallest Mental Map
+## Mental Map
 
 | Java or Kotlin idea | Python equivalent |
 |---|---|
@@ -64,8 +68,6 @@ If you come from Kotlin, the easiest Python bridge is:
 If you come from Java, the biggest adjustment is:
 
 - fewer compile-time guarantees unless you add type discipline deliberately
-
----
 
 ## When To Reach For Python
 
@@ -87,25 +89,14 @@ Short rule:
 - small task, fast feedback, lots of libraries -> Python is a good candidate
 - complex long-lived enterprise service -> JVM stack may still be the better fit
 
----
+## Recommended Order
 
-## Files In This Folder
-
-| File | Purpose | Run |
+| File | Why start here | Run |
 |---|---|---|
-| `examples/01-basics.py` | syntax refresher for Java and Kotlin developers | `python examples/01-basics.py` |
-| `04-project-shape-and-quality.md` | typing, tooling, testing, and project shape when Python is rusty | read as guide |
-| `examples/02-data-scripts.py` | data and ETL style work | `python examples/02-data-scripts.py` |
-| `examples/03-fastapi-app.py` | lightweight API mental bridge from Spring Boot | `uvicorn examples.03-fastapi-app:app --reload` |
-
-Recommended order:
-
-1. `examples/01-basics.py`
-2. `04-project-shape-and-quality.md`
-3. `examples/02-data-scripts.py`
-4. `examples/03-fastapi-app.py`
-
----
+| [examples/01-basics.py](./examples/01-basics.py) | syntax refresher for Java and Kotlin developers | `python examples/01-basics.py` |
+| [04-project-shape-and-quality.md](./04-project-shape-and-quality.md) | typing, tooling, testing, and project shape when Python is rusty | read as guide |
+| [examples/02-data-scripts.py](./examples/02-data-scripts.py) | data and ETL style work | `python examples/02-data-scripts.py` |
+| [examples/03-fastapi-app.py](./examples/03-fastapi-app.py) | lightweight API mental bridge from Spring Boot | `uvicorn examples.03-fastapi-app:app --reload` |
 
 ## Setup
 
@@ -127,8 +118,6 @@ source .venv/bin/activate
 pip install pandas fastapi uvicorn
 ```
 
----
-
 ## Practical Framing
 
 Good framing:
@@ -140,8 +129,6 @@ Good framing:
 Bad framing:
 
 > Python is easy so I would just use it for everything.
-
----
 
 ## What To Internalize
 

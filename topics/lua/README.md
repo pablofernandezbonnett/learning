@@ -1,27 +1,21 @@
 # Lua for Embedded Business Rules
 
-Lua is background material for one specific design idea:
+Use this folder when you want to study one narrow but useful architecture idea:
+moving fast-changing business rules out of the main JVM deployment cycle.
 
-> when frequent business-rule changes should be moved out of the main JVM deployment cycle
+This makes it useful for retail, pricing, promotion, or other rule-heavy
+systems.
 
-This makes it useful for retail, pricing, promotion, or rules-heavy systems.
+The goal is not to learn Lua as a general-purpose language.
+The goal is to understand when an embedded rule layer helps, what it buys you,
+and what risks it introduces.
 
----
-
-## 1. What Lua Is Doing Here
+## Smallest Mental Model
 
 Lua is a lightweight embeddable scripting language.
-
-In this repo, the interesting question is not "learn Lua as a language for its own sake".
-The interesting question is:
-
-- when would a backend system benefit from an embedded rule layer?
-- what does that buy you?
-- what does it cost?
-
----
-
-## 2. What Problem It Solves
+The host application stays responsible for security, context, execution limits,
+and the final business flow.
+The script only evaluates a narrow rule and returns a result.
 
 Some rules change faster than the host application should be redeployed.
 
@@ -45,10 +39,6 @@ Short rule:
 
 > embedded scripting is useful when the rule layer changes faster than the service runtime should
 
----
-
-## 3. Smallest Mental Model
-
 The host application stays responsible for:
 
 - loading trusted script content
@@ -71,9 +61,7 @@ Spring Boot service
   -> gets { finalPrice, discountReason }
 ```
 
----
-
-## 4. Why Lua Can Be Attractive
+## Why Lua Can Be Attractive
 
 Pros:
 
@@ -89,35 +77,20 @@ Tradeoffs / Cons:
 - debugging and version control of scripts need discipline
 - not a good default if rules are stable and developer-owned anyway
 
----
+## What To Learn First
 
-## 5. What To Learn First
+- `Tables`: Lua's main data structure. Think of them as the flexible core
+  structure behind arrays, maps, and object-like data.
+- `Local` vs global: variables are global by default. That is dangerous. Use
+  `local` unless there is a very deliberate reason not to.
+- functions and closures: useful because rule evaluation often passes small
+  functions and context.
+- metatables: interesting, but secondary for the business-rules use case. You
+  do not need to go deep here before understanding the host-integration model.
 
-### Tables
+## Real Backend Use Case
 
-Lua's main data structure.
-Think of them as the flexible core structure behind arrays, maps, and object-like data.
-
-### Local vs global
-
-Variables are global by default.
-That is dangerous.
-Use `local` unless there is a very deliberate reason not to.
-
-### Functions and closures
-
-Useful because rule evaluation often passes small functions and context.
-
-### Metatables
-
-Interesting, but secondary for the business-rules use case.
-You do not need to go deep here before understanding the host-integration model.
-
----
-
-## 6. Real Backend Use Case
-
-### Retail-style pricing and promotions
+Retail-style pricing and promotions
 
 Example:
 
@@ -134,9 +107,7 @@ This can be attractive when:
 This is not a replacement for core transactional correctness.
 The source of truth and final order/payment state still belong to the main backend system.
 
----
-
-## 7. Minimal Host Integration Shape
+## Minimal Host Integration Shape
 
 The host service should do the safe work:
 
@@ -164,9 +135,7 @@ Important rule:
 
 > the host application must own the sandbox, boundaries, and validation; the script should not get arbitrary runtime power
 
----
-
-## 8. Security And Operational Caution
+## Security And Operational Caution
 
 If you embed a scripting language, the hard part is not syntax.
 The hard part is controlling what the script is allowed to do.
@@ -181,9 +150,7 @@ Questions that matter:
 
 This is why embedded scripting is a real architecture choice, not a toy.
 
----
-
-## 9. When I Would Use It And When I Would Not
+## When I Would Use It And When I Would Not
 
 Use it when:
 
@@ -197,9 +164,7 @@ Avoid it when:
 - the team has no appetite for script governance
 - strong typing and normal code review are more valuable than hot-swappable rule changes
 
----
-
-## 10. Practical Summary
+## Practical Summary
 
 Good short answer:
 
@@ -208,9 +173,7 @@ Good short answer:
 > faster rule iteration without full redeployment. The cost is weaker typing, more
 > sandboxing work, and the need for strong governance around script publication.
 
----
-
-## 11. Code Examples
+## Code Examples
 
 | File | What it teaches |
 |---|---|

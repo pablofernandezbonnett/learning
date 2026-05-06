@@ -4,7 +4,7 @@
 
 
 Use this after reading
-[04-serverless-for-backend-engineers.md](./04-serverless-for-backend-engineers.md).
+[03-serverless-for-backend-engineers.md](./03-serverless-for-backend-engineers.md).
 
 This is the short version to retain and reopen quickly.
 
