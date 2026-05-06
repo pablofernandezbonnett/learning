@@ -10,7 +10,7 @@ how they reduce user impact, and how they keep future changes safer.
 Focus:
 
 - what changes when you move from building services to operating them
-- `SLI`, `SLO`, error budget, and the difference between measuring and promising
+- `SLI` and `SLO`, meaning the measured reliability signal and the target you operate against, plus error budget and the difference between measuring and promising
 - alerting, on-call judgment, and how to avoid paging people for noise
 - incident triage, mitigation, and service recovery under pressure
 - capacity planning, load shedding, and safe degradation
@@ -54,7 +54,7 @@ If your goal is the role transition from backend engineer to `SRE`, start with:
 
 ## Related Internal Topics
 
-- [../devops/03-observability-and-monitoring.md](../devops/03-observability-and-monitoring.md): logs, metrics, traces, and baseline `SLI` / `SLO` vocabulary
+- [../devops/03-observability-and-monitoring.md](../devops/03-observability-and-monitoring.md): logs, metrics, traces, and baseline `SLI` / `SLO` vocabulary for reliability measurement and targets
 - [../devops/02-zero-downtime-deployments.md](../devops/02-zero-downtime-deployments.md): rollout safety and backward compatibility
 - [../devops/04-kubernetes-crash-course.md](../devops/04-kubernetes-crash-course.md): probes, scaling, and runtime behavior
 - [../architecture/02-resiliency-patterns.md](../architecture/02-resiliency-patterns.md): retries, timeouts, circuit breakers, and graceful degradation

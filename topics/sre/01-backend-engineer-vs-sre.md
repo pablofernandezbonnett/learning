@@ -12,6 +12,25 @@ It is the difference between mainly building service behavior and mainly operati
 
 ---
 
+## Why This Matters
+
+This distinction matters because many backend engineers already understand a lot
+of reliability mechanics, but they still frame them as code problems only.
+The role shift into `SRE` starts when the same failure is read as an operating
+problem too: detection, blast radius, mitigation, and recovery.
+
+---
+
+## Smallest Mental Model
+
+- backend mainly asks whether the service behaves correctly
+- `SRE` mainly asks whether that behavior stays safe and recoverable in production
+
+Both roles look at the same system.
+What changes is the center of gravity.
+
+---
+
 ## 0. Two Bad Mental Models
 
 Bad mental model 1:

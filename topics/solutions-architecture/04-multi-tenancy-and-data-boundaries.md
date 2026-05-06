@@ -6,6 +6,31 @@ The moment one platform serves many customers, regions, or business accounts, ar
 
 ---
 
+## Smallest Mental Model
+
+Multi-tenancy is the problem of sharing a platform without sharing the wrong
+things.
+The key design question is not whether tenants exist, but how strong the
+separation between them must be across data, workloads, support flows, and
+recovery.
+
+---
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- add `tenant_id` to the schema and the tenancy problem is mostly solved
+
+Better mental model:
+
+- tenant context must survive reads, writes, caches, logs, exports, async work, and admin tooling
+
+The stronger model is more work up front, but it reveals the real boundary
+design earlier.
+
+---
+
 ## 1. What Multi-Tenancy Means
 
 Multi-tenancy means one platform serves multiple distinct customers or customer groups, usually called tenants.

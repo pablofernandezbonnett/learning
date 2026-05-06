@@ -9,6 +9,17 @@ If the path is unrealistic, the target is weaker than it looks.
 
 ---
 
+## Smallest Mental Model
+
+Target-state architecture answers where you want to end up.
+Migration strategy answers how the current system can move there without losing
+correctness, control, or business continuity on the way.
+
+If the team cannot explain coexistence, rollout, and rollback, the target design
+is still incomplete.
+
+---
+
 ## 1. Target State Is Not Enough
 
 A target-state design answers:

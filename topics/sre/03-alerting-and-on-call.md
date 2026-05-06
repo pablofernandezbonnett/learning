@@ -11,6 +11,17 @@ When should the system interrupt a human?
 
 ---
 
+## Smallest Mental Model
+
+Alerting is not "more monitoring."
+It is the boundary where a signal becomes expensive enough to justify waking a
+human or interrupting active work.
+
+If the team cannot say what action the responder should take, the alert is
+probably not ready to page.
+
+---
+
 ## 1. The Goal Of Alerting
 
 The goal is not "notify us whenever anything looks unusual."
@@ -40,6 +51,26 @@ Better alert:
 - and the responder has a real mitigation path such as rollback, traffic shift, failover, or feature disable
 
 That is usually the difference between noise and operational value.
+
+---
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- page on any technical signal that looks suspicious
+
+Why weak:
+
+- it optimizes for fear of missing something and usually destroys trust in the page
+
+Better mental model:
+
+- page on user or business pain, or on a fast-moving signal that will require human action soon
+
+Why stronger:
+
+- it keeps interruption cost aligned with real urgency and real mitigation value
 
 ---
 

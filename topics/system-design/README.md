@@ -1,12 +1,12 @@
 # System Design for Backend Engineers
 
-This folder is for practical system design study.
+Use this folder for practical system design study.
 
 The focus is not abstract box-drawing.
-The focus is reasoning about the concrete rules and failure cases that decide
+It is reasoning about the concrete rules and failure cases that decide
 whether a backend flow is trustworthy.
 
-The main ideas you will see repeatedly are:
+Focus:
 
 - invariants: the business rules that must always stay true, such as "do not charge twice" or "do not oversell final stock"
 - source of truth: the durable system whose final state you trust when caches, retries, or downstream systems disagree
@@ -40,3 +40,11 @@ For any design exercise:
 3. walk the critical write path
 4. say what happens on retries, timeouts, and duplicate delivery
 5. only then add extra components for scale or convenience
+
+## Related Paths
+
+Use this topic directly when you want stronger design judgment in general.
+If you want a role-transition path built on top of these ideas, start with:
+
+- [../../paths/solutions-architect-from-backend.md](../../paths/solutions-architect-from-backend.md)
+- [../../paths/sre-from-backend-engineers.md](../../paths/sre-from-backend-engineers.md)

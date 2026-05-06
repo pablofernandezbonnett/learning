@@ -136,7 +136,7 @@ Do not try to become a vague high-level architect.
 First become the backend engineer who is strongest at:
 
 - explicit tradeoff reasoning
-- requirement and `NFR` discovery
+- requirement and `NFR` discovery, meaning finding the qualities and constraints that rule out weak solutions early
 - integration and trust-boundary judgment
 - migration realism
 - written decisions and stakeholder clarity

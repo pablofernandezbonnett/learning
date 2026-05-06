@@ -7,6 +7,16 @@ This note is about keeping systems stable before saturation becomes an outage.
 
 ---
 
+## Smallest Mental Model
+
+Capacity planning is really the study of which limit fills first, how quickly it
+fills under stress, and what the system should do before overload turns into a
+wider failure.
+
+That is why the topic belongs to backend and `SRE`, not only to infrastructure.
+
+---
+
 ## 1. What Capacity Planning Means
 
 Capacity planning means estimating how much load the system can handle safely, and deciding what needs to change before normal traffic or spikes exceed that limit.

@@ -44,7 +44,7 @@ It is "turn software knowledge into production judgment".
 
 The new layer is mostly about operating systems as live services:
 
-- `SLI`, `SLO`, and error budget thinking
+- `SLI` and `SLO` thinking, meaning the measured reliability signal and the reliability target, plus error budget judgment
 - alert design and on-call judgment
 - incident triage, mitigation, and postmortem habits
 - Kubernetes runtime behavior, probes, autoscaling, and scheduling basics

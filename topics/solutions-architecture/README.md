@@ -10,11 +10,11 @@ It is the layer that connects them into a defensible end-to-end solution.
 Focus:
 
 - what changes when you stop thinking only about one service and start shaping a whole solution
-- requirements and `NFRs`, meaning what the solution must do and what qualities it must preserve under load, change, and failure
+- requirements and `NFRs` (`non-functional requirements`), meaning what qualities and constraints the solution must preserve under load, change, and failure
 - build-vs-buy judgment, meaning when a managed or third-party capability is the better solution than custom code
 - multi-tenancy, trust boundaries, and data placement
 - migration and modernization strategy, meaning how to move from current reality to the target state safely
-- `ADR` writing and stakeholder communication, meaning how decisions are recorded and explained clearly
+- `ADR` writing (`Architecture Decision Records`) and stakeholder communication, meaning how decisions are recorded and explained clearly
 
 Working style:
 

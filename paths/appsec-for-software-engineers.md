@@ -41,7 +41,7 @@ Outcome:
 
 Outcome:
 
-- you can explain the difference between sessions, bearer tokens, JWTs, OAuth2, and OIDC without mixing them up
+- you can explain the difference between sessions, bearer tokens, JWTs, OAuth2, and `OIDC` (`OpenID Connect`) without mixing them up
 
 ### Phase 3. Core Web Vulnerabilities
 

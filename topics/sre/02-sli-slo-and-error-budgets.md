@@ -8,7 +8,20 @@ The goal is to understand how reliability targets shape real engineering decisio
 
 ---
 
-## 1. The Smallest Useful Meaning
+## Why This Matters
+
+Without a clear reliability target, teams usually drift into one of two weak
+habits:
+
+- shipping changes without a shared idea of acceptable failure
+- arguing about reliability with vague phrases such as "this feels unstable"
+
+`SLI`, `SLO`, and error budget matter because they turn that vagueness into
+something teams can operate against.
+
+---
+
+## 1. Smallest Mental Model
 
 - `SLI` = what you measure
 - `SLO` = the target you operate against
@@ -23,6 +36,24 @@ That matters because many teams start with a target number first:
 - "we want 99.99%"
 
 But without a clear measured behavior, that number is mostly decoration.
+
+---
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- choose a number first
+- then look for a graph that makes the number look official
+
+Better mental model:
+
+- start from a critical user journey
+- define the behavior that actually matters
+- then decide the target and what happens when you miss it
+
+That order is what turns reliability targets into operating tools instead of
+ceremony.
 
 ---
 

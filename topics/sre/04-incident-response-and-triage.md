@@ -10,6 +10,34 @@ The goal is to reduce user impact safely and quickly.
 
 ---
 
+## Smallest Mental Model
+
+Incident response is not mainly about proving the root cause quickly.
+It is about building the first useful picture of live impact, choosing the
+safest mitigation, and confirming whether user pain is going down.
+
+That is why symptom, blast radius, and mitigation matter earlier than perfect
+explanation.
+
+---
+
+## Bad First Instinct vs Better First Instinct
+
+Bad first instinct:
+
+- explain the whole failure before acting
+
+Better first instinct:
+
+- identify the live symptom
+- estimate scope
+- choose the safest reversible mitigation
+- keep diagnosing while damage is contained
+
+During the first minutes, that order is usually faster and safer.
+
+---
+
 ## 1. What An Incident Is
 
 An incident is not every bug.

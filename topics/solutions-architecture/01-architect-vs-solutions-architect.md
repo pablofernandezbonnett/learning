@@ -8,6 +8,26 @@ The point is to separate the responsibility centers clearly enough that the role
 
 ---
 
+## Why This Matters
+
+This distinction matters because many engineers try to grow into wider
+architecture work by collecting tools or diagrams first.
+That usually misses the real shift: the role gets wider mainly in constraint
+handling, boundary judgment, migration realism, and stakeholder clarity.
+
+---
+
+## Smallest Mental Model
+
+- backend engineer: makes one service or workflow behave correctly
+- architect: shapes the technical structure of systems
+- solutions architect: shapes the end-to-end solution across systems, constraints, and operating reality
+
+The deeper the role gets, the less it is about drawing more boxes and the more
+it is about making better cross-system decisions.
+
+---
+
 ## 1. Two Bad Mental Models
 
 Bad mental model 1:

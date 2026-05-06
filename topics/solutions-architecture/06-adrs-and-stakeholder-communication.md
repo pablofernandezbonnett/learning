@@ -7,6 +7,30 @@ That is where written decision records and stakeholder communication matter.
 
 ---
 
+## Smallest Mental Model
+
+Good architecture work is not finished when the team reaches a good decision.
+It is finished when the decision can be reviewed, explained, challenged later,
+and still make sense to people who were not in the room.
+
+That is the practical job of `ADRs` and stakeholder communication.
+
+---
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- if the technical decision is good, the rest is presentation
+
+Better mental model:
+
+- a good decision that cannot be explained clearly will be harder to implement, operate, review, and revisit safely
+
+That is why written reasoning is part of architecture quality, not admin work.
+
+---
+
 ## 1. What An ADR Is
 
 `ADR` means `Architecture Decision Record`.

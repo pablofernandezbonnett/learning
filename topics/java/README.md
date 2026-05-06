@@ -3,10 +3,23 @@
 Use this folder as a practical Java refresh when your mental model is strongest
 in Java `8` or `11` and needs updating for modern backend work.
 
+Focus:
+
+- JVM memory and garbage collection behavior
+- concurrency, visibility, and the Java Memory Model (`JMM`)
+- language features that matter in day-to-day backend code
+- production concurrency issues such as pool saturation and request overload
+
+Working style:
+
+- explain runtime behavior before language trivia
+- keep concurrency tied to real backend failure modes instead of academic examples
+- prefer the Java `17-21` baseline that is most useful in current backend work
+
 ## Recommended Order
 
 1. [01-jvm-memory-and-gc.md](./01-jvm-memory-and-gc.md): heap, stack, metaspace, allocation, and GC behavior
-2. [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md): race conditions, visibility, `volatile`, locks, atomics, executors, and virtual threads
+2. [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md): race conditions, visibility, `volatile`, locks, atomics, executors, and the `JMM`, meaning the rules that decide when one thread can see another thread's writes
 3. [03-modern-java-for-backend-engineers.md](./03-modern-java-for-backend-engineers.md): records, sealed types, pattern matching, and modern backend-friendly language features
 4. [04-modern-java-21-plus-notes.md](./04-modern-java-21-plus-notes.md): structured concurrency, scoped values, and newer post-21 awareness
 5. [05-concurrency-in-production.md](./05-concurrency-in-production.md): pool saturation, admission control, request budgets, and when local locks stop being enough

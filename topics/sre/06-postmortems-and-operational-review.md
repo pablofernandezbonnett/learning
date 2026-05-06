@@ -14,6 +14,36 @@ This note is about how to do that without turning review into blame theater.
 
 ---
 
+## Smallest Mental Model
+
+A postmortem is not a story about who was wrong.
+It is a structured way to explain why the incident was possible, why it lasted
+as long as it did, and what changes would make the next version of the system
+or team safer.
+
+If the review does not improve future decisions, it was mostly paperwork.
+
+---
+
+## Bad Postmortem vs Better Postmortem
+
+Bad postmortem:
+
+- one-line root cause
+- one person implicitly blamed
+- vague action such as "improve monitoring"
+
+Better postmortem:
+
+- clear timeline
+- root cause separated from contributing factors
+- explicit review of detection and mitigation quality
+- concrete owned actions tied to the actual failure
+
+That difference is what makes postmortems operationally useful.
+
+---
+
 ## 1. What A Postmortem Is
 
 A postmortem is a structured review after an incident or major operational failure.

@@ -9,6 +9,27 @@ turning vague asks into usable architectural inputs.
 
 ---
 
+## Why This Matters
+
+Many weak designs are technically tidy but strategically wrong.
+They solved the visible feature request while ignoring the qualities and
+constraints that decide whether the solution is actually acceptable.
+
+That is why requirements discovery is architecture work, not only project
+management work.
+
+---
+
+## Smallest Mental Model
+
+- functional requirements say what the system must do
+- `NFRs` (`non-functional requirements`) say what qualities and constraints the solution must preserve while doing it
+
+Features tell you what exists.
+`NFRs` often decide which designs should be rejected.
+
+---
+
 ## 1. Functional Requirements vs NFRs
 
 Functional requirements are what the system must do.

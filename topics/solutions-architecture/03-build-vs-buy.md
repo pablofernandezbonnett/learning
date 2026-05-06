@@ -8,6 +8,17 @@ But many expensive architecture mistakes start here.
 
 ---
 
+## Smallest Mental Model
+
+Build-vs-buy is not mainly a feature comparison.
+It is a boundary decision about differentiation, ownership, operating burden,
+and how much of the capability should live inside your product at all.
+
+That is why the same product can look attractive in a demo and still be the
+wrong solution in production.
+
+---
+
 ## 1. What Build vs Buy Really Means
 
 Build means:
