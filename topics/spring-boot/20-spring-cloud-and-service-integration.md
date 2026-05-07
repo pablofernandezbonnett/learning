@@ -16,6 +16,52 @@ problems remain the same.
 
 ---
 
+## Why This Matters
+
+Spring Cloud topics matter less because of the brand itself and more because
+they gather recurring distributed-systems concerns in one place: service
+communication, resilience, config, gateway boundaries, and contract safety.
+
+This matters because many enterprise JVM teams still use this ecosystem
+directly, and even when they do not, the same design decisions still exist in
+Kubernetes or managed-platform form.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Spring Cloud is a checklist of libraries to memorize
+- if the platform is Kubernetes, Spring Cloud concepts are mostly obsolete
+- learning the client library is the same as understanding service integration
+
+Better mental model:
+
+- Spring Cloud is one expression of distributed-systems problems that still
+  exist elsewhere
+- the durable knowledge is gateway boundaries, remote-call discipline,
+  configuration strategy, and resilience
+- platform tooling may replace some components, but not the underlying tradeoffs
+
+Small concrete example:
+
+- weak approach: "we use Feign, so service integration is solved"
+- better approach: "the HTTP client choice is secondary; the real decisions are
+  timeout policy, retry safety, auth between services, and whether the concern
+  belongs at the gateway or in the service"
+
+Strong default:
+
+- learn the concerns first, then map them to Spring Cloud, Kubernetes, or
+  managed platform tools depending on the environment
+
+Interview-ready takeaway:
+
+> I do not optimize for memorizing Spring Cloud components. I optimize for the
+> distributed-systems concerns underneath them: gateway boundaries, remote-call
+> discipline, resilience, config, and contract safety.
+
+---
+
 ## What Spring Cloud Is
 
 Spring Cloud is a group of projects for distributed systems and service-based

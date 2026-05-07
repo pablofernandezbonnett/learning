@@ -11,6 +11,58 @@ This is the shortest useful cloud refresher for the current repo.
 
 ---
 
+## Why This Matters
+
+Cloud basics matter because many backend design decisions are really decisions
+about who owns operational responsibility, not just where the code is hosted.
+
+This matters in work and interviews because weak cloud answers often list AWS
+products, while stronger answers explain what the team is choosing to manage
+themselves and what they are delegating to the platform.
+
+## Smallest Mental Model
+
+Cloud is a responsibility-allocation model.
+
+The practical first question is:
+
+- what does the platform manage for us
+- what does the application team still have to own and operate
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- cloud knowledge means memorizing vendor services
+- moving to the cloud automatically removes operational complexity
+- managed service choice is mostly a pricing or convenience detail
+
+Better mental model:
+
+- cloud design is mainly about responsibility boundaries
+- managed services remove some work but also change control, coupling, and
+  failure modes
+- the useful comparison is who owns servers, runtime, scaling, backups, and
+  failover
+
+Small concrete example:
+
+- weak approach: "we run Postgres in AWS, so we are cloud-native"
+- better approach: "we use a managed relational database because backups,
+  failover, and patching are not something the product team should hand-operate"
+
+Strong default:
+
+- explain cloud choices in terms of responsibility, operational burden, and fit
+  for the workload, not just provider names
+
+Interview-ready takeaway:
+
+> I treat cloud basics as responsibility choices: who manages compute, data,
+> scaling, and failover, and which parts still belong to the application team.
+
+---
+
 ## 1. What Cloud Basics Actually Mean
 
 Cloud is not mainly about memorizing provider product names.

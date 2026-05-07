@@ -14,6 +14,62 @@ Important reminder:
 > behave like interchangeable backends. The repository abstraction is shared.
 > The persistence model is not.
 
+## Why This Matters
+
+Spring Data is very productive until the repository abstraction starts hiding
+important query-shape or storage-model decisions.
+
+This matters because many backend teams can move fast with repositories at the
+start and then lose clarity later if they treat JPA, MongoDB, and Redis as if
+the same abstraction meant the same persistence behavior.
+
+## Smallest Mental Model
+
+Spring Data gives you a shared repository programming style, not a shared
+storage model.
+
+The practical question is:
+
+- when is repository convenience enough
+- when does query shape, performance, or storage behavior require a more
+  explicit tool
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- if Spring Data exposes the same repository interface style, the backends are
+  close enough
+- derived queries and repositories are always the cleanest option
+- the abstraction removes the need to think about query shape
+
+Better mental model:
+
+- repository style is a convenience layer over very different stores
+- query shape and access pattern still decide whether repositories, projections,
+  templates, or explicit SQL are the right tool
+- productivity is good until it starts hiding the real cost of the storage model
+
+Small concrete example:
+
+- weak approach: keep stretching a derived query method until the name becomes a
+  paragraph
+- better approach: stay with repositories for conventional access, then move to
+  projections, specifications, templates, or explicit queries when the shape
+  demands it
+
+Strong default:
+
+- use repositories for normal aggregate CRUD and simple lookup patterns
+- step outside the abstraction once the query or storage behavior becomes the
+  real problem
+
+Interview-ready takeaway:
+
+> I use Spring Data repositories for the simple path, but I do not confuse the
+> shared abstraction with shared storage behavior. Once query shape or backend
+> behavior matters, I move to the more explicit tool.
+
 ### 1. Interface-based Projections
 
 Projection means:

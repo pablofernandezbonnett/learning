@@ -18,6 +18,62 @@ This note follows the same reusable study pattern:
 
 ---
 
+## Why This Matters
+
+Systems do not fail in useful ways. They fail with partial slowness, unclear
+symptoms, and disagreement between what users feel and what a single service
+metric says.
+
+Observability matters because it turns "something is wrong" into a path toward
+locating the failing dependency, the affected business flow, and the right
+recovery move.
+
+## Smallest Mental Model
+
+Use three views together:
+
+- traces for one request path
+- metrics for trend and alerting
+- logs for detailed event context
+
+That is usually enough to move from symptom to explanation.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- observability means dashboards and log search
+- if CPU and memory look fine, the system is probably healthy
+- one metric per service is enough
+
+Better mental model:
+
+- observability means building enough signals to explain failure, not only
+  detect it
+- technical health and business health both matter
+- the useful question is not only "is the pod alive?" but "which dependency,
+  tenant, or workflow is degrading?"
+
+Small concrete example:
+
+- weak approach: alert only on 5xx rate
+- better approach: combine request latency, error rate, trace data, and business
+  metrics such as checkout or payment success so slow dependency failures show
+  up before users fully lose the flow
+
+Strong default:
+
+- start with structured logs, correlation IDs, latency/error/saturation
+  metrics, and request traces on critical flows
+
+Interview-ready takeaway:
+
+> I use observability to explain failure, not just notice it. Traces show one
+> request path, metrics show trends and alerting, and logs provide detailed
+> context, ideally tied to business outcomes as well as technical health.
+
+---
+
 ## 1. What Observability Actually Means
 
 Short version:

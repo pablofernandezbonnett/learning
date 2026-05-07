@@ -199,5 +199,5 @@ and that the claim is protected by a unique constraint.
 
 ## Related Reading
 
-- [../Security/03-payment-integration-patterns.md](../../Security/03-payment-integration-patterns.md)
-- [../Security/07-secrets-logging-and-secure-sdlc.md](../../Security/07-secrets-logging-and-secure-sdlc.md)
+- [../../topics/security/05-payment-integration-patterns.md](../../topics/security/05-payment-integration-patterns.md)
+- [../../topics/security/07-secrets-logging-and-secure-sdlc.md](../../topics/security/07-secrets-logging-and-secure-sdlc.md)

@@ -44,10 +44,12 @@ Licensing details are in `LICENSE`.
 
 Use one of these entry points depending on what you need:
 
-- `paths/general-refresh.md`: a broad backend refresh path
+- `paths/general-refresh.md`: a broad backend refresh path when you want guided order across topics
 - `paths/appsec-for-software-engineers.md`: a practical AppSec path for developers
-- `topics/`: topic-by-topic notes, usually split into `Refresh`, `Required`, and `Growth`
-- `labs/`: runnable companion material
+- `paths/sre-from-backend-engineers.md`: a practical path from backend ownership to reliability ownership
+- `paths/solutions-architect-from-backend.md`: a practical path from backend depth to end-to-end solution design
+- `topics/`: topic-by-topic entrypoints when you already know which problem space you want to reopen
+- `labs/`: runnable companion material when you want to turn a note into practice
 
 ## Topic Index
 
@@ -62,6 +64,8 @@ Jump directly into a topic entry point:
 - [System Design](./topics/system-design/README.md)
 - [Security](./topics/security/README.md)
 - [AppSec](./topics/appsec/README.md)
+- [SRE](./topics/sre/README.md)
+- [Solutions Architecture](./topics/solutions-architecture/README.md)
 - [Cloud](./topics/cloud/README.md)
 - [DevOps](./topics/devops/README.md)
 - [Testing](./topics/testing/README.md)
@@ -73,7 +77,7 @@ Jump directly into a topic entry point:
 
 ## Current Focus
 
-The first migration wave is centered on:
+The repo's current core study surface is centered on:
 
 - [Java](./topics/java/README.md)
 - [Kotlin](./topics/kotlin/README.md)
@@ -83,6 +87,8 @@ The first migration wave is centered on:
 - [Architecture](./topics/architecture/README.md)
 - [System design](./topics/system-design/README.md)
 - [Security](./topics/security/README.md)
+- [SRE](./topics/sre/README.md)
+- [Solutions Architecture](./topics/solutions-architecture/README.md)
 - [Cloud](./topics/cloud/README.md)
 - [DevOps](./topics/devops/README.md)
 - [Testing](./topics/testing/README.md)

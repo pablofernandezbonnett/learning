@@ -10,6 +10,64 @@ be readable even when the topic is rusty.
 
 ---
 
+## Why This Matters
+
+These principles matter because many backend mistakes are not syntax mistakes.
+They are judgment mistakes: trusting a cache too much, treating retries as an
+edge case, or designing only the happy path.
+
+If these ideas are warm, system design answers become simpler and day-to-day
+backend decisions get safer.
+
+## Smallest Mental Model
+
+Most backend design reduces to five recurring questions:
+
+- what must stay true
+- where final truth lives
+- what happens when something fails
+- how retries and duplicates stay safe
+- which complexity is actually justified
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- backend design is mostly about frameworks, patterns, and scale components
+- correctness will emerge if the implementation is clean enough
+
+Better mental model:
+
+- backend design is mainly about protecting business truth under failure,
+  contention, and change
+- frameworks matter less than safe state transitions, safe retries, and a clear
+  source of truth
+
+Small concrete example:
+
+- weak view: "Redis tells us whether stock is available"
+- stronger view: "Redis can help serve availability quickly, but the inventory
+  table is still the final authority when real stock decisions are made"
+
+Strong default:
+
+- if a flow touches money, orders, reservations, or external callbacks, assume
+  retries will happen and design for replay-safe behavior from the start
+
+Main tradeoff or failure mode:
+
+- simple-looking systems often become dangerous when they hide their real
+  failure modes
+- the goal is not maximum machinery; it is enough structure to keep the system
+  correct and recoverable
+
+Reusable takeaway:
+
+> Good backend design is mostly the discipline of naming truth, failure, and
+> recovery before adding technology.
+
+---
+
 ## 1. Design for Failure
 
 Assume that networks time out, dependencies slow down, and workers crash in the
@@ -164,3 +222,9 @@ If you need a quick reset, come back to these five:
 3. separate read scale from write correctness
 4. make retries safe
 5. keep the design simpler than your first impulse
+
+Interview-ready takeaway:
+
+> My default backend lens is simple: define the source of truth, make retries
+> safe, design for failure, and keep the write path simpler than the first
+> architecture impulse.

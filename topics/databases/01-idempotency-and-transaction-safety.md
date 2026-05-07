@@ -17,6 +17,54 @@ Quick terms used here:
 
 ---
 
+## Smallest Mental Model
+
+Idempotency answers one question:
+
+> what happens if the same request arrives again?
+
+Transaction safety answers a different question:
+
+> what happens if part of my local work succeeds and another part fails?
+
+Strong systems often need both at the same time.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- retries are mostly a client concern
+- one transaction annotation makes duplicate effects unlikely enough
+- deduplication can be added later without shaping the write path
+
+Better mental model:
+
+- retries are normal in distributed systems
+- duplicate prevention needs explicit request identity plus durable state
+- transaction safety and idempotency solve different failure shapes and often
+  have to work together
+
+Small concrete example:
+
+- weak approach: retry `POST /payments` after timeout and hope the first attempt
+  failed cleanly
+- better approach: claim an idempotency key durably, store the attempt state,
+  and return the existing result when the same logical request appears again
+
+Strong default:
+
+- if the flow can charge, reserve, create, publish, or mutate something
+  important, assume retries will happen and design the write path around stable
+  request identity from the start
+
+Interview-ready takeaway:
+
+> Idempotency is how I make retries safe: I give the business action a stable
+> identity, claim it durably, and return or continue the same logical attempt
+> instead of creating a second effect.
+
+---
+
 ## 1. What Idempotency Actually Means
 
 An operation is **idempotent** if repeating it does not change the final effect after

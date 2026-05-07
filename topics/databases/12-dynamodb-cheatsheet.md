@@ -3,7 +3,7 @@
 > Primary fit: `Platform / Growth lane`
 
 
-Use this after reading [08-dynamodb.md](./08-dynamodb.md).
+Use this after reading [09-dynamodb.md](./09-dynamodb.md).
 
 This is the short version to retain and reopen quickly.
 

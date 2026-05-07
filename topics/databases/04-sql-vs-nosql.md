@@ -14,6 +14,62 @@ This note keeps the question practical:
 
 ---
 
+## Why This Matters
+
+Database choice is easy to overcomplicate and easy to answer too vaguely. The
+real job is not to praise one family of databases. It is to match the store to
+the shape of the data, the access pattern, and the correctness requirements.
+
+This matters because weak design answers often say "NoSQL for scale" or "SQL for
+structure" without explaining what kind of scale, which correctness rule, or
+which read pattern actually drives the choice.
+
+## Smallest Mental Model
+
+Start from the write path and the main read shape.
+
+Ask:
+
+- do I need cross-entity correctness and transactions
+- do I mostly read one denormalized record at a time
+- is this a source of truth or a support layer such as cache or coordination
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- SQL and NoSQL are rivals where one modern choice should win
+- NoSQL automatically scales better and is therefore preferable
+- Redis is just another alternative source of truth
+
+Better mental model:
+
+- relational, document, and key-value stores solve different problems
+- correctness, relationship shape, and access pattern matter more than slogans
+- Redis usually complements a primary store instead of replacing it
+
+Small concrete example:
+
+- weak approach: put orders and payments in a document store because joins are
+  annoying
+- better approach: keep correctness-critical order and payment state in SQL, and
+  use a document store only where one denormalized read shape is the real win
+
+Strong default:
+
+- default to SQL for correctness-critical commit paths
+- choose document stores for predictable denormalized reads
+- use Redis as a support layer for cache, counters, sessions, or short-lived
+  coordination
+
+Interview-ready takeaway:
+
+> I choose the database by business truth and access pattern first: SQL for
+> correctness-critical relational writes, document stores for denormalized read
+> shapes, and Redis as a support layer rather than the main source of truth.
+
+---
+
 ## 1. Default Rule
 
 Before comparing them, keep one definition straight:

@@ -193,5 +193,5 @@ This teaches the next AppSec lesson:
 
 ## Related Reading
 
-- [../Security/04-web-and-api-security.md](../../Security/04-web-and-api-security.md)
-- [../Security/05-spring-jvm-appsec.md](../../Security/05-spring-jvm-appsec.md)
+- [../../topics/security/02-web-and-api-security.md](../../topics/security/02-web-and-api-security.md)
+- [../../topics/security/03-spring-and-jvm-appsec.md](../../topics/security/03-spring-and-jvm-appsec.md)

@@ -11,6 +11,50 @@ in real backend work.
 
 ---
 
+## Why This Matters
+
+Caching is one of the easiest backend topics to make sound easy and one of the
+easiest places to hide correctness risk.
+
+This matters because many real problems come not from missing `@Cacheable`, but
+from caching the wrong thing, trusting stale data too much, or having no clear
+invalidation story.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- caching is a framework annotation problem
+- if a method is slow, add `@Cacheable`
+- once Redis is present, the read path is solved
+
+Better mental model:
+
+- caching is a data-correctness and staleness decision first
+- the real question is what can safely be stale and who still owns final truth
+- Spring annotations are only the implementation layer on top of that choice
+
+Small concrete example:
+
+- weak approach: cache real-time stock during checkout because the product page
+  is hot
+- better approach: cache product details or derived read models, but keep final
+  stock reservation on the authoritative write path
+
+Strong default:
+
+- cache stable or expensive reads
+- do not cache payment truth, final order truth, or high-contention write
+  decisions unless the whole design is built around that
+
+Interview-ready takeaway:
+
+> I decide caching by staleness tolerance and source of truth first. Spring and
+> Redis help implement it, but the real design question is what may be cached
+> safely and how invalidation stays credible.
+
+---
+
 ## 1. What Caching Actually Solves
 
 A cache exists to avoid repeating expensive reads.

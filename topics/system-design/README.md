@@ -1,12 +1,12 @@
 # System Design for Backend Engineers
 
-This folder is for practical system design study.
+Use this folder for practical system design study.
 
 The focus is not abstract box-drawing.
-The focus is reasoning about the concrete rules and failure cases that decide
+It is reasoning about the concrete rules and failure cases that decide
 whether a backend flow is trustworthy.
 
-The main ideas you will see repeatedly are:
+Focus:
 
 - invariants: the business rules that must always stay true, such as "do not charge twice" or "do not oversell final stock"
 - source of truth: the durable system whose final state you trust when caches, retries, or downstream systems disagree
@@ -27,9 +27,10 @@ Working style:
 2. [practical-checkout-design.md](./practical-checkout-design.md): a concrete checkout example that shows how those rules appear in a real flow
 3. [system-design-guide.md](./system-design-guide.md): a repeatable answer structure for correctness-critical backend design prompts
 4. [system-design-drills.md](./system-design-drills.md): small practice prompts plus a rubric so design work does not stay passive
-5. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): a decision helper for common architecture choices like SQL vs NoSQL or monolith vs microservices
-6. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): a way to keep framework lifecycle, transaction lifecycle, and business lifecycle clearly separated
-7. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows, with the write path and failure path in view
+5. [distributed-workflow-case-studies.md](./distributed-workflow-case-studies.md): resolved cases for outbox, saga, async boundaries, and interview-style pattern choice
+6. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): a decision helper for common architecture choices like SQL vs NoSQL or monolith vs microservices
+7. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): a way to keep framework lifecycle, transaction lifecycle, and business lifecycle clearly separated
+8. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows, with the write path and failure path in view
 
 ## Working Rule
 
@@ -40,3 +41,11 @@ For any design exercise:
 3. walk the critical write path
 4. say what happens on retries, timeouts, and duplicate delivery
 5. only then add extra components for scale or convenience
+
+## Related Paths
+
+Use this topic directly when you want stronger design judgment in general.
+If you want a role-transition path built on top of these ideas, start with:
+
+- [../../paths/solutions-architect-from-backend.md](../../paths/solutions-architect-from-backend.md)
+- [../../paths/sre-from-backend-engineers.md](../../paths/sre-from-backend-engineers.md)

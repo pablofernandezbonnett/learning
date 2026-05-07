@@ -6,6 +6,12 @@ coding, debugging, and data-structure reasoning.
 This is not meant to become a full puzzle bank.
 The goal is a small repeatable set with Java and Kotlin awareness.
 
+Focus:
+
+- the highest-value data structures and algorithms (`DSA`) patterns
+- invariants, meaning the rule your current state must keep true while the algorithm runs
+- explanation quality under time pressure, not only getting to a working answer
+
 One term that appears often in this folder is `invariant`.
 Here it simply means the rule your current state must keep true after every
 step, such as "the sliding window never contains duplicates" or "the left heap
@@ -13,7 +19,7 @@ never ends up smaller than the right heap by more than one item."
 
 ## Recommended Order
 
-1. [01-core-patterns.md](./01-core-patterns.md): the highest-value DSA patterns with backend-flavored examples
+1. [01-core-patterns.md](./01-core-patterns.md): the highest-value `DSA` patterns with backend-flavored examples
 2. [02-coding-round-drills.md](./02-coding-round-drills.md): worked drills, edge cases, and complexity discussion
 
 ## Working Loop

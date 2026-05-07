@@ -21,6 +21,7 @@ Focus:
 4. [04-networking-fundamentals.md](./04-networking-fundamentals.md): HTTP, gRPC, DNS, load balancing, and the network-level realities behind service-to-service calls
 5. [05-distributed-tracing.md](./05-distributed-tracing.md): how to follow one request across several hops without guessing from logs alone
 6. [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md): when asynchronous flows help and when they mainly add complexity
+7. [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md): how to choose between queue, event stream, outbox, saga, and `CQRS` based on the real coordination problem
 
 ## Refresh
 
@@ -30,11 +31,12 @@ Focus:
 - [04-networking-fundamentals.md](./04-networking-fundamentals.md)
 - [05-distributed-tracing.md](./05-distributed-tracing.md)
 - [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md)
+- [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md)
 
 ## Required
 
 - [07-caching-strategies.md](./07-caching-strategies.md): where cache helps, where stale data hurts, and how to think about invalidation
-- [09-domain-driven-design.md](./09-domain-driven-design.md): how to shape boundaries and business language without turning DDD into ceremony
+- [09-domain-driven-design.md](./09-domain-driven-design.md): how to shape boundaries and business language without turning `DDD` (`Domain-Driven Design`) into ceremony
 - [11-service-discovery.md](./11-service-discovery.md): how services find each other in dynamic environments such as Kubernetes
 
 ## Growth
@@ -43,7 +45,7 @@ Focus:
 - [10-consistent-hashing.md](./10-consistent-hashing.md): how distributed caches and partitioned systems spread load without reshuffling everything
 - [12-consensus-and-leader-election.md](./12-consensus-and-leader-election.md): how one instance becomes the active coordinator safely, and why this is harder than a plain lock
 - [13-enterprise-integration-patterns.md](./13-enterprise-integration-patterns.md): practical message and integration patterns without turning the topic into acronym soup
-- [14-b2b-vs-b2c-commerce-systems.md](./14-b2b-vs-b2c-commerce-systems.md): how requirements change when the same platform serves end consumers versus business accounts
+- [14-b2b-vs-b2c-commerce-systems.md](./14-b2b-vs-b2c-commerce-systems.md): how requirements change when the same platform serves `B2C` (end consumers) versus `B2B` (business accounts)
 - [15-retail-inventory-and-fulfillment-systems.md](./15-retail-inventory-and-fulfillment-systems.md): real operational tradeoffs around stock, reservation, order routing, and fulfillment
 
 ## Core Rule

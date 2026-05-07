@@ -10,12 +10,25 @@ In a monolith, you use `@Transactional` to ensure a write to the `Users` table a
 
 In a microservices world, the `Users` table and `Orders` table belong to different databases owned by different services. You cannot use one simple local database transaction across them. This is one of the hardest recurring backend problems once data and ownership are split across services.
 
+## Why This Matters
+
+This topic matters because many important backend workflows look simple from the
+UI and then become tricky as soon as state is split across service boundaries.
+
+If you can explain how the system behaves after partial success, timeout, or
+duplicate delivery, you are already doing the part that matters most in
+real-world architecture work and many strong interviews.
+
 Plain-English version:
 
 - one step may already have committed in Service A
 - another step may fail in Service B
 - now the system is in a half-finished business state
 - the real job is making that state safe and recoverable
+
+Pattern-choice follow-up:
+
+- [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md)
 
 Quick terms used here:
 
@@ -24,6 +37,57 @@ Quick terms used here:
 - `choreography` = services react to each other's events without one central coordinator
 - `orchestration` = one central workflow component tells the other services what step to run next
 - `projection` = a read-optimized view built from source data or events
+
+---
+
+## Smallest Mental Model
+
+Most of this topic is really about one question:
+
+> when one business operation spans several boundaries, how do we keep the
+> result safe and recoverable when one step succeeds and a later step fails?
+
+The useful first split is:
+
+- `saga` for workflow recovery across services
+- `outbox` for reliable state change plus event publication
+- `CQRS` when read and write shapes have clearly diverged
+- `event sourcing` when history itself is part of the product or audit value
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- distributed transactions are just regular transactions with more services
+- if each service is clean enough, the full business workflow will stay clean
+- a broker or a workflow engine automatically solves consistency
+
+Better mental model:
+
+- every service boundary is a place where uncertainty appears
+- local database transactions stop at the local database
+- cross-service correctness comes from explicit state transitions,
+  compensation, idempotency, and recovery logic
+
+Small concrete example:
+
+- weak approach: order service writes the order, then calls payment, then calls
+  inventory, and if inventory fails it "expects rollback"
+- better approach: order stays `PENDING`, payment authorization and inventory
+  reservation are explicit steps, and compensation or later confirmation moves
+  the workflow safely
+
+Strong default:
+
+- pick the smallest pattern that solves the actual failure shape
+- do not reach for choreography, orchestration, CQRS, or event sourcing just
+  because the names sound more advanced
+
+Interview-ready takeaway:
+
+> In distributed workflows, I first ask whether the problem is workflow
+> recovery, dual-write safety, read/write divergence, or audit-grade history.
+> That tells me whether I need saga, outbox, CQRS, or event sourcing.
 
 ---
 

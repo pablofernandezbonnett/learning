@@ -163,5 +163,5 @@ Good summary:
 
 ## Related Reading
 
-- [../Security/06-threat-modeling-and-business-abuse.md](../../Security/06-threat-modeling-and-business-abuse.md)
-- [../Security/04-web-and-api-security.md](../../Security/04-web-and-api-security.md)
+- [../../topics/security/06-threat-modeling-and-business-abuse.md](../../topics/security/06-threat-modeling-and-business-abuse.md)
+- [../../topics/security/02-web-and-api-security.md](../../topics/security/02-web-and-api-security.md)

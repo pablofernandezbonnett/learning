@@ -288,7 +288,7 @@ Typical reactions:
 
 After the `@Transactional` method commits, the application service publishes these events
 to Kafka. Other contexts (Inventory, Warehouse, Notification) react independently.
-This is the basis of the **Outbox Pattern** (see [Idempotency and Transaction Safety](../Databases/01-idempotency-and-transactions.md)).
+This is the basis of the **Outbox Pattern** (see [Idempotency and Transaction Safety](../databases/01-idempotency-and-transaction-safety.md)).
 
 ### Repository — Abstraction Over Persistence
 
@@ -387,7 +387,7 @@ Good business-friendly explanation:
 - `ACL` = "we still depend on your system, but we keep a translation layer so your language does not pollute ours"
 
 The **ACL** is the most common pattern when integrating with legacy systems or external APIs.
-See [Enterprise Integration Patterns](./08-enterprise-integration-patterns.md) for implementation details.
+See [Enterprise Integration Patterns](./13-enterprise-integration-patterns.md) for implementation details.
 
 This is why `ACL` fits naturally with `DDD`:
 

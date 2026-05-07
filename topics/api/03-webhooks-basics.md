@@ -29,6 +29,71 @@ Quick terms used here:
 
 ---
 
+## Why This Matters
+
+Webhook handling looks simple because it arrives as a normal HTTP request, but
+the real problem is not controller syntax. The real problem is protecting your
+system from duplicate delivery, forged requests, invalid state transitions, and
+uncertainty after retries.
+
+This matters in day-to-day work and in interviews because webhook flows are a
+common place where otherwise solid backend systems accidentally charge twice,
+process the same event twice, or trust the wrong input.
+
+## Smallest Mental Model
+
+Treat a webhook as an external event intake boundary.
+
+That usually means:
+
+- verify who sent it
+- claim or record the delivery safely
+- apply only a valid business transition
+- acknowledge quickly
+- move heavy or slow work behind the intake path
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- a webhook is just another POST endpoint
+- if the JSON looks correct, process it immediately
+- if the provider retries, the app can probably handle it
+
+Better mental model:
+
+- a webhook is an external event from a system you do not control
+- delivery may be duplicated, delayed, or replayed
+- the endpoint must be security-aware, replay-safe, and strict about state
+  transitions
+
+Small concrete example:
+
+- weak approach: Stripe calls your endpoint and you immediately mark the order
+  paid every time the event arrives
+- better approach: you verify the signature, claim the event ID durably, check
+  that the order can move to `PAID`, and only then apply the transition once
+
+Strong default:
+
+- acknowledge fast after durable local acceptance
+- do not put expensive downstream work on the provider-facing request path
+
+Main tradeoff or failure mode:
+
+- fast intake improves reliability, but it pushes more work into async
+  processing, replay-safe consumers, and better observability
+- the common failure is handling the happy path only and then discovering that
+  a valid duplicate event can still break business state
+
+Interview-ready takeaway:
+
+> I treat webhook handling as a correctness and security boundary: verify the
+> sender, deduplicate the delivery, enforce valid state transitions, and keep
+> the endpoint fast by moving heavy work behind it.
+
+---
+
 ## 1. What A Webhook Actually Is
 
 The shortest good definition is:

@@ -5,6 +5,56 @@
 
 Why can you just add a dependency and "it works"? This is the core of Spring Boot.
 
+## Why This Matters
+
+Auto-configuration is one of the main reasons Spring Boot feels productive, and
+also one of the fastest places to get confused when the app creates beans you
+did not expect.
+
+This matters because once teams move beyond simple starters, they need to know
+why something was auto-wired, why something was not, and how to override the
+default behavior safely.
+
+## Smallest Mental Model
+
+Spring Boot looks at the classpath, configuration properties, and existing beans
+to decide which framework setup to provide automatically.
+
+The key idea is not "magic." It is conditional bean registration.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Spring Boot just guesses and wires things randomly
+- adding a dependency always means "enable everything"
+- excluding auto-config is a hack for when Spring misbehaves
+
+Better mental model:
+
+- Spring Boot loads candidate configurations and then applies conditions
+- defaults appear only when the needed classes, properties, and missing beans
+  line up
+- you can override or exclude auto-config deliberately when your app needs a
+  different shape
+
+Small concrete example:
+
+- weak view: "I added the database dependency and Spring magically created a
+  datasource"
+- better view: "the datasource auto-config activated because the right classes
+  and properties existed and no custom datasource bean had replaced it"
+
+Strong default:
+
+- understand conditions first, override second, exclude third
+
+Interview-ready takeaway:
+
+> Spring Boot auto-configuration is conditional registration, not random magic.
+> It activates when the right classes, properties, and missing beans line up,
+> and I override or exclude it only when my app needs a different shape.
+
 ### 📍 The "Core" Annotations
 - **`@SpringBootApplication`**: A 3-in-1 annotation:
   1. `@Configuration`: Marks it as a source of bean definitions.

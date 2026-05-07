@@ -9,6 +9,54 @@ well-known, but the same core patterns apply across other PSPs.
 
 ---
 
+## Why This Matters
+
+Payment integrations look like API integrations from far away, but the real
+problem is protecting money and order state under retries, partial failure, and
+asynchronous confirmation.
+
+This matters because many weak payment designs work on the happy path and then
+fail exactly where the business risk is highest: double charge, missing order,
+or replayed confirmation.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- payment is mainly "call the PSP and trust the response"
+- if the checkout request times out, retrying is mostly harmless
+- one synchronous success response is enough to settle the flow
+
+Better mental model:
+
+- payment is a correctness-sensitive state machine
+- every mutating provider call needs idempotency
+- webhook or later confirmation is often the durable signal that settles the
+  business flow safely
+
+Small concrete example:
+
+- weak approach: charge the card and create the order in one synchronous step
+- better approach: create a payment attempt safely, use provider idempotency,
+  keep local truth for payment and order state, and let durable confirmation
+  move the order forward
+
+Strong default:
+
+- treat payment confirmation as asynchronous unless the provider model clearly
+  proves otherwise
+- keep your own authoritative payment and order state instead of trusting the
+  PSP response alone
+
+Interview-ready takeaway:
+
+> I treat payment integration as a correctness problem: safe payment attempt
+> creation, idempotent provider calls, asynchronous confirmation, and strict
+> local state transitions so retries or duplicate webhooks cannot create
+> duplicate charges.
+
+---
+
 ## 0. What Payment Integration Actually Is
 
 The core problem is not "how do I call the PSP API?"

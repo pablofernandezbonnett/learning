@@ -6,6 +6,14 @@ The practical question is always the same: which part of the system you own,
 which part the platform owns, and what operational tradeoff comes with that
 boundary.
 
+Why this folder matters:
+
+- cloud choices are often disguised runtime and ownership choices
+- many backend discussions get vague because people name products before they
+  explain responsibility or failure shape
+- this folder keeps the discussion grounded in compute model, service shape, and
+  operational burden
+
 Focus:
 
 - responsibility boundaries
@@ -19,6 +27,12 @@ Working style:
 - explain provider or platform jargon in practical terms before going deeper
 - keep the focus on ownership and runtime behavior, not product-catalog memorization
 - connect cloud choices back to deployment risk, operability, and service shape
+
+Smallest mental model:
+
+- first choose the runtime shape
+- then choose how much operational responsibility the team should own
+- then judge the tradeoff in cost, control, latency, and operability
 
 ## Recommended Order
 

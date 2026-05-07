@@ -4,13 +4,26 @@ Use this folder as a Kotlin bridge for someone who already knows Java, Spring,
 and backend service design.
 
 The goal is not to relearn backend fundamentals from zero.
-The goal is to translate strong Java and Spring instincts into idiomatic Kotlin without overcomplicating the code.
+The goal is to translate strong Java and Spring instincts into idiomatic Kotlin
+without overcomplicating the code.
+
+Focus:
+
+- null safety and type-system differences that change everyday backend code
+- coroutines, meaning lightweight asynchronous code that can replace some thread-heavy flows
+- simple Kotlin idioms that improve clarity without turning the codebase into a DSL
+
+Working style:
+
+- keep mapping Kotlin features back to familiar Java and Spring use cases
+- prefer the smallest useful Kotlin feature over clever language tricks
+- treat readability and correctness as more important than idiomatic flair
 
 ## Recommended Order
 
 1. [01-kotlin-for-backend-vs-java.md](./01-kotlin-for-backend-vs-java.md): translate Java and Spring instincts into Kotlin
 2. [../../labs/kotlin-basics/README.md](../../labs/kotlin-basics/README.md): language basics, null safety, collections, and coroutines
-3. [02-kotlin-backend-idioms-and-gotchas.md](./02-kotlin-backend-idioms-and-gotchas.md): value classes, `Result`, interop, and avoiding clever Kotlin
+3. [02-kotlin-backend-idioms-and-gotchas.md](./02-kotlin-backend-idioms-and-gotchas.md): value classes, `Result` as a success-or-failure wrapper, Java interop, and avoiding clever Kotlin
 
 ## Working Loop
 

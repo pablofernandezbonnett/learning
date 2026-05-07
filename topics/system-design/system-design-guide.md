@@ -8,6 +8,7 @@ design prompt.
 Practice next:
 
 - [system-design-drills.md](./system-design-drills.md)
+- [distributed-workflow-case-studies.md](./distributed-workflow-case-studies.md)
 
 This is not a company-specific playbook.
 It is the shared execution guide for questions such as:
@@ -18,6 +19,59 @@ It is the shared execution guide for questions such as:
 - explain a correctness-critical write path
 
 Use it as a general guide for correctness-critical backend design.
+
+---
+
+## Why This Matters
+
+Many system design answers sound organized but still miss the real job:
+protecting correctness when retries, timeouts, partial failures, and external
+systems are involved.
+
+This guide matters because strong answers are not mainly about drawing many
+components. They are about showing that you can protect the business invariant,
+name the source of truth, and explain what the system does when something goes
+wrong.
+
+## Smallest Mental Model
+
+Treat system design as an exercise in protecting one important write path under
+real failure.
+
+That usually means:
+
+- name what must stay true
+- name where final truth lives
+- walk the write path
+- explain retries, async work, and recovery
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- system design means listing technologies
+- more boxes means a more senior answer
+- adding Kafka, Redis, or microservices early makes the design stronger
+
+Better mental model:
+
+- system design means making one business flow safe, explainable, and operable
+- components only matter after the invariant and source of truth are clear
+- the answer gets stronger when failure and recovery are explicit
+
+Small concrete example:
+
+- weak answer: "checkout API -> Redis -> Kafka -> payment service -> database"
+- stronger answer: "one purchase intent must not create two paid orders; the
+  order and payment attempt tables are the source of truth; if the provider
+  times out, the order stays `PENDING` and later moves by webhook or
+  reconciliation"
+
+Interview-ready takeaway:
+
+> In backend system design, I first anchor on the invariant, the source of
+> truth, and the critical write path. Then I explain retries, async boundaries,
+> and recovery before I add scale components.
 
 ---
 
@@ -162,6 +216,19 @@ Then name one tradeoff:
 - stronger correctness vs lower throughput
 - simpler synchronous API vs safer async confirmation
 - fresher data vs lower latency
+
+Strong default:
+
+- start with one clear source of truth, one safe write path, and one explicit
+  recovery story
+- add brokers, caches, projections, or service splits only when the prompt
+  really needs them
+
+Main tradeoff or failure mode:
+
+- the most common failure is not lack of technology
+- it is hiding uncertainty under a fake synchronous success path and then having
+  no good answer for retries, duplicate work, or timeouts
 
 ---
 

@@ -15,6 +15,41 @@ treated as an afterthought.
 
 ---
 
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- every controller can map its own errors with local `try/catch`
+- returning the right status code is enough
+- exception handling is mostly a presentation detail
+
+Better mental model:
+
+- error mapping is part of the API contract
+- controllers should stay focused on request flow while one central place owns
+  error translation
+- the goal is consistent client behavior without leaking internal detail
+
+Small concrete example:
+
+- weak approach: each endpoint catches exceptions differently and invents a
+  different JSON shape
+- better approach: typed exceptions move up to `@RestControllerAdvice`, which
+  returns one stable `ProblemDetail` structure
+
+Strong default:
+
+- use typed domain exceptions plus one central advice layer for API error
+  mapping
+
+Interview-ready takeaway:
+
+> I treat exception handling as part of the API contract: controllers stay thin,
+> domain exceptions stay typed, and one central advice layer returns a
+> consistent error shape such as `ProblemDetail`.
+
+---
+
 ## 1. What Exception Handling Actually Solves
 
 Bad backend error handling usually creates three problems:

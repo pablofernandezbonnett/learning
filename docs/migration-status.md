@@ -59,6 +59,8 @@ The expanded set now also includes:
 - Database expansion for scaling, Redis, MongoDB, Postgres, DynamoDB, query optimization, and delivery tradeoffs
 - Spring Boot expansion for container internals, bean lifecycle, proxies, auto-configuration, profiles, caching, Spring Data, Kotlin idioms, AppSec labs, Flyway, and Spring Cloud integration
 - Architecture expansion for caching, concurrency models, DDD, consistent hashing, service discovery, and leader-election basics
+- SRE material for backend engineers covering role boundaries, `SLO` thinking, alerting, incidents, capacity, and postmortems
+- Solutions-architecture material for backend engineers covering `NFRs`, build-vs-buy, tenancy, migration strategy, and `ADR`-driven decision communication
 - Secondary language refresh tracks for Go, Python, Lua, and Dart
 
 ## Coverage Rule

@@ -24,6 +24,60 @@ Quick terms used here:
 
 ---
 
+## Why This Matters
+
+Concurrency mistakes are one of the fastest ways to break checkout, stock,
+ledger, and payment flows even when the code looks correct in single-threaded
+thinking.
+
+This matters because many strong backend systems fail not from bad schemas but
+from unsafe read-modify-write logic under real contention.
+
+## Smallest Mental Model
+
+Treat concurrency as a business-rule protection problem, not just a threading
+or SQL topic.
+
+The useful first question is:
+
+> what must remain true if two or twenty requests try to update the same thing
+> at the same time?
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- one transaction annotation makes the flow safe
+- if the code reads cleanly, concurrent requests will behave cleanly too
+- locking is mostly a database tuning topic
+
+Better mental model:
+
+- concurrency safety is about protecting business rules when several writers act
+  at the same time
+- transactions still need the right read/write pattern, lock strategy, and
+  conflict handling
+- locking choice is a correctness decision before it is a performance decision
+
+Small concrete example:
+
+- weak approach: read stock, subtract one in memory, write the new value back
+- better approach: detect the write race with optimistic locking or serialize
+  access with a short pessimistic lock when contention is high
+
+Strong default:
+
+- start by naming the business invariant, then choose optimistic or pessimistic
+  control based on contention and conflict cost
+
+Interview-ready takeaway:
+
+> I frame database concurrency around protecting one business invariant under
+> competing writers, then choose optimistic locking for rarer collisions or
+> pessimistic locking when contention is high and retries are too expensive.
+
+---
+
 ## 1. What Problem Concurrency Actually Creates
 
 The core problem is simple:

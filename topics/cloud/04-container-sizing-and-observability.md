@@ -24,6 +24,62 @@ The goal is to build a sane decision loop:
 
 ---
 
+## Why This Matters
+
+Container sizing is one of those decisions that looks operational but quickly
+becomes architectural. Too little memory kills the process, too little CPU
+raises latency, and bad sizing makes autoscaling and capacity discussions noisy.
+
+This matters because many teams size containers by habit, not by workload, and
+then misread the real bottleneck.
+
+## Smallest Mental Model
+
+Treat sizing as an observe-and-adjust loop:
+
+- start from workload shape
+- pick a safe baseline
+- test under realistic load
+- inspect memory, CPU, latency, and contention signals
+- refine from evidence
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- there is a standard JVM or service size that usually works
+- CPU percentage alone tells me whether sizing is right
+- requests and limits are just deployment boilerplate
+
+Better mental model:
+
+- sizing depends on workload, runtime, concurrency model, and latency target
+- memory, throttling, queueing, and downstream waits often explain more than raw
+  CPU percent
+- requests and limits shape both scheduling and failure behavior
+
+Small concrete example:
+
+- weak approach: every Spring service gets `1Gi` and `2 CPU` because the last
+  service used that
+- better approach: start conservatively, warm the service, load test realistic
+  traffic, and refine request and limit values from observed working set,
+  latency, and throttling or OOM signals
+
+Strong default:
+
+- size from measured workload, not folklore
+- treat memory as the sharper edge and confirm that latency behavior under load
+  matches the business target
+
+Interview-ready takeaway:
+
+> I size containers from workload shape and telemetry, not habit. I care about
+> memory headroom, CPU throttling, latency, and downstream contention because
+> those signals tell me whether the service is merely busy or actually unsafe.
+
+---
+
 ## 1. First Principle: Size From Workload, Not Folklore
 
 Do not answer this question with:

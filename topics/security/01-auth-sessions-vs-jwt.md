@@ -486,7 +486,7 @@ If the discussion is backend-focused and not identity-heavy, `OAuth2 authorizati
 
 If the discussion moves into Spring APIs, reopen:
 
-- [05-spring-jvm-appsec.md](./05-spring-jvm-appsec.md)
+- [03-spring-and-jvm-appsec.md](./03-spring-and-jvm-appsec.md)
 
 That note covers the practical difference between OAuth2 scopes, Spring roles, and authorities.
 

@@ -1,18 +1,19 @@
 # Go Refresh for JVM Backend Engineers
 
-This folder is a small, code-first Go refresher.
+Use this folder when you want a small, code-first Go refresher from a JVM
+backend point of view.
 
-It is a secondary reference path, not part of the main backend refresh path.
+This is not a full Go roadmap.
+It is a secondary reference surface that helps you understand the runtime and
+service-shape ideas that come up most often when comparing Go with Java or
+Kotlin in backend contexts.
 
-It is not a full Go roadmap.
+Focus:
 
-It is meant to help you understand the runtime and language ideas that most
-often come up when comparing Go with Java or Kotlin in backend contexts.
-
-The goal is not to turn this repo into a full Go curriculum.
-It is to make the comparison practical enough that Go runtime and service-shape decisions stop feeling vague.
-
----
+- explicit error handling instead of exceptions
+- small standard-library HTTP services
+- lightweight concurrency with goroutines and channels
+- where a small framework such as `Gin` helps and where plain `net/http` is enough
 
 ## Recommended Order
 
@@ -28,8 +29,6 @@ Outcome:
 
 ### 2. [03-http-json/main.go](./03-http-json/main.go)
 
-Read this next.
-
 Outcome:
 
 - understand how small Go handlers map request JSON, validate input, and return
@@ -40,11 +39,10 @@ Outcome:
 
 ### 3. [04-gin-service/README.md](./04-gin-service/README.md)
 
-Read this after the stdlib HTTP example.
-
 Outcome:
 
-- see one real service slice with `Gin` without turning Go into framework soup
+- see one real service slice with `Gin`, a lightweight web framework, without
+  turning Go into framework soup
 - practice route groups, middleware, config, graceful shutdown, logging, tests,
   and timeout-aware boundary calls
 - understand where a framework helps and where the stdlib still does the real
@@ -60,8 +58,6 @@ Outcome:
 - compare Go concurrency with threads and coroutines more clearly
 - know when message passing fits better than shared-state locking
 
----
-
 ## How To Run
 
 From [go](.):
@@ -73,7 +69,16 @@ cd 04-gin-service && go run .
 go run ./02-concurrency
 ```
 
----
+## Smallest Mental Model
+
+Go removes a lot of framework and language ceremony.
+That makes the control flow easier to see, but it also means more behavior is
+spelled out directly in the code.
+
+The main trade is simple:
+
+- less magic and smaller runtime surface
+- more explicit handling for errors, HTTP, and concurrency boundaries
 
 ## What To Internalize
 
@@ -82,8 +87,6 @@ go run ./02-concurrency
 - HTTP, JSON, and validation are usually more explicit than in Spring
 - one framework is enough for this repo; `Gin` is the practical one we cover
 - goroutines are lightweight, but concurrency design still needs discipline
-
----
 
 ## What To Practice
 
@@ -99,8 +102,6 @@ If you want this folder to stay practical:
 
 The goal is not to learn Go academically.
 The goal is to feel how Go changes backend design choices.
-
----
 
 ## Where This Helps
 

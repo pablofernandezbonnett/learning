@@ -11,6 +11,62 @@ This pattern is useful any time a modern backend depends on older or company-wid
 
 ---
 
+## Why This Matters
+
+Enterprise integration work is where many otherwise clean services become
+harder to change, harder to explain, and harder to operate.
+
+This matters because the technical problem is rarely just "call SAP" or "ship a
+batch file". The real problem is how to exchange data with older or company-wide
+systems without letting their model, timing, and failure modes take over your
+service design.
+
+## Smallest Mental Model
+
+Treat enterprise integration as a boundary-management problem.
+
+You usually need to decide:
+
+- how your model stays separate from the external model
+- whether the handoff is synchronous, near-real-time, or batch
+- where truth lives when the systems disagree
+- how failures, retries, and duplicates are handled
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- integration means exposing our service directly to the external system's model
+- if the payloads move, the design is good enough
+- real-time is always more advanced than batch
+
+Better mental model:
+
+- integration means protecting your service boundary while exchanging data
+  safely
+- translation, timing, and recovery choices shape the whole solution
+- batch is often the better choice when latency is not business-critical
+
+Small concrete example:
+
+- weak approach: ecommerce order service starts using SAP status codes and field
+  names directly inside its domain objects
+- better approach: the service keeps its own order model and uses an
+  anti-corruption layer to translate at the integration edge
+
+Strong default:
+
+- keep the internal model clean, translate at the boundary, and choose the sync
+  style based on business urgency rather than taste
+
+Interview-ready takeaway:
+
+> For enterprise integration, I optimize for clear boundaries first. I keep our
+> domain model separate, translate at the edge, and choose batch or near-real
+> time based on business urgency, not on whether real-time sounds more modern.
+
+---
+
 ## 1. What Problem Enterprise Integration Actually Creates
 
 The challenge is not "how do I call SAP".

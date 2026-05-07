@@ -6,6 +6,15 @@ The emphasis is not just on SQL syntax.
 It is on the places where data modeling, transactions, retries, and concurrency
 directly decide whether the business result is correct.
 
+Why this folder matters:
+
+- database mistakes often look like application bugs, but the root cause is
+  usually a wrong data, transaction, or concurrency assumption
+- backend interviews and production incidents both tend to expose weak judgment
+  around retries, locks, query shape, and source of truth
+- this folder keeps the focus on the database decisions that most often matter
+  under real load and real business risk
+
 Focus:
 
 - idempotency and transaction safety, meaning the same request can be retried without creating a second business result by accident
@@ -18,6 +27,12 @@ Working style:
 - explain the first useful meaning of the jargon before going deeper
 - prefer short practical definitions over telegraphic shorthand
 - connect DB mechanics back to checkout, payments, orders, and inventory
+
+Smallest mental model:
+
+- start with business truth
+- then protect the write path
+- then optimize query shape and scale without breaking correctness
 
 ## Recommended Order
 
