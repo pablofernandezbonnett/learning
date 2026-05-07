@@ -53,7 +53,7 @@ Short explanation:
 
 ### Distributed Log
 
-Example:
+Concrete example:
 
 - Kafka
 

@@ -202,6 +202,20 @@ They are about user-critical writes that can be retried, delayed, or confirmed l
 
 ### 5.1 Retry-safe `POST`
 
+Smallest mental model first:
+
+```kotlin
+var active = false
+var attempts = 0
+
+fun activate() { active = true }      // idempotent
+fun recordAttempt() { attempts += 1 } // not idempotent
+```
+
+If the write sets the final state, repeating it is often harmless.
+If the write creates a new effect each time, the HTTP contract needs a stable
+request identity before retries become safe.
+
 Good minimal shape:
 
 ```http
@@ -217,6 +231,9 @@ Why it matters:
 Short rule:
 
 > if a write can be retried and a duplicate side effect would hurt, give the request a stable identity
+
+If you want the longer Java and Kotlin teaching examples behind that rule, see
+[`../databases/01-idempotency-and-transaction-safety.md`](../databases/01-idempotency-and-transaction-safety.md).
 
 ### 5.2 `202 Accepted` for async completion
 
@@ -250,7 +267,7 @@ This distinction matters a lot:
 - `422` when the JSON is valid but the business content is not
 - `409` when the request is valid but conflicts with current state or duplicate processing
 
-Example:
+Concrete example:
 
 - malformed JSON -> `400`
 - amount is negative -> `422`
@@ -262,7 +279,7 @@ Example:
 
 The BFF pattern exists because different clients want different payloads and latency tradeoffs.
 
-Smallest example:
+Small concrete example:
 
 - mobile app wants one compact checkout summary call
 - admin web wants large tables, filters, and detailed audit fields

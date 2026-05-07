@@ -159,7 +159,7 @@ Riskier examples:
 
 This is the most important production pattern to pair with Flyway.
 
-Example:
+Concrete example:
 
 1. expand: add the new column or table
 2. deploy app code that can read/write both shapes

@@ -15,6 +15,11 @@ and still make sense to people who were not in the room.
 
 That is the practical job of `ADRs` and stakeholder communication.
 
+Small concrete example:
+
+- decision: use a shared database now, but isolate high-risk tenants later if needed
+- the `ADR` records the current constraints, the rejected alternatives, the migration consequence, and the trigger that would justify revisiting the choice
+
 ---
 
 ## Bad Mental Model vs Better Mental Model

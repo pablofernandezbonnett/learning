@@ -15,6 +15,12 @@ wider failure.
 
 That is why the topic belongs to backend and `SRE`, not only to infrastructure.
 
+Small concrete example:
+
+- traffic spike plus a slow payment provider keeps requests in flight longer
+- thread pools and DB connections start filling even though CPU still looks acceptable
+- the stronger response is not "wait for a crash" but shed non-critical work, tighten admission, or degrade gracefully before the whole service saturates
+
 ---
 
 ## 1. What Capacity Planning Means
@@ -193,7 +199,7 @@ Three common responses to capacity pressure:
 
 Many teams jump to scaling before asking whether the workload became inefficient.
 
-Example:
+Concrete example:
 
 - adding replicas may help
 - but if every request does an avoidable slow query, the system is still wasting capacity
@@ -293,7 +299,7 @@ Earlier controlled rejection is often kinder than slower hidden failure.
 
 Retries are useful, but they can destroy capacity when used badly.
 
-Example:
+Concrete example:
 
 1. payment provider gets slow
 2. your service retries aggressively

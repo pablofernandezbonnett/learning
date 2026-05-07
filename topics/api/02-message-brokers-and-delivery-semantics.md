@@ -35,13 +35,36 @@ The core problems are usually one or more of these:
 - traffic spikes need buffering
 - retries and failures need clearer boundaries
 
-Smallest example:
+Small concrete example:
 
 - user places an order
 - you want to send email, update analytics, notify warehouse, and maybe trigger fraud checks
 
 If you do all of that synchronously inside one HTTP request, the user request becomes too dependent on many later steps.
 A broker lets you separate the critical write from the follow-up work.
+
+Smallest code example:
+
+```kotlin
+fun placeOrder(order: Order) {
+    orderRepository.save(order)
+    emailService.sendConfirmation(order)
+    analyticsService.trackOrder(order)
+}
+```
+
+Better production direction:
+
+```kotlin
+fun placeOrder(order: Order) {
+    orderRepository.save(order)
+    broker.publish(OrderPlaced(order.id))
+}
+```
+
+The first shape makes the user request wait on follow-up work.
+The second shape keeps the critical write small and lets later consumers run
+independently.
 
 ---
 
@@ -218,6 +241,33 @@ Why:
 
 - it is simpler than end-to-end exactly-once
 - it is good enough for most backend systems
+
+Smallest code example:
+
+```kotlin
+class ShipmentConsumer {
+    private val processedEventIds = mutableSetOf<String>()
+
+    fun handle(eventId: String, orderId: String) {
+        val firstTime = processedEventIds.add(eventId)
+        if (!firstTime) return
+
+        shipmentService.createShipment(orderId)
+    }
+}
+```
+
+That snippet is deliberately small, but it shows the core idea clearly:
+
+- at-least-once means the same event may arrive again
+- the consumer needs a stable event identity
+- duplicate delivery must not create a second business effect
+
+Production translation:
+
+- keep the deduplication state durable, not in memory
+- combine it with valid state-transition checks
+- assume retries are normal, not exceptional
 - it matches how real systems behave under retry and crash conditions
 
 If the consumer crashes after doing the work but before committing the offset, the same

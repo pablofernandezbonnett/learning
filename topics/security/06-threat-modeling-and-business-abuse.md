@@ -98,7 +98,7 @@ Examples:
 
 ### Step 3. Map the critical flow
 
-Example:
+Concrete example:
 
 cart -> reserve inventory -> authorize payment -> create order -> capture later
 

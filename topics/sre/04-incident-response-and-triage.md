@@ -99,7 +99,7 @@ Better order:
 3. stop the damage if possible
 4. continue diagnosis while impact is contained
 
-Example:
+Concrete example:
 
 - canary release increases 5xx rate
 
@@ -199,7 +199,7 @@ Good incident communication usually includes:
 - current mitigation
 - next update time
 
-Example:
+Concrete example:
 
 > Since 14:10 JST, checkout success has dropped for a subset of users in ap-northeast-1.
 > We paused the active canary rollout and are validating whether success rate recovers.

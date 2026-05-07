@@ -245,6 +245,24 @@ correctness needs durable state and better failure handling.
 `Multiple application instances` means several copies of the same service are
 running at once, so in-memory deduplication inside only one process is not enough.
 
+### 2.3 The short work-answer shape
+
+If I need to explain idempotency quickly in a review, interview, or pairing
+session, I use this sequence:
+
+1. smallest code example: `setSubscribed(true)` is idempotent because it sets
+   the final state, but `incrementBalanceBy(10)` is not because it adds a new
+   effect every time
+2. production translation: `POST /payments` is not naturally idempotent, so the
+   client sends an `Idempotency-Key`, the server claims it durably, and retries
+   reuse the first logical result instead of creating a second charge
+
+Short reusable answer:
+
+> First I show the state-setting example, then I move to the real backend case:
+> if a retry-prone write is not naturally idempotent, I give the business
+> action a stable identity and reuse the first durable result.
+
 ---
 
 ## 3. HTTP: Why PUT Is Idempotent And POST Usually Is Not
@@ -275,7 +293,7 @@ Important nuance:
 That distinction matters because the business effect can stay safely the same
 even if a later retry returns a different HTTP status or a reused cached result.
 
-Example:
+Concrete example:
 
 - first `DELETE /users/42` returns `204 No Content`
 - second `DELETE /users/42` returns `404 Not Found`
@@ -491,7 +509,7 @@ Idempotency answers "what if the client retries?"
 
 Transactions answer "what if part of my local write succeeds and another part fails?"
 
-Example:
+Concrete example:
 
 - deduct balance
 - create payment row

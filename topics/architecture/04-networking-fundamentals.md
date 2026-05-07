@@ -291,6 +291,9 @@ Practical rule:
 
 Practical question: can a `POST` be idempotent?
 
+- first anchor the idea in business effect: `set active = true` is idempotent
+  because retries keep the same final state, but `charge card again` is not
+  because each retry can create a second effect
 - not by default; `POST` usually creates a new resource or triggers a new side effect
 - but a `POST` can be made retry-safe by design
 - the client sends the same `Idempotency-Key` for the same business operation, for

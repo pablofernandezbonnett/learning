@@ -328,7 +328,7 @@ Useful correction:
 - `BlockingQueue` is not just "a thread-safe queue"; it also gives waiting semantics, which is useful for producer-consumer work
 - `PriorityBlockingQueue` gives concurrent priority ordering, but it is not a bounded backpressure mechanism by itself
 
-Small example:
+Smallest code example:
 
 ```kotlin
 import java.util.concurrent.ConcurrentHashMap

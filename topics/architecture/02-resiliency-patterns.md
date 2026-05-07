@@ -49,7 +49,7 @@ The problem is not only "a request fails".
 The bigger problem is that one slow or unhealthy dependency can consume threads,
 connections, retries, and queue capacity until healthy parts of the system also degrade.
 
-Smallest example:
+Small concrete example:
 
 - checkout service calls payment provider
 - payment provider is slow

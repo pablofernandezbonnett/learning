@@ -49,6 +49,37 @@ Small concrete example:
 - better approach: cache helps product browsing, while final reservation still
   checks the authoritative write path
 
+Smallest code example:
+
+```kotlin
+fun getProduct(productId: Long): Product {
+    val cached = cache.get(productId)
+    if (cached != null) return cached
+
+    val product = repository.findById(productId)
+    cache.put(productId, product)
+    return product
+}
+
+fun updateProduct(product: Product) {
+    repository.save(product)
+    cache.remove(product.id)
+}
+```
+
+This is the smallest useful cache-aside shape:
+
+- reads try cache first
+- misses fall back to the source of truth
+- writes update the source of truth first
+- cache entries are refreshed or invalidated around the authoritative write
+
+Production translation:
+
+- Redis replaces the in-memory cache
+- `TTL` and invalidation policy decide how stale reads may become
+- correctness-critical writes still go through the primary write path
+
 Strong default:
 
 - cache read-heavy data whose slight staleness is acceptable

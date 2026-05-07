@@ -59,7 +59,7 @@ Interview-ready takeaway:
 
 A cache exists to avoid repeating expensive reads.
 
-Smallest example:
+Small concrete example:
 
 - product detail is read thousands of times
 - product metadata changes a few times per day

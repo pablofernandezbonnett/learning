@@ -86,7 +86,7 @@ Each one points to a different default.
 
 ### 1. Slow follow-up work after a successful write
 
-Example:
+Concrete example:
 
 - order is saved
 - email and analytics can happen later
@@ -111,7 +111,7 @@ Tradeoff:
 
 ### 2. Save state and publish an event reliably
 
-Example:
+Concrete example:
 
 - save order state
 - publish `OrderConfirmed`
@@ -136,7 +136,7 @@ Tradeoff:
 
 ### 3. One business workflow spans several services
 
-Example:
+Concrete example:
 
 - order creation
 - payment authorization
@@ -163,7 +163,7 @@ Tradeoff:
 
 ### 4. Several systems need the same fact, and replay matters
 
-Example:
+Concrete example:
 
 - order placed
 - fraud, warehouse, analytics, and search all care
@@ -184,7 +184,7 @@ Tradeoff:
 
 ### 5. Reads and writes have very different needs
 
-Example:
+Concrete example:
 
 - strict write-side order rules
 - heavy dashboard and search reads
@@ -204,7 +204,7 @@ Tradeoff:
 
 ### 6. Full history is part of the value
 
-Example:
+Concrete example:
 
 - ledger or compliance-heavy money flow
 

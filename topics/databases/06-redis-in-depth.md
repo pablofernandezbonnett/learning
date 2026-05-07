@@ -153,7 +153,7 @@ Because Redis lives in RAM, memory behavior matters from day one.
 
 TTL means the key expires automatically after a time limit.
 
-Example:
+Concrete example:
 
 ```text
 SET product:123 "{...}" EX 300

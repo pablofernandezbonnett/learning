@@ -152,7 +152,7 @@ Common high-value index patterns:
 - composite index for filtered and sorted queries
 - partial index for hot filtered subsets
 
-Example:
+Concrete example:
 
 ```sql
 CREATE INDEX idx_orders_store_created

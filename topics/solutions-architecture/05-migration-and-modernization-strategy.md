@@ -18,6 +18,12 @@ correctness, control, or business continuity on the way.
 If the team cannot explain coexistence, rollout, and rollback, the target design
 is still incomplete.
 
+Small concrete example:
+
+- today: one monolith writes order and payment state together
+- target: payment becomes its own service
+- stronger migration shape: introduce explicit pending states, let old and new paths coexist for a while, move one tenant or traffic slice at a time, and keep a clear rollback point
+
 ---
 
 ## 1. Target State Is Not Enough
@@ -102,7 +108,7 @@ One of the safest recurring mental models is:
 2. coexist
 3. contract
 
-Example:
+Concrete example:
 
 - add new schema or endpoint shape
 - let old and new behavior coexist

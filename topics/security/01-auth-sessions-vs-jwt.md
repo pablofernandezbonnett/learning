@@ -202,7 +202,7 @@ Smallest mental model:
 - `payload`: the claims, meaning the data inside the token
 - `signature`: proof that the token was signed by the trusted issuer and was not modified
 
-Smallest example:
+Smallest code example:
 
 ```json
 // header
@@ -529,7 +529,7 @@ Important limit:
 
 CSRF matters mainly when authentication depends on cookies that the browser sends automatically.
 
-Smallest example:
+Small concrete example:
 
 1. user is logged into `shop.example.com`
 2. browser has a valid session cookie for that site

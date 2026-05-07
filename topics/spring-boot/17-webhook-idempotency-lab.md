@@ -116,7 +116,7 @@ again cleanly.
 
 Do not let the webhook jump the state machine incorrectly.
 
-Example:
+Concrete example:
 
 - `payment_succeeded` can move `PENDING_PAYMENT` -> `PAID`
 - it must not re-run on an already `PAID` order

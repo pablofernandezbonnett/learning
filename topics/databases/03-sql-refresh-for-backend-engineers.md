@@ -202,7 +202,7 @@ Backend use cases:
 - ranking search or sales results
 - rolling metrics
 
-Example:
+Concrete example:
 
 ```sql
 SELECT *

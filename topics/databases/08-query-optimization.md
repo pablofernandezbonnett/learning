@@ -128,7 +128,7 @@ Common useful patterns:
 - partial index when only part of the table matters often
 - covering index when you want index-only scans
 
-Example:
+Concrete example:
 
 ```sql
 CREATE INDEX idx_orders_store_status_date

@@ -100,7 +100,7 @@ The shortest good definition is:
 
 > a webhook is an HTTP callback triggered by an event in another system
 
-Smallest example:
+Small concrete example:
 
 - Stripe marks a payment as succeeded
 - Stripe sends `POST /webhooks/payments` to your backend

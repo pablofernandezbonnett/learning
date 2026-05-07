@@ -23,6 +23,11 @@ or team safer.
 
 If the review does not improve future decisions, it was mostly paperwork.
 
+Small concrete example:
+
+- weak review: "the deploy was bad, be more careful next time"
+- stronger review: show the timeline, explain why the canary guardrail did not stop the rollout, and assign one concrete follow-up to reduce the same failure next time
+
 ---
 
 ## Bad Postmortem vs Better Postmortem
@@ -165,7 +170,7 @@ A better review often separates:
 - root cause
 - contributing factors
 
-Example:
+Concrete example:
 
 - root cause: new release introduced an unindexed query on checkout read path
 - contributing factor: alerting focused on CPU instead of checkout latency

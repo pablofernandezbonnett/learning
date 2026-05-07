@@ -20,6 +20,11 @@ human or interrupting active work.
 If the team cannot say what action the responder should take, the alert is
 probably not ready to page.
 
+Small concrete example:
+
+- dashboard-only signal: CPU is briefly high, but user journeys still work and nobody needs to act right now
+- paging signal: checkout success rate drops and the responder can rollback, disable a feature, or shift traffic immediately
+
 ---
 
 ## 1. The Goal Of Alerting
@@ -207,7 +212,7 @@ Simple model:
 - high-priority notification: serious but not yet page-worthy
 - ticket or backlog item: needs follow-up, not immediate action
 
-Example:
+Concrete example:
 
 - checkout failure rate spikes right now -> page
 - one replica is unhealthy but traffic is fine -> notification
@@ -306,7 +311,7 @@ If the runbook is longer than the responder can use under pressure, it is probab
 
 During one incident, many alerts may fire.
 
-Example:
+Concrete example:
 
 - checkout errors spike
 - payment provider timeouts spike

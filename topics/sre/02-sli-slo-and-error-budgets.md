@@ -105,7 +105,7 @@ That order usually produces stronger `SLIs` than starting from whichever infrast
 `SLO` means `Service Level Objective`.
 It is the target you set for the `SLI`.
 
-Example:
+Concrete example:
 
 - `SLI`: checkout success rate
 - `SLO`: 99.9% successful checkouts over 30 days
@@ -141,7 +141,7 @@ That is what makes it operational instead of ceremonial.
 `SLA` means `Service Level Agreement`.
 This is usually customer-facing or contractual.
 
-Example:
+Concrete example:
 
 - internal `SLO`: 99.95% monthly availability
 - external `SLA`: 99.9% monthly availability
@@ -168,7 +168,7 @@ Simple definition:
 If your `SLO` is not 100%, then some amount of failure is allowed.
 That allowed amount is your error budget.
 
-Example:
+Concrete example:
 
 - `SLO`: 99.9% success over 30 days
 - allowed failure: 0.1%
@@ -193,7 +193,7 @@ It helps answer:
 
 Burn rate tells you how quickly you are consuming the error budget.
 
-Small example:
+Small concrete example:
 
 - monthly `SLO`: 99.9%
 - monthly error budget: 0.1%
@@ -270,7 +270,7 @@ Examples:
 
 For some flows, correctness matters more than raw latency.
 
-Example:
+Concrete example:
 
 - inventory reservation that responds in 200ms but double-reserves stock is not healthy
 

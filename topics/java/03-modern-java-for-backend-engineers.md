@@ -161,7 +161,7 @@ Short rule:
 
 Virtual threads matter because they change the cost model of blocking-style concurrency.
 
-Smallest example:
+Smallest code example:
 
 ```kotlin
 suspend fun buildProductBundle(productId: String): ProductBundle = coroutineScope {

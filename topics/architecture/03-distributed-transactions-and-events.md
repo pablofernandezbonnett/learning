@@ -77,6 +77,32 @@ Small concrete example:
   reservation are explicit steps, and compensation or later confirmation moves
   the workflow safely
 
+Smallest code example:
+
+```kotlin
+@Transactional
+fun createLocalOrder(order: Order, ledgerEntry: LedgerEntry) {
+    orderRepository.save(order)
+    ledgerRepository.save(ledgerEntry)
+}
+```
+
+That is still one local consistency boundary.
+Now compare it with the first distributed shape:
+
+```kotlin
+fun createDistributedOrder(order: Order) {
+    orderRepository.save(order.copy(status = OrderStatus.PENDING))
+    paymentClient.authorize(order.id)
+    inventoryClient.reserve(order.id)
+}
+```
+
+The second example is where the topic really starts:
+the order may already be saved when a later remote step fails, so the system
+needs explicit recovery instead of pretending one rollback can still protect the
+whole workflow.
+
 Strong default:
 
 - pick the smallest pattern that solves the actual failure shape
@@ -88,6 +114,12 @@ Interview-ready takeaway:
 > In distributed workflows, I first ask whether the problem is workflow
 > recovery, dual-write safety, read/write divergence, or audit-grade history.
 > That tells me whether I need saga, outbox, CQRS, or event sourcing.
+
+Short reusable answer:
+
+> First I show the local transaction that really can roll back. Then I show the
+> same business flow crossing a remote boundary, where a saved local state can
+> outlive a failed later step. That is why saga and outbox exist.
 
 ---
 
@@ -136,7 +168,7 @@ Important clarification:
 - each service has already committed its own local transaction
 - a compensating transaction is a **new business action** that semantically undoes the earlier step
 
-Example:
+Concrete example:
 
 - in many card flows, `Payment Service` authorizes first and captures later
 - if `Inventory Service` fails before capture, the saga compensates by cancelling the payment authorization

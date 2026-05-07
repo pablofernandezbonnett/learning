@@ -26,6 +26,13 @@ handling, boundary judgment, migration realism, and stakeholder clarity.
 The deeper the role gets, the less it is about drawing more boxes and the more
 it is about making better cross-system decisions.
 
+Small concrete example:
+
+- requirement: add a new payment provider for enterprise customers
+- backend engineer asks how checkout, retries, and webhooks stay correct
+- architect asks where the payment boundary, source of truth, and failure recovery should live
+- solutions architect asks whether the provider, support model, residency rules, rollout path, and commercial constraints fit the wider solution
+
 ---
 
 ## 1. Two Bad Mental Models

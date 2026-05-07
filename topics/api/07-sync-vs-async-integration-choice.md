@@ -36,6 +36,12 @@ Short version:
 
 The job is deciding where that boundary belongs.
 
+Small concrete example:
+
+- checkout still needs a synchronous answer for "was the order accepted?"
+- email, analytics, and fraud review do not need to block that first response
+- the strong default is to keep the critical acceptance path synchronous and move the follow-up work behind an async boundary
+
 ---
 
 ## Bad Mental Model vs Better Mental Model
@@ -118,7 +124,7 @@ Tradeoff:
 
 ### 1. User needs final confirmation now
 
-Example:
+Concrete example:
 
 - login success
 - card authorization response shown immediately
@@ -133,7 +139,7 @@ Reason:
 
 ### 2. User can accept `PENDING`
 
-Example:
+Concrete example:
 
 - payment provider timed out
 - final confirmation may come from webhook later
@@ -149,7 +155,7 @@ Reason:
 
 ### 3. One business fact triggers several later actions
 
-Example:
+Concrete example:
 
 - order placed
 - analytics, warehouse, and email all care
@@ -165,7 +171,7 @@ Reason:
 
 ### 4. Dependency is slow, flaky, or rate-limited
 
-Example:
+Concrete example:
 
 - external provider or partner API
 

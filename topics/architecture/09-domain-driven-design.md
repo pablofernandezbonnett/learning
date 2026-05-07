@@ -363,7 +363,7 @@ Plain-language version:
 - upstream is the side saying "this is the model / contract / data I provide"
 - downstream is the side saying "I need that, so I either align with it or translate it"
 
-Smallest example:
+Small concrete example:
 
 - Catalogue publishes product data
 - Order Service consumes product data

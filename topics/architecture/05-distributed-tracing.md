@@ -17,7 +17,7 @@ Metrics tell you there is a latency spike.
 Logs tell you what one service said.
 Tracing tells you how one request moved across the whole system.
 
-Smallest example:
+Small concrete example:
 
 - browser calls gateway
 - gateway calls order service
@@ -65,7 +65,7 @@ One unit of work inside that journey.
 
 The trace metadata must travel to the next service or provider call, otherwise the trace breaks.
 
-Smallest example:
+Small concrete example:
 
 ```text
 trace abc-123
@@ -101,7 +101,7 @@ If every trace carries too many unique values, tracing becomes expensive and noi
 The trace context is sent in request headers.
 The modern standard is W3C Trace Context.
 
-Example:
+Concrete example:
 
 ```text
 traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
@@ -205,7 +205,7 @@ business operation boundary.
 HTTP is the simpler case because headers can carry the trace context directly.
 Async boundaries need you to copy that context into message headers yourself.
 
-Smallest example:
+Small concrete example:
 
 - order service publishes `OrderCreated`
 - inventory consumer handles the event later

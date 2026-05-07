@@ -17,6 +17,12 @@ and how much of the capability should live inside your product at all.
 That is why the same product can look attractive in a demo and still be the
 wrong solution in production.
 
+Small concrete example:
+
+- requirement: enterprise customers need `SSO`
+- weak first move: build user directory, password reset, token issuance, and federation because login feels important
+- stronger first move: buy the identity layer, then keep tenant-specific authorization and onboarding workflow in your own system
+
 ---
 
 ## 1. What Build vs Buy Really Means

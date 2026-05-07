@@ -87,7 +87,7 @@ Gateways become more useful when you need:
 It is a backend layer built for one client experience, such as `web` or `mobile`.
 Its job is to hide the need to call several internal services and return data already shaped for that screen or app flow.
 
-Smallest example:
+Small concrete example:
 
 - mobile app needs order summary + loyalty points + delivery ETA in one response
 - instead of making the app call three services directly, a BFF calls them internally and returns one frontend-shaped payload
@@ -335,7 +335,7 @@ If multiple services read and write the same tables:
 - releases are not truly independent because both services depend on the same tables and migration timing
 - failures become harder to isolate because data bugs leak across the supposed boundary
 
-Example:
+Concrete example:
 
 - `Order Service` and `Inventory Service` are separate deployables, but both update the same `orders` and `inventory` tables in one shared schema
 
@@ -352,7 +352,7 @@ you create:
 - harder debugging because the visible failure may be several hops away from the real cause
 - cascading failure paths because one slow service can back up the whole request path
 
-Example:
+Concrete example:
 
 - checkout request calls pricing, then inventory, then promotions, then fraud, then notifications synchronously before returning to the user
 
@@ -366,7 +366,7 @@ You need patterns such as:
 - saga or compensating actions when one step succeeds and a later step fails
 - idempotent consumers so retries do not duplicate business effects
 
-Example:
+Concrete example:
 
 - the order row is committed, but the payment event publish fails, so downstream systems (the later dependent systems) never learn that the order moved forward
 
@@ -385,7 +385,7 @@ Better boundaries:
 - `payments`
 - `orders`
 
-Example:
+Concrete example:
 
 - creating a standalone "email service" just because sending email is a technical function, even though it has no real business ownership or stable domain boundary
 
@@ -400,7 +400,7 @@ Without:
 
 microservices become an expensive guessing exercise.
 
-Example:
+Concrete example:
 
 - an order fails somewhere after the gateway, but no correlation ID ties together the traces, so three teams spend hours guessing which hop actually broke
 

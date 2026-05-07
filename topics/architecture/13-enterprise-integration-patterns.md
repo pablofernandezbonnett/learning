@@ -77,7 +77,7 @@ The real challenge is this:
 - both need to exchange data safely
 - but you do not want your service to become shaped around the `ERP` (`Enterprise Resource Planning`) system's model
 
-Smallest example:
+Small concrete example:
 
 - ecommerce order service confirms an order
 - finance or fulfillment master data lives in SAP

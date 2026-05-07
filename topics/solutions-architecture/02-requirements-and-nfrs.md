@@ -123,7 +123,7 @@ They are usually decision filters.
 
 The same feature set can lead to very different solutions depending on the `NFRs`.
 
-Example:
+Concrete example:
 
 - "customers can upload documents"
 
@@ -185,7 +185,7 @@ Better handling:
 - rank them
 - explain the tradeoff when two of them pull in different directions
 
-Example:
+Concrete example:
 
 - fastest delivery may conflict with highest isolation
 - lowest cost may conflict with strongest regional separation

@@ -24,7 +24,7 @@ Short version:
 - or all local changes roll back together
 - concurrent operations see the database under a defined isolation model
 
-Smallest example:
+Small concrete example:
 
 - deduct balance
 - create order row

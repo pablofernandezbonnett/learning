@@ -104,7 +104,7 @@ It is reliability work.
 Both roles may care about the same service.
 The difference is what each role treats as the main problem.
 
-Small example:
+Small concrete example:
 
 - checkout latency goes from 300ms to 4 seconds
 
