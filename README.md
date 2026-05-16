@@ -45,6 +45,7 @@ Licensing details are in `LICENSE`.
 Use one of these entry points depending on what you need:
 
 - `paths/general-refresh.md`: a broad backend refresh path when you want guided order across topics
+- `paths/java-spring-dart-flutter-refresh.md`: a deep refresh path across backend Java, Spring Boot, and Dart/Flutter-oriented app work
 - `paths/appsec-for-software-engineers.md`: a practical AppSec path for developers
 - `paths/sre-from-backend-engineers.md`: a practical path from backend ownership to reliability ownership
 - `paths/solutions-architect-from-backend.md`: a practical path from backend depth to end-to-end solution design
