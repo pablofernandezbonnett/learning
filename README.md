@@ -1,60 +1,27 @@
 # Learning Repository
 
-A curated repository for practical backend learning and refresh.
+Practical backend learning and refresh materials in one place:
 
-The goal is to keep useful technical notes, examples, and small runnable labs in one
-place so you can reopen a topic quickly without depending on scattered articles,
-random bookmarks, or ten different explanations of the same thing.
+- topic-first notes for fast reopening
+- small runnable labs in Java and Kotlin
+- paths that give you a study order instead of a pile of disconnected notes
 
-This repo is meant to be useful when you want to revisit topics such as:
-
-- Spring Boot exception handling
-- transactions, isolation, and idempotency
-- JVM memory, concurrency, and modern Java
-- Kotlin backend idioms
-- API design and messaging semantics
-- system design tradeoffs
-- container sizing, observability, and deployment basics
-
-## What You Will Find
-
-- topic-first notes written for fast reopening
-- practical examples in Kotlin and Java
-- small runnable labs and companion code
-- curated explanations focused on tradeoffs, failure modes, and day-to-day backend decisions
-
-The general writing style is intentionally practical:
-
-- keep the first useful meaning of jargon visible
-- prefer short explanations over shorthand that assumes too much context
-- connect theory back to real backend flows such as checkout, payments, inventory, and integrations
-
-## Usage
-
-This repository is shared as a curated learning and reference base.
-
-- read it, reuse it for study, and adapt it for your own learning
-- if you want your own version, fork it and customize it around your own topics and priorities
-- commercial use is not allowed
-
-For contribution and usage details, see `CONTRIBUTING.md`.
-Licensing details are in `LICENSE`.
+The repo is optimized for practical understanding, tradeoffs, and failure
+modes, not encyclopedic coverage.
 
 ## Start Here
 
-Use one of these entry points depending on what you need:
+Pick the entry point that matches your goal:
 
-- `paths/general-refresh.md`: a broad backend refresh path when you want guided order across topics
-- `paths/java-spring-dart-flutter-refresh.md`: a deep refresh path across backend Java, Spring Boot, and Dart/Flutter-oriented app work
-- `paths/appsec-for-software-engineers.md`: a practical AppSec path for developers
-- `paths/sre-from-backend-engineers.md`: a practical path from backend ownership to reliability ownership
-- `paths/solutions-architect-from-backend.md`: a practical path from backend depth to end-to-end solution design
-- `topics/`: topic-by-topic entrypoints when you already know which problem space you want to reopen
-- `labs/`: runnable companion material when you want to turn a note into practice
+- `paths/general-refresh.md`: broad backend refresh
+- `paths/java-spring-dart-flutter-refresh.md`: deep refresh across Java, Spring Boot, and Dart/Flutter-oriented work
+- `paths/appsec-for-software-engineers.md`: AppSec from a developer point of view
+- `paths/sre-from-backend-engineers.md`: backend to reliability ownership
+- `paths/solutions-architect-from-backend.md`: backend to end-to-end solution design
+- `topics/`: topic-by-topic entrypoints when you already know what you want to study
+- `labs/`: runnable companion material
 
-## Topic Index
-
-Jump directly into a topic entry point:
+## Main Topics
 
 - [Java](./topics/java/README.md)
 - [Kotlin](./topics/kotlin/README.md)
@@ -76,43 +43,16 @@ Jump directly into a topic entry point:
 - [Dart](./topics/dart/README.md)
 - [Lua](./topics/lua/README.md)
 
-## Current Focus
+## How The Repo Is Shaped
 
-The repo's current core study surface is centered on:
+Most topic folders use the same order:
 
-- [Java](./topics/java/README.md)
-- [Kotlin](./topics/kotlin/README.md)
-- [Spring Boot](./topics/spring-boot/README.md)
-- [Databases](./topics/databases/README.md)
-- [API design](./topics/api/README.md)
-- [Architecture](./topics/architecture/README.md)
-- [System design](./topics/system-design/README.md)
-- [Security](./topics/security/README.md)
-- [SRE](./topics/sre/README.md)
-- [Solutions Architecture](./topics/solutions-architecture/README.md)
-- [Cloud](./topics/cloud/README.md)
-- [DevOps](./topics/devops/README.md)
-- [Testing](./topics/testing/README.md)
-- [Algorithms](./topics/algorithms/README.md)
+- `Refresh`: shortest useful reopen
+- `Required`: day-to-day material
+- `Growth`: deeper follow-up study
 
-See `docs/migration-status.md` for the current migration scope and cleanup rules.
+When a topic has runnable examples, its `README` should point to the matching
+lab.
 
-Most topic folders use the same simple layering:
-
-- `Refresh`: the shortest useful reopen order when you are rusty
-- `Required`: the topics that show up often in real backend work
-- `Growth`: deeper material worth studying once the core feels stable
-
-When a topic has runnable companion material, the matching `README` should also
-point you to the relevant lab instead of leaving the concept as static notes only.
-
-## Contributions
-
-This repository is intentionally kept read-only by default.
-
-If you want to improve or adapt something:
-
-- fork it and customize it for your own interests
-- if you want to contribute back directly, contact me and I can add you as a contributor
-
-The goal is to keep the material curated, consistent, and easy to trust as a practical reference.
+See `docs/migration-status.md` for migration scope and cleanup rules.
+See `CONTRIBUTING.md` and `LICENSE` for contribution and usage details.
