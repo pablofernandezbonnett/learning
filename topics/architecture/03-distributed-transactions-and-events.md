@@ -302,6 +302,10 @@ direct call to every dependency.
 - query side builds merchant dashboards, customer history views, or reconciliation read models
 - that lets the payment write flow stay strict while the reporting side stays fast
 
+If you want the Spring-oriented follow-up on when this stays a projection,
+becomes a dedicated read model, or grows into fuller `CQRS`, see
+[`../spring-boot/22-practical-cqrs-and-read-models.md`](../spring-boot/22-practical-cqrs-and-read-models.md).
+
 ---
 
 ## 3. Event Sourcing

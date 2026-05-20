@@ -165,6 +165,13 @@ Short version:
 > You do not lose ACID because microservices are "worse." You lose it because the
 > work is no longer one local database transaction.
 
+If you want the practical follow-up docs behind these boundary decisions, see:
+
+- [`../spring-boot/23-practical-modular-monolith-in-spring.md`](../spring-boot/23-practical-modular-monolith-in-spring.md)
+- [`17-gateway-vs-bff-vs-edge-patterns.md`](./17-gateway-vs-bff-vs-edge-patterns.md)
+- [`18-shared-db-and-independent-deployments.md`](./18-shared-db-and-independent-deployments.md)
+- [`19-database-per-service-and-read-model-migration.md`](./19-database-per-service-and-read-model-migration.md)
+
 #### How do microservices communicate?
 
 The common answers are:

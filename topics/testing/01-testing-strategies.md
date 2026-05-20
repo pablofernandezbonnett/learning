@@ -193,6 +193,9 @@ If the provider silently renames `firstName` to `name`, the contract test fails 
 
 > I use contract tests when a downstream service boundary (a dependency my service calls or consumes) is important enough that request or response shape changes would hurt us, but full end-to-end testing would be too slow or too brittle.
 
+If you want the wider contract-evolution guidance behind that rule, see
+[`../api/08-contract-testing-and-api-evolution.md`](../api/08-contract-testing-and-api-evolution.md).
+
 ---
 
 ## 5. End-To-End And Smoke Tests

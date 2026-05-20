@@ -63,6 +63,11 @@ If you want a structured first-pass study order instead of a topic-only entrypoi
 
 - [../../paths/appsec-for-software-engineers.md](../../paths/appsec-for-software-engineers.md)
 
+If your goal expands into APIs, mobile clients, and AppSec work inside a
+product team, continue with:
+
+- [../../paths/appsec-in-product-teams.md](../../paths/appsec-in-product-teams.md)
+
 ## Related Internal Topics
 
 - [../security/README.md](../security/README.md): deeper backend security notes already present in this repo

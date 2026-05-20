@@ -118,6 +118,9 @@ Bad gateway concerns:
 - stateful workflow orchestration
 - deep domain validation
 
+If you want the fuller gateway vs BFF vs edge decision guide, see
+[`../architecture/17-gateway-vs-bff-vs-edge-patterns.md`](../architecture/17-gateway-vs-bff-vs-edge-patterns.md).
+
 ### 2. Service-to-Service Clients
 
 In Java/Spring shops, you will see several styles:
@@ -208,6 +211,9 @@ Smallest mental model:
 
 You do not need deep tooling expertise on day one, but you should understand
 why contract testing helps when microservices replace a monolith.
+
+If you want the deeper practical note on compatibility and additive evolution,
+see [`../api/08-contract-testing-and-api-evolution.md`](../api/08-contract-testing-and-api-evolution.md).
 
 ---
 

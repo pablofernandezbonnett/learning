@@ -45,6 +45,8 @@ The path works best when it keeps momentum instead of turning into a checklist m
 If your goal is a role shift rather than a broad refresh, use one of the more
 targeted paths instead:
 
+- [java-spring-dart-flutter-refresh.md](./java-spring-dart-flutter-refresh.md)
 - [sre-from-backend-engineers.md](./sre-from-backend-engineers.md)
 - [solutions-architect-from-backend.md](./solutions-architect-from-backend.md)
 - [appsec-for-software-engineers.md](./appsec-for-software-engineers.md)
+- [appsec-in-product-teams.md](./appsec-in-product-teams.md)

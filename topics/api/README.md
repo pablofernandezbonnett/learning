@@ -21,6 +21,7 @@ Focus:
 5. [03-webhooks-basics.md](./03-webhooks-basics.md): webhook intake, signature checks, deduplication, and safe asynchronous follow-up work
 6. [04-graphql-in-depth.md](./04-graphql-in-depth.md): schema design, resolvers, `DataLoader`, meaning a batching helper that avoids one query per nested item, and how to stop flexible queries from becoming expensive or unsafe
 7. [07-sync-vs-async-integration-choice.md](./07-sync-vs-async-integration-choice.md): how to choose the boundary between immediate response and later async processing
+8. [08-contract-testing-and-api-evolution.md](./08-contract-testing-and-api-evolution.md): how to evolve service and API contracts safely, and where contract tests help before full end-to-end integration
 
 ## Refresh
 
@@ -29,6 +30,7 @@ Focus:
 - [06-kafka-practical-foundations.md](./06-kafka-practical-foundations.md)
 - [03-webhooks-basics.md](./03-webhooks-basics.md)
 - [07-sync-vs-async-integration-choice.md](./07-sync-vs-async-integration-choice.md)
+- [08-contract-testing-and-api-evolution.md](./08-contract-testing-and-api-evolution.md)
 
 ## Required
 

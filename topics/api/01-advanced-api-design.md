@@ -193,6 +193,9 @@ Practical rule:
 - do not create a new version for every additive field
 - prefer additive change when clients can ignore new fields safely
 
+If you want the broader compatibility and test strategy behind that rule, see
+[`08-contract-testing-and-api-evolution.md`](./08-contract-testing-and-api-evolution.md).
+
 ---
 
 ## 5. Write Paths Under Retry And Async Work
@@ -278,6 +281,9 @@ Concrete example:
 ## 6. BFF: When A Shared API Stops Fitting The Clients
 
 The BFF pattern exists because different clients want different payloads and latency tradeoffs.
+
+If you want the fuller edge-boundary discussion, including gateway vs BFF, see
+[`../architecture/17-gateway-vs-bff-vs-edge-patterns.md`](../architecture/17-gateway-vs-bff-vs-edge-patterns.md).
 
 Small concrete example:
 

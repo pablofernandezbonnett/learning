@@ -29,6 +29,8 @@ Working style:
 5. [05-payment-integration-patterns.md](./05-payment-integration-patterns.md): idempotency, webhooks, auth/capture, and payment correctness
 6. [06-threat-modeling-and-business-abuse.md](./06-threat-modeling-and-business-abuse.md): workflow risk, abuse cases, and control mapping
 7. [07-secrets-logging-and-secure-sdlc.md](./07-secrets-logging-and-secure-sdlc.md): secrets, logging, dependency hygiene, and secure delivery
+8. [08-mobile-appsec-basics.md](./08-mobile-appsec-basics.md): public-client constraints, token handling, secure storage, WebViews, SDK risk, and backend trust boundaries for mobile systems
+9. [09-appsec-standards-and-resources.md](./09-appsec-standards-and-resources.md): how to use `OWASP Top 10`, `API Top 10`, `ASVS`, `MASVS`, `MASTG`, `SAMM`, and practice resources without mixing their roles
 
 ## Refresh
 
@@ -45,6 +47,8 @@ Working style:
 
 - [06-threat-modeling-and-business-abuse.md](./06-threat-modeling-and-business-abuse.md)
 - [07-secrets-logging-and-secure-sdlc.md](./07-secrets-logging-and-secure-sdlc.md)
+- [08-mobile-appsec-basics.md](./08-mobile-appsec-basics.md)
+- [09-appsec-standards-and-resources.md](./09-appsec-standards-and-resources.md)
 
 ## Related Path
 
@@ -52,6 +56,11 @@ If you want a structured first-pass study order from browser and web basics up
 to common vulnerability classes, start with:
 
 - [../../paths/appsec-for-software-engineers.md](../../paths/appsec-for-software-engineers.md)
+
+If your goal is broader and includes APIs, mobile clients, standards, and
+secure delivery habits inside a product team, continue with:
+
+- [../../paths/appsec-in-product-teams.md](../../paths/appsec-in-product-teams.md)
 
 ## Core Rule
 

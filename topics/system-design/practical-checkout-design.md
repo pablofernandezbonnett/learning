@@ -5,6 +5,9 @@
 Use this note when system design still feels too abstract and you want one
 practical way to think about a checkout flow from start to finish.
 
+If you want the wider connected case study after this one, see
+[`checkout-to-fulfillment-end-to-end.md`](./checkout-to-fulfillment-end-to-end.md).
+
 Checkout is the example here, but the same thinking also helps with:
 
 - order creation

@@ -78,3 +78,8 @@ After this first pass, extend the path with:
 4. dependency risk and supply chain basics
 5. threat modeling
 6. secure code review checklists
+
+If your goal is wider than web-first AppSec and includes APIs, mobile clients,
+standards, and secure product delivery habits, continue with:
+
+- [appsec-in-product-teams.md](./appsec-in-product-teams.md)

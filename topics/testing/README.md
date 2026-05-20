@@ -22,6 +22,10 @@ Working style:
 1. [01-testing-strategies.md](./01-testing-strategies.md): how to choose unit, integration, and end-to-end tests by failure risk rather than by habit
 2. [02-clean-code-and-code-review.md](./02-clean-code-and-code-review.md): how code shape affects testability, review quality, and long-term change cost
 
+## Related Reading
+
+- [../api/08-contract-testing-and-api-evolution.md](../api/08-contract-testing-and-api-evolution.md): deeper contract-testing and compatibility guidance when service or event boundaries evolve independently
+
 ## Core Rule
 
 - choose the test level by the failure that matters most

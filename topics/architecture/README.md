@@ -22,6 +22,9 @@ Focus:
 5. [05-distributed-tracing.md](./05-distributed-tracing.md): how to follow one request across several hops without guessing from logs alone
 6. [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md): when asynchronous flows help and when they mainly add complexity
 7. [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md): how to choose between queue, event stream, outbox, saga, and `CQRS` based on the real coordination problem
+8. [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md): how to choose between gateway, `BFF`, reverse proxy, and service mesh without adding edge layers by default
+9. [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md): how to reason about transitional architectures where deploys are split before data ownership is cleanly split
+10. [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md): how to replace old shared-database joins with API composition, projections, or read models once write ownership is split
 
 ## Refresh
 
@@ -32,6 +35,9 @@ Focus:
 - [05-distributed-tracing.md](./05-distributed-tracing.md)
 - [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md)
 - [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md)
+- [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md)
+- [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md)
+- [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md)
 
 ## Required
 
@@ -47,6 +53,9 @@ Focus:
 - [13-enterprise-integration-patterns.md](./13-enterprise-integration-patterns.md): practical message and integration patterns without turning the topic into acronym soup
 - [14-b2b-vs-b2c-commerce-systems.md](./14-b2b-vs-b2c-commerce-systems.md): how requirements change when the same platform serves `B2C` (end consumers) versus `B2B` (business accounts)
 - [15-retail-inventory-and-fulfillment-systems.md](./15-retail-inventory-and-fulfillment-systems.md): real operational tradeoffs around stock, reservation, order routing, and fulfillment
+- [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md): edge-boundary decision help for public APIs, web, mobile, and partner flows
+- [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md): practical guidance for awkward middle-stage architectures and distributed-monolith smells
+- [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md): practical guidance for replacing old relational joins once services own writes separately
 
 ## Core Rule
 

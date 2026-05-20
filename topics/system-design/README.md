@@ -31,6 +31,7 @@ Working style:
 6. [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md): a decision helper for common architecture choices like SQL vs NoSQL or monolith vs microservices
 7. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): a way to keep framework lifecycle, transaction lifecycle, and business lifecycle clearly separated
 8. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows, with the write path and failure path in view
+9. [checkout-to-fulfillment-end-to-end.md](./checkout-to-fulfillment-end-to-end.md): one concrete flow that ties API design, AppSec, DDD, outbox, read models, deployment boundaries, and observability together
 
 ## Working Rule
 

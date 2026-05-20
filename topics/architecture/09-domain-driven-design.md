@@ -19,6 +19,9 @@ Short rule:
 
 > DDD is about domain boundaries, not deployment style.
 
+If you want the Spring Boot follow-up on how these ideas land in a real codebase,
+see [`../spring-boot/21-practical-ddd-in-spring.md`](../spring-boot/21-practical-ddd-in-spring.md).
+
 ---
 
 ## 1. Ubiquitous Language — The Foundation

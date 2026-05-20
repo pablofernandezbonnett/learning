@@ -67,6 +67,9 @@ Smallest mental model:
 - [17-webhook-idempotency-lab.md](./17-webhook-idempotency-lab.md)
 - [18-threat-modeling-lab.md](./18-threat-modeling-lab.md)
 - [20-spring-cloud-and-service-integration.md](./20-spring-cloud-and-service-integration.md)
+- [21-practical-ddd-in-spring.md](./21-practical-ddd-in-spring.md)
+- [22-practical-cqrs-and-read-models.md](./22-practical-cqrs-and-read-models.md)
+- [23-practical-modular-monolith-in-spring.md](./23-practical-modular-monolith-in-spring.md)
 
 ## Companion Lab
 

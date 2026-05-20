@@ -23,6 +23,10 @@ Working style:
 
 1. [01-dart3-features.md](./01-dart3-features.md): records, patterns, sealed classes, and class modifiers
 
+## Related Reading
+
+- [../flutter/README.md](../flutter/README.md): continue here when you want the wider Flutter architecture, auth, mobile-boundary, and testing refresh
+
 ## Core Rule
 
 - refresh the language first, then decide whether any broader Flutter refresh is needed
