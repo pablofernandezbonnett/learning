@@ -74,7 +74,28 @@ Everything else is supporting hygiene, not a replacement for that boundary.
 
 ---
 
-## 6. What To Look For In Code
+## 6. What Good Looks Like In Practice
+
+Bad vs better:
+
+- bad: `"SELECT * FROM users WHERE email = '" + email + "'" `
+- better: `"SELECT * FROM users WHERE email = ?"` with `email` bound as a parameter
+
+- bad: `ORDER BY " + sortField`
+- better: map requested sort fields through a small allowlist before they influence the query shape
+
+Small practical rule:
+
+- values should be parameterized
+- structural choices such as table names, sort fields, or sort directions should come from trusted code or tight allowlists
+
+Why this matters:
+
+- many teams avoid obvious concatenation in `WHERE` clauses but still create injection risk through dynamic search, filtering, and sorting helpers
+
+---
+
+## 7. What To Look For In Code
 
 When reviewing code, pay special attention to places where the team stepped outside the ORM or query builder defaults.
 That is often where convenience turns into unsafe string assembly.
@@ -87,7 +108,7 @@ That is often where convenience turns into unsafe string assembly.
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Find one query in code and answer:
 
@@ -100,7 +121,7 @@ The value of the exercise is in learning to recognize dangerous construction pat
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - base and practice: [PortSwigger SQL Injection](https://portswigger.net/web-security/sql-injection)
 - guided labs: [PortSwigger SQL Injection Learning Path](https://portswigger.net/web-security/learning-paths/sql-injection)
@@ -108,6 +129,6 @@ The value of the exercise is in learning to recognize dangerous construction pat
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/02-web-and-api-security.md](../security/02-web-and-api-security.md): broader backend AppSec note on unsafe input trust, API exposure, and high-value web risks around business endpoints

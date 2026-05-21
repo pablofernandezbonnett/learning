@@ -76,7 +76,31 @@ Use the token to carry identity or session-related claims, but keep sensitive au
 
 ---
 
-## 6. What To Look For In Code
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- the server verifies the token, not just decodes it
+- issuer, audience, expiry, and accepted algorithm are explicit
+- short-lived access tokens stay narrow in purpose
+- the token helps establish identity or API access context, but server-side authorization still decides the business action
+
+Bad vs better:
+
+- bad: "it is a JWT, so it is secure by design"
+- better: "it is only trustworthy if the signature, issuer, audience, expiry, and intended use are all validated correctly"
+
+- bad: "the token says `isAdmin=true`, so the business action is obviously allowed"
+- better: "claims can support the authorization model, but sensitive decisions still need a clear server-side trust rule"
+
+Small practical rule:
+
+- do not ask whether the token looks valid
+- ask whether this service is validating exactly what it should trust from this token
+
+---
+
+## 7. What To Look For In Code
 
 Many JWT bugs are visible in just a few lines of code.
 Look closely at whether the library call actually verifies the token or merely decodes it, and whether claim validation is configured or assumed.
@@ -89,7 +113,7 @@ Look closely at whether the library call actually verifies the token or merely d
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Take a sample JWT and:
 
@@ -102,7 +126,7 @@ If you can explain that scenario clearly, you already understand more than many 
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - formal reference: [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519)
 - defense: [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
@@ -110,7 +134,7 @@ If you can explain that scenario clearly, you already understand more than many 
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): longer repo note comparing session auth and JWT-based auth with web and mobile tradeoffs
 - [../security/04-advanced-auth-and-sso.md](../security/04-advanced-auth-and-sso.md): extends JWT usage into OIDC, BFF flows, and service-to-service auth

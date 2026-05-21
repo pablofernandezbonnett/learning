@@ -220,7 +220,35 @@ Use this in code review or design review:
 
 ---
 
-## 5. Practical Summary
+## 5. What Good Looks Like In Practice
+
+Strong default:
+
+- every endpoint has an explicit server-side authorization rule
+- risky workflows enforce state transitions intentionally
+- expensive paths have resource limits
+- outbound calls and third-party payloads are treated as trust boundaries
+- old or internal surfaces are inventoried, not assumed away
+
+Bad vs better:
+
+- bad: "it is internal, partner-only, or behind login, so the risk is low"
+- better: "internal and partner-facing surfaces still need explicit authz, input trust rules, and abuse limits"
+
+- bad: "the endpoint is authenticated, so the main security work is done"
+- better: "authenticated callers can still abuse object access, workflow order, retries, and expensive operations"
+
+Small practical review loop:
+
+1. who can call this endpoint?
+2. which object or workflow state can they affect?
+3. what input or callback is being trusted?
+4. what expensive, replayable, or dangerous action could be abused?
+5. what explicit control answers each of those risks?
+
+---
+
+## 6. Practical Summary
 
 Good short answer:
 
@@ -231,7 +259,7 @@ Good short answer:
 
 ---
 
-## 6. Further Reading
+## 7. Further Reading
 
 - OWASP Top 10: https://owasp.org/www-project-top-ten/
 - OWASP API Security Top 10: https://owasp.org/API-Security/

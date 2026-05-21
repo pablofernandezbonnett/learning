@@ -78,7 +78,31 @@ The code should make it obvious which combinations of user, role, ownership, and
 
 ---
 
-## 6. What To Look For In Code
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- object access rules are enforced on the server next to the business action
+- client-controlled IDs are treated as lookup hints, not proof of permission
+- both success and forbidden paths are tested
+- state-changing actions check workflow state as well as ownership or role
+
+Bad vs better:
+
+- bad: `findById(id)` and return the object because the route already requires login
+- better: fetch the object through a query or policy path that already constrains access for the current actor
+
+- bad: "the ID is hard to guess"
+- better: "even if the ID is guessed, the server still denies unauthorized access"
+
+Small practical example:
+
+- weak approach: `GET /invoices/{id}` returns whatever invoice matches that ID for any authenticated tenant user
+- stronger approach: the service loads the invoice only if it belongs to the caller's tenant or the caller has an explicit cross-tenant support permission
+
+---
+
+## 7. What To Look For In Code
 
 When you see a client-controlled ID, slow down.
 That is one of the clearest signals that an object-level authorization check should exist nearby, either in the service layer or in a well-defined policy component.
@@ -91,7 +115,7 @@ That is one of the clearest signals that an object-level authorization check sho
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Take a route like `GET /users/{id}` or `GET /orders/{id}` and answer:
 
@@ -104,7 +128,7 @@ If you cannot point to the exact line or function that enforces the rule, the im
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - defense: [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
 - IDOR-specific defense: [OWASP Insecure Direct Object Reference Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html)
@@ -112,7 +136,7 @@ If you cannot point to the exact line or function that enforces the rule, the im
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/02-web-and-api-security.md](../security/02-web-and-api-security.md): broader repo treatment of broken access control, BOLA, and workflow abuse in product systems
 - [../spring-boot/16-appsec-authz-lab.md](../spring-boot/16-appsec-authz-lab.md): concrete lab on object-level authorization in a Spring API

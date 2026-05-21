@@ -72,6 +72,33 @@ Interview-ready takeaway:
 
 ---
 
+## What Good Looks Like In Practice
+
+Strong operational defaults:
+
+- choose auth by caller type first, not by buzzword
+- keep long-lived secrets out of public clients
+- prefer short-lived tokens over static credentials where the architecture supports it
+- explain where tokens or credentials live, who can read them, and how they are rotated or revoked
+
+Bad vs better:
+
+- bad: one generic "OAuth/JWT/SSO" answer for browsers, mobile apps, services, and partner APIs
+- better: separate patterns for machine clients, internal services, browser users, mobile apps, and enterprise identity federation
+
+- bad: public clients holding long-lived secrets or tokens with broad scope
+- better: PKCE for public clients, server-side exchange for confidential web apps, and narrower credentials per caller type
+
+Small review loop:
+
+1. who is the caller?
+2. can this caller safely hold a secret?
+3. where does the credential or token live?
+4. how is it rotated, revoked, or expired?
+5. what exact access does it grant?
+
+---
+
 ## 1. Basic Auth vs. API Keys (Machine-to-Machine)
 
 When a script, a cron job, or an external partner system needs to talk to your API, you do not use a web login screen.
@@ -86,6 +113,11 @@ When a script, a cron job, or an external partner system needs to talk to your A
 *   **Storage:** Similar to passwords, API Keys should be **hashed** (using bcrypt/argon2) in your database. You only show the plaintext key to the user *once* during creation.
 *   **Rolling/Revocation:** If a key is leaked, the user can instantly revoke it in their dashboard and generate a new one.
 *   *Practical tip:* For a public B2B API, validate API keys close to the edge and cache the validation result briefly if the lookup is expensive.
+
+Bad vs better:
+
+- bad: reusing a human user's password or a shared static secret for partner API access
+- better: issue one revocable API key per machine client or integration and scope it to what that integration really needs
 
 ---
 
@@ -103,6 +135,11 @@ You _could_ use API Keys, but managing hundreds of static keys across microservi
 5.  **Validation:** `BillingService` statically verifies the JWT signature (without needing to contact the IdP).
 
 *Why this is Senior level:* It eliminates long-lived static keys flying around your network. If a token is intercepted, it becomes useless in 60 minutes.
+
+Bad vs better:
+
+- bad: shared static keys copied across many internal services with unclear ownership and rotation
+- better: per-service identity plus short-lived access tokens with explicit audience and scope
 
 ---
 
@@ -148,18 +185,23 @@ In this model, tokens may live in the client runtime, so the security discussion
 must include browser XSS and storage tradeoffs for SPAs, or secure OS storage
 for mobile apps.
 
-Short rule:
+Practical rule:
 
 - backend-rendered web app or BFF -> server-side code exchange plus secure cookie/session
 - SPA or mobile app -> authorization code flow plus PKCE
 - do not answer only "OIDC" without explaining where tokens live
 
-Short rule:
+Reusable takeaway:
 
 > If the app is a confidential web client or BFF, I keep the code exchange and
 > token handling server-side and give the browser a secure session. If it is an
 > SPA or mobile app, I use authorization code flow with PKCE and then discuss
 > token storage and XSS/runtime tradeoffs explicitly.
+
+Bad vs better:
+
+- bad: SPA stores long-lived high-privilege tokens and the design stops at "OIDC login works"
+- better: the team explains client type, token location, token lifetime, refresh behavior, and the XSS or device-storage tradeoff
 
 ---
 
@@ -183,6 +225,11 @@ Practical rule:
 > For enterprise B2B customers, SSO support is often a platform requirement. OIDC is
 > the cleaner modern default, but SAML 2.0 still appears in older enterprise identity
 > environments, so an identity broker is often the pragmatic choice.
+
+Small practical caution:
+
+- do not treat enterprise SSO as only a login screen feature
+- it also affects tenant onboarding, attribute mapping, provisioning, logout behavior, and support/debug complexity
 
 ---
 

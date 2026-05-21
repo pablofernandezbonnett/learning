@@ -74,7 +74,30 @@ That is why anti-CSRF tokens and sound cookie settings work well together instea
 
 ---
 
-## 6. What To Look For In Code
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- browser-based state-changing actions use a CSRF defense intentionally
+- auth cookies use deliberate `SameSite` settings instead of vague defaults
+- `GET` stays non-mutating
+- teams know whether a flow is cookie-backed or bearer-token based before applying CSRF advice
+
+Bad vs better:
+
+- bad: "the user is logged in, so the request is obviously valid"
+- better: "the session proves identity, but the server still needs a signal that this state-changing request came from a legitimate app flow"
+
+- bad: "we set `SameSite`, so CSRF is solved"
+- better: "we use token-based request integrity plus cookie settings that fit the real browser flow"
+
+Small practical rule:
+
+- if the browser sends authentication automatically, ask what proves intent
+
+---
+
+## 7. What To Look For In Code
 
 You are looking for actions that matter and that a browser can trigger automatically.
 Password changes, payment actions, admin operations, and profile updates are the usual places to start.
@@ -87,7 +110,7 @@ Password changes, payment actions, admin operations, and profile updates are the
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Take one browser-based update action and ask:
 
@@ -101,7 +124,7 @@ If the answer is unclear, the flow probably needs to be drawn and reviewed, not 
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - base and practice: [PortSwigger CSRF](https://portswigger.net/web-security/csrf)
 - prevention guidance: [PortSwigger Preventing CSRF Vulnerabilities](https://portswigger.net/web-security/csrf/preventing)
@@ -109,7 +132,7 @@ If the answer is unclear, the flow probably needs to be drawn and reviewed, not 
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): extends the discussion of cookie-based browser auth and why CSRF appears in that model
 - [../spring-boot/01-spring-boot-fast-review.md](../spring-boot/01-spring-boot-fast-review.md): practical Spring-specific notes on CSRF tokens, CORS, and secure browser-session setup

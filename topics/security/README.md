@@ -31,6 +31,7 @@ Working style:
 7. [07-secrets-logging-and-secure-sdlc.md](./07-secrets-logging-and-secure-sdlc.md): secrets, logging, dependency hygiene, and secure delivery
 8. [08-mobile-appsec-basics.md](./08-mobile-appsec-basics.md): public-client constraints, token handling, secure storage, WebViews, SDK risk, and backend trust boundaries for mobile systems
 9. [09-appsec-standards-and-resources.md](./09-appsec-standards-and-resources.md): how to use `OWASP Top 10`, `API Top 10`, `ASVS`, `MASVS`, `MASTG`, `SAMM`, and practice resources without mixing their roles
+10. [10-secure-java-companion.md](./10-secure-java-companion.md): durable companion map for secure Java, Spring, cookies, sessions, validation, output handling, misconfiguration, and secure database interaction
 
 ## Refresh
 
@@ -89,3 +90,13 @@ What this companion set gives you that a vendor course often does not:
 - more explicit mental models and bad-vs-better reasoning
 - easier transfer from Java to Kotlin and then conceptually to other backend stacks
 - durable notes you can keep improving after the course access ends
+
+Most of the practical guidance should live in the topic notes above, not in a
+separate route.
+Use the companion note as a summary map when useful, not as the only place
+where the "how" exists.
+
+If you want one durable secure-Java summary entrypoint for that companion work,
+start with:
+
+- [10-secure-java-companion.md](./10-secure-java-companion.md)

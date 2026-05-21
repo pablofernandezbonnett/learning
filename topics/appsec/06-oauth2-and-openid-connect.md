@@ -79,7 +79,30 @@ That is more valuable than copying a library example without understanding who i
 
 ---
 
-## 6. What To Look For In Code and Design
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- OIDC is used when the goal is login or identity
+- authorization code flow with PKCE is the normal default for public clients
+- each token has one clear job: API access, refresh, or identity
+- redirect URIs, token validation, and token storage are explicit design decisions, not library side effects
+
+Bad vs better:
+
+- bad: "we use OAuth for login"
+- better: "we use OIDC for identity, and we can explain which token proves login and which token is for API access"
+
+- bad: "the app receives a token, so it can probably use it everywhere"
+- better: "the team can explain who issued this token, who consumes it, and what exact decision it is allowed to support"
+
+Small practical rule:
+
+- if the team cannot draw the sequence, token roles, and trust boundaries, the implementation probably is not ready
+
+---
+
+## 7. What To Look For In Code and Design
 
 This topic is partly code and partly architecture.
 Review not only the implementation, but also whether the design can explain redirect handling, token storage, token validation, and the boundary between identity and API access.
@@ -92,7 +115,7 @@ Review not only the implementation, but also whether the design can explain redi
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Draw a simple auth flow with these boxes:
 
@@ -114,7 +137,7 @@ It is a good diagnostic: this topic becomes much easier once the sequence is vis
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - formal reference: [RFC 6749](https://www.rfc-editor.org/rfc/rfc6749)
 - OIDC reference: [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html)
@@ -122,7 +145,7 @@ It is a good diagnostic: this topic becomes much easier once the sequence is vis
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/04-advanced-auth-and-sso.md](../security/04-advanced-auth-and-sso.md): deeper repo coverage of OIDC login flows, BFF patterns, API keys, and enterprise SSO
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): practical comparison of token and session models before you go deeper into OAuth and OIDC

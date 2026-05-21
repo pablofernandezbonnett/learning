@@ -81,7 +81,31 @@ If the rule is important, a reviewer should be able to find it and reason about 
 
 ---
 
-## 6. What To Look For In Code
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- authentication establishes identity
+- authorization is checked server-side for the specific action and resource
+- ownership, role, and workflow state are combined where the business rule needs them
+- the UI mirrors backend rules, but does not define them
+
+Bad vs better:
+
+- bad: "the endpoint requires login, so access control is mostly handled"
+- better: "login tells me who is calling; authorization still decides whether this actor may do this thing to this resource"
+
+- bad: "admins can see the button and users cannot, so it is probably safe"
+- better: "the backend enforces the permission whether or not the UI shows the action"
+
+Small practical example:
+
+- weak approach: `GET /orders/{id}` is allowed for any authenticated user
+- stronger approach: the backend checks both `ORDER_READ` permission and whether the caller owns that order or has support/admin authority to read it
+
+---
+
+## 7. What To Look For In Code
 
 One of the best review habits in AppSec is to trace a client-supplied ID from the route to the database call and ask where permission is actually enforced.
 
@@ -93,7 +117,7 @@ One of the best review habits in AppSec is to trace a client-supplied ID from th
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Take a resource endpoint such as `GET /orders/{id}` and ask:
 
@@ -106,7 +130,7 @@ If the answer depends on "the frontend would never show that button", the design
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - defense: [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - defense: [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
@@ -114,7 +138,7 @@ If the answer depends on "the frontend would never show that button", the design
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/02-web-and-api-security.md](../security/02-web-and-api-security.md): broader backend view of broken access control, workflow abuse, and API trust boundaries
 - [../spring-boot/16-appsec-authz-lab.md](../spring-boot/16-appsec-authz-lab.md): hands-on lab focused on object-level authorization and BOLA prevention

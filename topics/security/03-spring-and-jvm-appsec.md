@@ -349,6 +349,36 @@ Good rule:
 
 > Accept explicit DTOs, validate them, and map them deliberately.
 
+Small Spring shape:
+
+```kotlin
+data class UpdateEmailRequest(
+    @field:NotBlank
+    @field:Email
+    val email: String,
+)
+
+@PostMapping("/users/{id}/email")
+fun updateEmail(
+    @PathVariable id: Long,
+    @Valid @RequestBody request: UpdateEmailRequest,
+) {
+    userService.updateEmail(id, request.email)
+}
+```
+
+Why this is better:
+
+- the request shape is explicit
+- validation happens at the HTTP boundary
+- the caller cannot over-post unrelated fields such as `role` or `enabled`
+
+Practical rule:
+
+- validate boundary DTOs
+- map them deliberately into domain commands or service inputs
+- do not bind broad entity-like objects straight from the request if the caller should only control a subset of fields
+
 ### Serialization and Deserialization
 
 Serialization is part of your attack surface.
@@ -362,6 +392,41 @@ Watch for:
 Good rule:
 
 > Be explicit about what enters and what leaves the API.
+
+Small review example:
+
+- weak approach: controller returns a JPA entity directly and trusts default Jackson behavior
+- stronger approach: controller returns a response DTO with only the fields the API intends to expose
+
+Practical caution:
+
+- polymorphic deserialization should be treated carefully because it expands what untrusted input may instantiate
+- entity graphs and internal persistence objects are often too broad for stable API output contracts
+
+### Headers, CORS, and Operational Exposure
+
+Some of the highest-value Spring misconfiguration questions are not inside one
+controller method.
+They are at the web edge and runtime edge.
+
+Watch for:
+
+- CORS allowlists broader than the real frontend origins
+- CSRF disabled without understanding the auth model
+- missing or weak security headers
+- actuator, error, or admin endpoints exposed too broadly
+
+Small mental model:
+
+- CORS controls which browser origins can call you
+- CSRF matters when the browser sends authenticated cookies automatically
+- headers such as `Content-Security-Policy` or `X-Frame-Options` add browser-side protection
+- actuator exposure is an operational boundary, not a convenience toggle
+
+Good rule:
+
+> Treat CORS, CSRF, headers, and actuator exposure as part of the public attack
+> surface, not as deployment trivia.
 
 ### Error Handling
 
@@ -413,6 +478,7 @@ In Spring systems, strong AppSec habits look like this:
 - Is authorization enforced server-side for the business action?
 - Are request DTOs explicit and validated?
 - Could a caller over-post fields they should not control?
+- Are CORS, CSRF, and exposed operational endpoints aligned with the real auth model?
 - Are errors sanitized?
 - Are secrets absent from source and logs?
 - Is method security used where request-level auth is too coarse?

@@ -81,7 +81,30 @@ That mindset pushes you toward shorter lifetimes, narrower scopes, better loggin
 
 ---
 
-## 6. What To Look For In Code and Config
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- `Basic` is rare and tightly controlled
+- bearer tokens are short-lived and treated like active credentials
+- API keys represent applications or integrations, not end users
+- every credential has a clear storage, rotation, and revocation story
+
+Bad vs better:
+
+- bad: "it is just an auth header, so any credential type is roughly the same"
+- better: "the important question is what this credential represents, how long it lives, and what happens if it leaks"
+
+- bad: long-lived bearer tokens or API keys copied into source, logs, or client apps
+- better: narrow-scope credentials kept out of logs and rotated with intent
+
+Small practical rule:
+
+- if the same secret can be reused by anyone who steals it, treat storage and lifetime as first-class security decisions
+
+---
+
+## 7. What To Look For In Code and Config
 
 When reviewing an implementation, look beyond the authentication library.
 A safe format can still become unsafe if tokens are stored badly, logged, or granted more power than they need.
@@ -94,7 +117,7 @@ A safe format can still become unsafe if tokens are stored badly, logged, or gra
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Compare three requests:
 
@@ -112,7 +135,7 @@ That comparison forces you to think in terms of blast radius, not just syntax.
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - base: [MDN HTTP Authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication)
 - header reference: [MDN Authorization Header](https://developer.mozilla.org/docs/Web/HTTP/Reference/Headers/Authorization)
@@ -120,7 +143,7 @@ That comparison forces you to think in terms of blast radius, not just syntax.
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): broader repo note on common auth shapes, bearer semantics, and session versus token tradeoffs
 - [../security/04-advanced-auth-and-sso.md](../security/04-advanced-auth-and-sso.md): deeper explanation of API keys, machine-to-machine auth, and advanced auth patterns

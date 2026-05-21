@@ -72,7 +72,29 @@ Good logging is:
 
 ---
 
-## 3. Secure SDLC for a Small Team
+## 3. What Good Looks Like In Practice
+
+Strong default:
+
+- secrets come from a proper secret source at runtime
+- the application never logs credentials, tokens, session IDs, or raw secrets
+- high-risk actions leave an audit trail with actor, target, and outcome
+- dependency scanning and patching are part of normal delivery, not occasional cleanup
+
+Bad vs better:
+
+- bad: secrets are copied into config files, shared over chat, and then leak into logs or support screenshots
+- better: secrets are injected at runtime, access is auditable, and rotation is part of the operating model
+
+- bad: logs exist mainly for debugging stack traces
+- better: logs also capture security-relevant events such as auth failures, authz denials, refund anomalies, and webhook verification failures
+
+- bad: dependency fixes only happen during emergencies
+- better: dependency review and patch cadence are part of normal engineering hygiene
+
+---
+
+## 4. Secure SDLC for a Small Team
 
 You do not need a huge security program to improve.
 
@@ -95,7 +117,16 @@ Examples of "dangerous changes":
 
 ---
 
-## 4. Cloud and AWS Basics
+## 5. Practical Review Questions
+
+- if this service is compromised, which secrets would an attacker likely find first?
+- can operators investigate an auth or refund incident without needing raw credentials in logs?
+- do we know which events would tell us that someone is abusing a high-risk workflow?
+- can the team patch a vulnerable dependency without treating the process as exceptional every time?
+
+---
+
+## 6. Cloud and AWS Basics
 
 You do not need to become an infra specialist to improve security.
 
@@ -113,7 +144,7 @@ If you only remember one AWS AppSec rule, remember this:
 
 ---
 
-## 5. Practical Checklist
+## 7. Practical Checklist
 
 - Are secrets absent from source, images, and logs?
 - Can the application rotate or reload secrets safely?
@@ -125,7 +156,7 @@ If you only remember one AWS AppSec rule, remember this:
 
 ---
 
-## 6. Interview Framing
+## 8. Interview Framing
 
 Good short answer:
 
@@ -136,7 +167,7 @@ Good short answer:
 
 ---
 
-## 7. Further Reading
+## 9. Further Reading
 
 - OWASP Secrets Management Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
 - OWASP Logging Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html

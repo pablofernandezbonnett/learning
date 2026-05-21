@@ -80,7 +80,27 @@ They need safe creation, safe transport, safe storage, safe expiration, and a pr
 
 ---
 
-## 6. What To Look For In Code and Config
+## 6. What Good Looks Like In Practice
+
+Strong default for browser sessions:
+
+- the cookie only identifies the session; it does not contain your whole authorization decision
+- the auth cookie is `HttpOnly` and `Secure`
+- `SameSite` is chosen intentionally based on the real frontend flow
+- the session ID rotates after login or privilege elevation
+- logout actually invalidates server-side authenticated state
+
+Bad vs better:
+
+- bad: the browser keeps a long-lived auth cookie and the team treats logout as a UI action only
+- better: the application treats the session as a credential with creation, rotation, timeout, and invalidation rules
+
+- bad: role or permission decisions are trusted straight from a user-controlled cookie value
+- better: the cookie carries an opaque identifier and the server resolves the trusted session state
+
+---
+
+## 7. What To Look For In Code and Config
 
 The most useful review question here is simple:
 "What exactly turns this browser from anonymous into authenticated, and how is that state protected over time?"
@@ -94,7 +114,7 @@ The most useful review question here is simple:
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Log in to a sample app and answer:
 
@@ -107,7 +127,7 @@ If you can answer those questions confidently in DevTools, you are already build
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - base: [MDN Using HTTP Cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
 - defense: [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
@@ -115,7 +135,7 @@ If you can answer those questions confidently in DevTools, you are already build
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): deeper explanation of session-based auth, cookie behavior, and the web tradeoff versus JWT
 - [../spring-boot/01-spring-boot-fast-review.md](../spring-boot/01-spring-boot-fast-review.md): practical Spring notes on secure cookies, CSRF, and browser-session behavior

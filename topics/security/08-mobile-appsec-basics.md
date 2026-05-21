@@ -186,7 +186,31 @@ For mobile-backed product systems, use this default:
 
 ---
 
-## 7. Practical Checklist
+## 7. What Good Looks Like In Practice
+
+Strong default:
+
+- the mobile app is treated as a public client
+- long-lived secrets are kept out of the app package
+- tokens use safe login, storage, rotation, and revocation patterns
+- sensitive actions are always enforced server-side
+- local protections help raise attacker cost, but do not define trust
+
+Bad vs better:
+
+- bad: "it is the official app, so the backend can trust its claims more than the web client"
+- better: "the device is user-controlled, so the backend still enforces identity, authorization, and workflow rules itself"
+
+- bad: local biometrics, PIN, attestation, or jailbreak checks are treated as the main authorization decision
+- better: those signals are defense-in-depth layered on top of server-side security and abuse controls
+
+Small practical rule:
+
+- if stealing or modifying the app would break your trust model, the trust model is too client-heavy
+
+---
+
+## 8. Practical Checklist
 
 - Is the mobile app treated as a public client?
 - Are long-lived secrets absent from the app package?
@@ -198,7 +222,7 @@ For mobile-backed product systems, use this default:
 
 ---
 
-## 8. Practical Summary
+## 9. Practical Summary
 
 Good short answer:
 
@@ -206,7 +230,7 @@ Good short answer:
 
 ---
 
-## 9. Further Reading
+## 10. Further Reading
 
 - OWASP Mobile Application Security project: https://mas.owasp.org/
 - OWASP MASVS: https://mas.owasp.org/MASVS/

@@ -262,7 +262,45 @@ Tradeoffs / Cons:
 
 ---
 
-## 5. Domain Exceptions
+## 5. What Good Looks Like In Practice
+
+Good API error handling is also part of security.
+The client should get a stable, sanitized answer, while the server keeps the
+diagnostic detail.
+
+Bad vs better:
+
+- bad: every controller invents a different error JSON and some of them leak raw exception messages
+- better: one advice layer returns one stable shape and generic client-safe detail for unexpected failures
+
+- bad: the response contains stack traces, SQL messages, framework class names, or secret values
+- better: the response stays small and predictable, while logs carry the internal detail with request correlation
+
+Strong default:
+
+- typed business exceptions for expected domain failures
+- one central advice layer for mapping
+- sanitized client detail
+- structured server logs for operators
+
+---
+
+## 6. A Practical Security Boundary
+
+When reviewing error handling, ask two separate questions:
+
+- what does the client need to react correctly?
+- what does the operator need to diagnose the failure safely?
+
+That split usually leads to a better design:
+
+- `4xx` responses explain the client mistake or denied action in stable terms
+- `5xx` responses avoid leaking internals
+- logs and tracing keep the deeper context off the public API boundary
+
+---
+
+## 7. Domain Exceptions
 
 Typed exceptions carry meaning and data.
 That is better than throwing a generic `RuntimeException("bad thing happened")`.
@@ -285,7 +323,7 @@ Why this is useful:
 
 ---
 
-## 6. Validation, Auth, And Generic Failures
+## 8. Validation, Auth, And Generic Failures
 
 You usually need a small number of categories:
 
@@ -315,7 +353,7 @@ Important nuance:
 
 ---
 
-## 7. Testing The Error Contract
+## 9. Testing The Error Contract
 
 If you care about API quality, you should test the error payload too, not only the happy path.
 
@@ -350,7 +388,7 @@ That test proves:
 
 ---
 
-## 8. Real Backend Use Cases
+## 10. Real Backend Use Cases
 
 ### Commerce-style API
 
@@ -370,7 +408,7 @@ Short rule:
 
 ---
 
-## 9. The Big Traps
+## 11. The Big Traps
 
 1. **Per-controller try/catch everywhere**
    You get duplication and inconsistent responses.
@@ -389,7 +427,7 @@ Short rule:
 
 ---
 
-## 10. Practical Summary
+## 12. Practical Summary
 
 Good short answer:
 

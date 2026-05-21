@@ -167,7 +167,30 @@ That is stronger than:
 
 ---
 
-## 6. Concrete Example
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- additive contract change first
+- contract tests on important independent boundaries
+- a few end-to-end tests for full-system risk
+- clear ownership of compatibility windows and breaking changes
+
+Bad vs better:
+
+- bad: "provider tests are green, so consumers should be fine"
+- better: "provider tests prove local behavior, but contract tests prove the consumer expectation still matches the provider promise"
+
+- bad: versioning every small change because compatibility feels scary
+- better: additive evolution where possible, and deliberate versioning only for real breaks
+
+Small practical rule:
+
+- if one team can ship a shape change without another team noticing until late integration, that boundary probably wants a contract test
+
+---
+
+## 7. Concrete Example
 
 Imagine:
 
@@ -193,7 +216,7 @@ It turns surprise breakage into planned change.
 
 ---
 
-## 7. Internal Services vs Public APIs
+## 8. Internal Services vs Public APIs
 
 ### Internal service contracts
 
@@ -222,7 +245,7 @@ Same principle, different tolerance for breakage.
 
 ---
 
-## 8. Where Contract Tests Sit In The Test Stack
+## 9. Where Contract Tests Sit In The Test Stack
 
 Contract tests are stronger than:
 
@@ -242,7 +265,7 @@ Short rule:
 
 ---
 
-## 9. Big Traps
+## 10. Big Traps
 
 1. **Versioning every additive change**
    Example: too much churn for no real compatibility gain.
@@ -261,7 +284,7 @@ Short rule:
 
 ---
 
-## 10. Practical Summary
+## 11. Practical Summary
 
 Good short answer:
 

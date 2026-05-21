@@ -74,7 +74,38 @@ Every time a codebase reaches for an escape hatch like raw HTML rendering, the r
 
 ---
 
-## 6. What To Look For In Code
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- untrusted text stays text
+- rich HTML is not allowed unless the product really needs it
+- each sink is reviewed for its real context, not with one vague "escaped somewhere" answer
+
+Bad vs better:
+
+- bad: "we escaped the string once, so it is probably fine everywhere"
+- better: "this value lands in HTML text, so the framework's escaped rendering path is correct here"
+
+- bad: "we used raw HTML because the page needed formatting"
+- better: "we kept the escaped path for ordinary text and only allow sanitized HTML in the one feature that truly needs rich content"
+
+Small server-side template example:
+
+```html
+<p th:text="${displayName}"></p>
+<p th:utext="${displayName}"></p>
+```
+
+How to read this:
+
+- escaped template output is the safe default for untrusted text
+- unescaped output is a deliberate risk point that needs stronger review
+- if the value goes into `href`, inline JavaScript, or a raw HTML fragment, treat that sink as a separate context with its own rules
+
+---
+
+## 7. What To Look For In Code
 
 One good review habit is to search for sinks, not only sources.
 If you know which APIs can create executable browser behavior, you can trace back to whether untrusted data can reach them.
@@ -87,7 +118,7 @@ If you know which APIs can create executable browser behavior, you can trace bac
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Take one UI page that renders user data and ask:
 
@@ -100,7 +131,7 @@ That exercise teaches you to reason about the real rendering path, not just abou
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - defense: [OWASP Cross Site Scripting Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
 - DOM-specific defense: [OWASP DOM Based XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html)
@@ -108,7 +139,7 @@ That exercise teaches you to reason about the real rendering path, not just abou
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): useful repo extension for the XSS tradeoff around browser token storage and cookie-based sessions
 - [../security/02-web-and-api-security.md](../security/02-web-and-api-security.md): broader backend security framing for web abuse and trust-boundary mistakes

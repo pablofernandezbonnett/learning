@@ -57,6 +57,34 @@ Short rule:
 
 ---
 
+## 1.2 What Good Looks Like In Practice
+
+Strong default:
+
+- bounded reads
+- actionable errors
+- retry-safe writes where duplicate side effects would hurt
+- explicit authorization and request-cost limits
+- additive contract evolution by default
+
+Bad vs better:
+
+- bad: "the endpoint works if the client behaves well"
+- better: "the contract is still safe when the client retries, paginates deeply, sends bad input, or asks for too much data"
+
+- bad: neat URLs but vague runtime behavior
+- better: clear limits, stable error shapes, and predictable contract behavior under failure
+
+Small review loop:
+
+1. can the client understand success and failure clearly?
+2. can this request become too expensive or too large?
+3. what happens if the client retries?
+4. what breaks if we add or change fields later?
+5. is authz and abuse control explicit, not assumed?
+
+---
+
 ## 2. Pagination: The Smallest Useful Example
 
 When a list endpoint can grow, pagination is not optional.
@@ -118,6 +146,11 @@ Important nuance:
 If the sort key is not unique, use a composite cursor such as `created_at + id`.
 Otherwise two rows with the same timestamp can break ordering.
 
+Bad vs better:
+
+- bad: one unbounded list endpoint because "clients can filter on their side"
+- better: explicit page limits and a pagination model that fits the real dataset and ordering needs
+
 ---
 
 ## 3. Error Shape: Make Failures Actionable
@@ -162,6 +195,11 @@ Status code rules worth saying cleanly:
 - `503`: service is overloaded or unavailable
 
 Do not hide everything behind `200 OK` with an `"error"` field in the payload.
+
+Bad vs better:
+
+- bad: every failure becomes a generic payload the client cannot act on
+- better: the response makes clear whether the caller should fix input, stop retrying, back off, or handle a state conflict
 
 ---
 
@@ -215,6 +253,11 @@ Practical rule:
 - pick URI versioning unless you have a strong reason not to
 - do not create a new version for every additive field
 - prefer additive change when clients can ignore new fields safely
+
+Bad vs better:
+
+- bad: version every tiny change or break old clients casually
+- better: prefer additive evolution and reserve versioning for real contract breaks
 
 If you want the broader compatibility and test strategy behind that rule, see
 [`08-contract-testing-and-api-evolution.md`](./08-contract-testing-and-api-evolution.md).
@@ -299,6 +342,11 @@ Concrete example:
 - amount is negative -> `422`
 - same idempotency key is already processing -> `409`
 
+Bad vs better:
+
+- bad: timeout plus blind retry can create a second charge or second order path
+- better: idempotency keys and explicit async status make retries part of the contract, not accidental behavior
+
 ---
 
 ## 6. BFF: When A Shared API Stops Fitting The Clients
@@ -322,6 +370,11 @@ What a BFF gives you:
 - smaller mobile payloads
 - less frontend orchestration
 - a place to shape data without polluting core domain services
+
+Bad vs better:
+
+- bad: one shared endpoint stretched awkwardly across mobile, admin, and public third-party use cases
+- better: separate client-facing shaping when the payload, latency, or composition needs genuinely diverge
 
 When to use it:
 

@@ -81,7 +81,30 @@ Then make sure developers can inspect real requests and understand which headers
 
 ---
 
-## 6. What To Look For In Code and Config
+## 6. What Good Looks Like In Practice
+
+Strong default:
+
+- authenticated traffic uses HTTPS everywhere
+- sensitive cookies use `Secure`
+- teams know which headers come from the client and which are added or normalized by trusted infrastructure
+- redirects, caching, and error responses are reviewed as part of security, not as afterthoughts
+
+Bad vs better:
+
+- bad: "we use HTTPS somewhere in front of the app, so transport is handled"
+- better: "we know how requests reach the app, where TLS terminates, and which downstream hops still need protection"
+
+- bad: headers are treated as trustworthy because they look infrastructure-related
+- better: the team distinguishes between client-controlled headers, proxy-added headers, and values that need explicit trust boundaries
+
+Small practical rule:
+
+- if you cannot read the real request and response, you are mostly guessing about web security
+
+---
+
+## 7. What To Look For In Code and Config
 
 When you review a web app, do not stop at controller logic.
 A lot of security posture sits one layer lower in proxy settings, cookie attributes, caching, redirects, and error handling.
@@ -95,7 +118,7 @@ A lot of security posture sits one layer lower in proxy settings, cookie attribu
 
 ---
 
-## 7. Practical Exercise
+## 8. Practical Exercise
 
 Take one authenticated request from a real app and inspect:
 
@@ -112,7 +135,7 @@ The goal is to get used to seeing web security as real traffic with concrete fie
 
 ---
 
-## 8. Resources
+## 9. Resources
 
 - base: [MDN HTTP Overview](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview)
 - defense: [OWASP Transport Layer Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html)
@@ -120,6 +143,6 @@ The goal is to get used to seeing web security as real traffic with concrete fie
 
 ---
 
-## 9. Internal Repo Links
+## 10. Internal Repo Links
 
 - [../architecture/04-networking-fundamentals.md](../architecture/04-networking-fundamentals.md): longer refresher on HTTP structure, headers, cookies, and TLS at a backend level
