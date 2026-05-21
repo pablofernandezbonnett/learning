@@ -67,3 +67,25 @@ secure delivery habits inside a product team, continue with:
 - security is part of backend design, not a phase after coding
 - authorization and workflow safety matter more than fashionable auth terminology
 - correctness, limits, and trust boundaries are part of security
+
+## If You Are Studying Secure Java
+
+This repo can work well as a companion set for a secure-Java course, but not as
+a copy of that course.
+
+Use this order:
+
+1. [03-spring-and-jvm-appsec.md](./03-spring-and-jvm-appsec.md): Spring/JVM security surface, validation, serialization, and dependency hygiene
+2. [01-auth-sessions-vs-jwt.md](./01-auth-sessions-vs-jwt.md): cookies, sessions, token flows, and browser/mobile auth tradeoffs
+3. [02-web-and-api-security.md](./02-web-and-api-security.md): trust boundaries, resource limits, and abuse thinking
+4. [07-secrets-logging-and-secure-sdlc.md](./07-secrets-logging-and-secure-sdlc.md): secrets, logging, and secure delivery habits
+5. [../appsec/07-sql-injection.md](../appsec/07-sql-injection.md): safe database interaction patterns
+6. [../appsec/08-cross-site-scripting-xss.md](../appsec/08-cross-site-scripting-xss.md): output handling and browser injection risk
+7. [../appsec/09-csrf.md](../appsec/09-csrf.md): cookie-backed request integrity
+
+What this companion set gives you that a vendor course often does not:
+
+- stronger repo-local cross-links between Java, Spring, API, and AppSec topics
+- more explicit mental models and bad-vs-better reasoning
+- easier transfer from Java to Kotlin and then conceptually to other backend stacks
+- durable notes you can keep improving after the course access ends
