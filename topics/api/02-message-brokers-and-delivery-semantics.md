@@ -26,6 +26,67 @@ Boundary-choice follow-up:
 
 ---
 
+## Why This Matters
+
+Teams often add a broker because "async feels scalable."
+That is a weak reason.
+
+This topic matters because brokers are really about:
+
+- keeping the user request small
+- buffering spikes and failure
+- decoupling independent follow-up work
+- accepting retries and duplicate delivery as normal system behavior
+
+If you cannot explain what the broker is protecting, why a queue or log fits
+better, and how duplicates stay safe, the design is still vague.
+
+## Smallest Mental Model
+
+Use a broker when one local request or transaction should not directly carry all
+later work.
+
+The smallest clean pattern is:
+
+1. finish the critical state change
+2. publish work or an event reliably
+3. let consumers process later
+4. assume retry and duplicate delivery
+
+Strong default:
+
+- queue for one background work path
+- log or stream for shared domain events and replay
+- at-least-once delivery plus idempotent consumers
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Kafka is the advanced answer, so it is probably the right answer
+- async automatically makes the system faster and more scalable
+- broker guarantees remove duplicate-processing risk
+
+Better mental model:
+
+- queue vs log is a boundary choice, not a prestige choice
+- async moves latency and failure out of the request path, but adds replay and operations work
+- broker delivery semantics still require idempotent consumer design
+
+Small concrete example:
+
+- weak approach: checkout calls email, analytics, and warehouse synchronously before returning
+- stronger approach: checkout commits the critical write, publishes `OrderPlaced`, and lets later consumers process independently
+
+Interview-ready takeaway:
+
+> I choose brokers when I want to shrink the critical request path, buffer
+> spikes, or let several consumers react later. Then I pick queue or log based
+> on the coordination need, and I assume at-least-once delivery plus idempotent
+> consumers as the normal default.
+
+---
+
 ## 1. What Problem A Broker Actually Solves
 
 The core problems are usually one or more of these:

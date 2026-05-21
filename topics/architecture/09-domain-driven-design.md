@@ -24,6 +24,66 @@ see [`../spring-boot/21-practical-ddd-in-spring.md`](../spring-boot/21-practical
 
 ---
 
+## Why This Matters
+
+DDD matters because many backend systems become hard to change not because the
+framework is wrong, but because the code model no longer matches the business
+rules and language.
+
+This topic helps with practical problems such as:
+
+- one word meaning different things in different parts of the system
+- service boundaries chosen by technical layer instead of business capability
+- business rules leaking across modules or services
+- data models shaped around tables instead of around invariants
+
+Good DDD use makes change cheaper by making the code speak the real domain more
+clearly.
+
+## Smallest Mental Model
+
+DDD is mainly about two things:
+
+- use the business language clearly inside one domain boundary
+- keep different domain models separate when the same word means different things
+
+That is why the two highest-value ideas are:
+
+- ubiquitous language
+- bounded context
+
+Strong default:
+
+- use DDD where the business rules are rich and changing
+- keep it lighter for thin CRUD or generic support domains
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- DDD means heavy ceremony and lots of tactical patterns everywhere
+- every service should use full textbook DDD
+- DDD is mostly a microservices topic
+
+Better mental model:
+
+- DDD is mainly about boundary clarity and business language
+- tactical patterns matter only when they help protect real rules
+- DDD works inside a modular monolith just as well as across services
+
+Small concrete example:
+
+- weak approach: one `Product` model is shared across catalogue, inventory, and order history even though each context needs different meaning
+- stronger approach: each context owns its own model and translates across boundaries
+
+Interview-ready takeaway:
+
+> I use DDD mainly to keep domain language and boundaries honest. The biggest
+> value is not ceremony. It is stopping one shared technical model from leaking
+> across different business contexts.
+
+---
+
 ## 1. Ubiquitous Language — The Foundation
 
 Before writing a single class, DDD demands a **shared vocabulary** between developers and
@@ -482,3 +542,13 @@ because they speak different business languages. Inside a domain, I would use pa
 like Aggregates, Value Objects such as Money, and Domain Events when they help protect
 real business rules. I would not force DDD onto simple CRUD or thin integration services
 where the overhead is not justified."*
+
+---
+
+## What To Internalize
+
+- DDD is mostly about domain language and boundaries
+- bounded context is the highest-value strategic concept
+- tactical patterns matter when they protect real invariants, not as ceremony
+- one shared model across different business meanings usually creates confusion and coupling
+- DDD is strongest in complex, changing domains and optional in thin CRUD domains

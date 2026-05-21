@@ -9,6 +9,59 @@ GraphQL is widely used for client-driven data fetching. Most backend APIs still 
 
 ---
 
+## Why This Matters
+
+This choice matters because it changes:
+
+- how clients fetch data
+- where aggregation complexity lives
+- how caching works
+- how query cost is controlled
+- how easy the public contract is to reason about
+
+Teams often talk about this as style preference.
+It is really a contract, performance, and operations choice.
+
+## Smallest Mental Model
+
+The smallest useful distinction is:
+
+- `REST` gives you resource-oriented endpoints and lets the backend shape responses
+- `GraphQL` gives the client one query surface and lets the client ask for a more exact shape
+
+Strong default:
+
+- default to `REST` for simple resource APIs, public partner APIs, and cache-friendly edge traffic
+- choose `GraphQL` when one frontend or BFF layer genuinely needs flexible aggregation and exact field selection
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- GraphQL is newer, so it is probably better
+- REST is old-fashioned CRUD
+- GraphQL automatically fixes frontend-backend mismatch with no major cost
+
+Better mental model:
+
+- REST is often the simplest and strongest default for public and resource-shaped APIs
+- GraphQL is useful when client data needs vary heavily, but it moves cost control and caching complexity onto the backend
+- the right answer depends on client shape, edge caching, and query-safety needs
+
+Small concrete example:
+
+- weak choice: expose GraphQL for a simple partner API that mostly needs stable resource reads and easy HTTP caching
+- stronger choice: keep partner APIs as REST, but use GraphQL in a BFF for a complex mobile or SPA client that needs several data shapes
+
+Interview-ready takeaway:
+
+> I do not choose REST vs GraphQL by trend. I ask whether the contract is
+> mostly resource-shaped and cache-friendly, or whether one frontend really
+> needs flexible aggregation and exact field selection badly enough to justify
+> the extra backend complexity.
+
+---
+
 ## 1. REST (Representational State Transfer)
 
 REST is the standard. It treats data as "resources" bound to unique URLs (e.g., `/users/123`).
@@ -95,3 +148,32 @@ query {
 
 **The Architectural Sweet Spot:**
 Many companies (like Shopify) use GraphQL as the public-facing API for their storefronts (so the UI only fetches exactly what it needs), but their internal microservices talk to each other using REST or gRPC.
+
+---
+
+## Practical Rule
+
+Do not ask "which one is more modern?"
+Ask:
+
+- is this mainly a resource API or a frontend composition layer?
+- do clients really need very different response shapes?
+- does edge caching matter a lot?
+- who will control query cost and abuse risk?
+- is the contract mainly public and stable, or app-facing and flexible?
+
+## 20-Second Answer
+
+> I default to REST for simple resource APIs, public contracts, and cacheable
+> edge traffic because it stays operationally simple. I choose GraphQL when a
+> complex frontend or BFF really needs exact field selection and flexible
+> aggregation, and I accept the extra backend work around caching, resolver
+> performance, and query-cost control.
+
+## What To Internalize
+
+- REST is usually the simpler default
+- GraphQL solves client-shape flexibility, not general API design by itself
+- GraphQL shifts more cost control and abuse protection to the backend
+- edge caching is much easier with resource-oriented REST endpoints
+- many strong architectures keep GraphQL at the frontend edge and use REST or gRPC internally

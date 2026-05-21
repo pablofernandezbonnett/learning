@@ -6,6 +6,61 @@ You do not need to be a network engineer, but understanding how traffic moves fr
 
 ---
 
+## Why This Matters
+
+Networking matters because many backend failures are really traffic-path
+failures:
+
+- wrong timeout assumptions
+- DNS or load-balancer confusion
+- retry behavior that multiplies pressure
+- rate limiting and gateway policy mistakes
+
+You do not need to memorize packet theory.
+You do need to explain how requests move, where latency is added, and which
+layer owns which decision.
+
+## Smallest Mental Model
+
+The smallest useful path is:
+
+1. client resolves a name to an IP
+2. transport carries bytes between the two sides
+3. HTTP defines the request and response semantics
+4. load balancers, gateways, and caches influence routing, protection, and latency
+
+Strong default:
+
+- separate name resolution, transport, and application concerns clearly
+- think in traffic path, trust boundary, and retry behavior
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- networking is mostly low-level trivia outside backend work
+- if the API code is correct, the request path is probably fine
+- retries, rate limits, and gateway behavior are separate from normal backend design
+
+Better mental model:
+
+- networking is the runtime path your backend depends on
+- every hop adds latency, failure modes, and policy decisions
+- good backend reasoning includes DNS, transport, HTTP semantics, and edge behavior
+
+Small concrete example:
+
+- weak approach: one timeout for every outbound call and no idea whether the delay is DNS, connect, TLS, or upstream response time
+- stronger approach: reason about where the request spends time and place timeouts, retries, and rate limits at the right layer
+
+Interview-ready takeaway:
+
+> I do not treat networking as separate from backend design. I use it to reason
+> about traffic path, latency, retries, and which layer owns routing, auth, and
+> protection decisions.
+
+---
+
 ## 0. The Network Layer Model (TCP/IP)
 
 Networks are organized in layers, each with a specific job. Each layer hands off to the

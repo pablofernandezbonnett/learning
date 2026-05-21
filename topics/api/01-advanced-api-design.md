@@ -32,6 +32,29 @@ more about whether you can protect:
 - client usability
 - clarity when the API grows and fails
 
+## 1.1 What Makes An API Good In Practice
+
+A good API is not just one that "works" in happy-path demos.
+In practice, a good API is usually:
+
+- clear for the client to understand and use correctly
+- explicit about validation errors, conflicts, and retryable failure
+- bounded in payload size, pagination, and request cost
+- safe under retries and duplicate delivery
+- protected by authorization, rate limits, and trust boundaries
+- stable enough to evolve without surprising old clients
+- observable enough that you can debug real failures in production
+
+Small practical example:
+
+- weak API: returns huge unbounded lists, vague errors, and duplicate charges on retry
+- stronger API: paginates, gives actionable errors, uses idempotency for sensitive writes, and rejects abusive request shapes early
+
+Short rule:
+
+> A good API is one the client can use safely under scale, failure, and change,
+> not just one with neat endpoint names.
+
 ---
 
 ## 2. Pagination: The Smallest Useful Example
@@ -371,6 +394,12 @@ When not to use it:
 6. **Treating a retry-prone write like a simple synchronous create**
    Example: `POST /payments` times out, the client retries, and the system creates a second charge path.
 
+7. **Ignoring request cost and abuse shape**
+   Example: one endpoint allows huge page sizes, expensive filters, or fan-out behavior with no limits.
+
+8. **Treating authentication as if it automatically solved authorization**
+   Example: the caller is logged in, but can still access another user's order or trigger an unsafe workflow step.
+
 ---
 
 ## 9. Decision Rules
@@ -414,6 +443,7 @@ These are the shortest clean answers worth memorizing:
 ## 12. What To Internalize
 
 - API design is contract design, not just endpoint naming
+- a good API is clear, bounded, retry-safe, and operable
 - pagination is a correctness and scale topic, not only a UX topic
 - clients need actionable error shapes, not vague strings
 - version only for breaking change when additive evolution is not enough

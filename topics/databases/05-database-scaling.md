@@ -9,6 +9,64 @@ Here is the hierarchy of how to scale a database.
 
 ---
 
+## Why This Matters
+
+Database scaling questions are dangerous because teams often jump too quickly to
+"we need sharding" when the real problem is still query shape, indexes, or one
+bad hot path.
+
+This topic matters because database bottlenecks directly affect:
+
+- request latency
+- write correctness under load
+- operational cost
+- migration complexity when the easy fixes stop working
+
+The most useful answer is usually not the fanciest one.
+It is the cheapest safe fix that matches the real bottleneck.
+
+## Smallest Mental Model
+
+Database scaling is usually a progression:
+
+1. make the existing queries cheaper
+2. give the database more room
+3. split reads from writes when reads dominate
+4. shard only when one node truly cannot carry the data or write load
+
+Strong default:
+
+- first fix query and index problems
+- then scale up or add replicas
+- treat sharding as the expensive last step
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- slow database means we need sharding
+- replicas solve all database scale problems
+- scaling is mostly an infrastructure purchase
+
+Better mental model:
+
+- many "database scaling" problems are still query-design problems
+- read scale and write scale are different problems
+- every scaling step adds operational and consistency tradeoffs
+
+Small concrete example:
+
+- weak approach: add replicas while one expensive query is still scanning a large table badly
+- stronger approach: fix the query and index first, then add replicas only if read pressure is still the real bottleneck
+
+Interview-ready takeaway:
+
+> I treat database scaling as a progression from cheapest to most dangerous:
+> query and index fixes first, then vertical scaling or replicas, and only then
+> sharding when one node truly cannot hold the write or data load anymore.
+
+---
+
 ## Step 1: Indexing (The Easiest Fix)
 
 **What is it?**
@@ -73,3 +131,13 @@ Sharding is incredibly complex.
 ## Practical Summary
 
 "If our database was a bottleneck, I would start by analyzing our slowest queries and ensuring we have appropriate **Indexes**. If reads are overwhelming the database, I would introduce **Read Replicas** and route `SELECT` queries to them, accepting eventual consistency. If the issue is **Write Throughput**, we can vertically scale the Primary node. I would only consider **Sharding** as an absolute last resort due to the massive application complexity it introduces around distributed joins and re-balancing."
+
+---
+
+## What To Internalize
+
+- most database scale conversations should start with query cost, not with sharding
+- vertical scaling is often the simplest next step after query fixes
+- replicas mainly help read-heavy systems and introduce replication-lag tradeoffs
+- sharding is a write-scale and data-volume answer with serious application complexity
+- scaling the database is still a correctness topic, not only a speed topic

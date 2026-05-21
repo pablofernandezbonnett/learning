@@ -17,6 +17,50 @@ wrong tool.
 
 ---
 
+## Why This Matters
+
+Redis matters because it appears in many backend answers as the "fast thing,"
+but the real skill is knowing what kind of fast shared state it is good for and
+where it becomes dangerous.
+
+This topic matters in practice because Redis often sits on critical paths for:
+
+- hot reads
+- rate limits
+- cache invalidation
+- coordination between app instances
+- ephemeral event fan-out
+
+Used well, it reduces latency and protects shared resources.
+Used badly, it creates stale-state and correctness bugs very quickly.
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Redis is fast, so it is a good place for any state
+- atomic commands make whole workflows safe
+- if persistence is enabled, Redis can replace a relational source of truth easily
+
+Better mental model:
+
+- Redis is excellent for fast shared state, not for every durable workflow
+- atomic commands help for one step, not for whole multi-step flows
+- Redis is strongest as a support layer around a primary source of truth
+
+Small concrete example:
+
+- weak approach: store final payment truth only in Redis because reads are fast
+- stronger approach: keep final payment truth in Postgres, and use Redis for throttling, cache, or short-lived coordination around that workflow
+
+Interview-ready takeaway:
+
+> I use Redis when I need fast shared state such as cache, counters, rate
+> limits, or short-lived coordination. I do not treat it as the primary durable
+> source of truth for money-like workflows.
+
+---
+
 ## 1. What Redis Actually Is
 
 Redis is an in-memory key-value data store optimized for very fast reads and writes.
@@ -407,3 +451,11 @@ Good short answer:
 > coordination, and ephemeral one-to-many messaging. I would not use it as the primary durable source
 > of truth for money-like workflows, but it is an excellent support layer around a
 > relational system.
+
+## What To Internalize
+
+- Redis is primarily a fast shared-state tool
+- cache, counters, rate limits, and short-lived coordination are its normal strengths
+- atomic Redis commands do not make whole workflows race-free by themselves
+- TTL and eviction are part of the design, not optional tuning
+- Pub/Sub is for ephemeral fan-out, not durable event processing

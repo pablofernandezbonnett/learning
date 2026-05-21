@@ -36,6 +36,37 @@ Short rule:
 
 > measure first, then fix
 
+## 1.1 A Slow Request Is Not Always A Slow Query
+
+This matters because teams often jump straight to the database when a request
+feels slow.
+Sometimes the database really is the bottleneck.
+Sometimes it is not.
+
+Common real causes:
+
+- slow SQL or missing indexes
+- N+1 queries from ORM navigation
+- waiting for a DB connection
+- slow downstream HTTP or gRPC call
+- cache miss or cache stampede
+- too much JSON serialization or payload size
+- too much synchronous work inside one user request
+
+Practical loop:
+
+1. confirm which endpoint or flow is slow
+2. check trace or timing breakdown first
+3. decide whether the time is in app code, SQL, connection wait, cache, or downstream IO
+4. only then optimize the expensive part
+5. measure again
+
+Plain-English version:
+
+> A slow request is an evidence problem. First I locate where the time goes,
+> then I decide whether the fix is query tuning, application read shape, pool
+> tuning, caching, or moving work out of the synchronous path.
+
 ---
 
 ## 2. The Smallest Broken Example: N+1
@@ -266,6 +297,25 @@ This is the practical sequence:
 7. check connection pool and transaction scope
 8. change one thing and measure again
 
+## 9.1 Slow Request Diagnosis Loop
+
+If the user complaint is "this endpoint is slow" rather than "this SQL is
+slow," use this wider loop:
+
+1. identify the slow endpoint and the user-visible symptom
+2. inspect trace spans or timing logs to find the slow segment
+3. separate DB time from connection wait, app CPU, cache behavior, and outbound calls
+4. inspect payload shape, pagination depth, and ORM read pattern
+5. check whether work that could be async is still blocking the request
+6. fix the dominant cost first
+7. verify p95 or p99 latency, not only the average
+
+Good practical summary:
+
+> I do not optimize slow requests by instinct. I first localize the time, then
+> ask whether the request is expensive because of query shape, connection wait,
+> downstream latency, payload size, or too much synchronous work.
+
 ---
 
 ## 10. 20-Second Answer
@@ -294,6 +344,7 @@ This is the practical sequence:
 ## 12. What To Internalize
 
 - measure before tuning
+- a slow request is not automatically a slow query
 - N+1 is one of the most common real production query problems
 - execution plans matter more than intuition
 - indexes must match the real query, not wishful thinking

@@ -25,6 +25,61 @@ Why that last bullet matters:
 - a `public client` means a browser SPA or mobile app that cannot safely hide a long-term secret
 - PKCE is the extra proof step that stops a stolen authorization code from being enough on its own
 
+## Why This Matters
+
+Auth discussions go wrong when people optimize for fashionable words instead of
+the real client and threat model.
+
+This topic matters because a weak auth choice creates very normal production
+problems:
+
+- token theft through `XSS`
+- missing `CSRF` protection in browser flows
+- weak revocation for stolen long-lived tokens
+- browser and mobile clients treated as if they had the same constraints
+
+If you can explain where auth state lives, how it is sent, how it is renewed,
+and how it is revoked, your answer is usually already much stronger.
+
+## Smallest Mental Model
+
+The real auth choice is usually four questions:
+
+- where does auth state live
+- how is it sent on each request
+- how is it renewed
+- how is it revoked
+
+Then add one practical distinction:
+
+- web clients live inside browser cookie and `XSS` / `CSRF` rules
+- mobile clients are public clients and need token plus secure-storage thinking
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- `JWT` is the modern answer, so it must be the better answer
+- sessions are old, so they are probably worse
+- if the user is authenticated, the auth design is good enough
+
+Better mental model:
+
+- sessions and bearer tokens solve different client and revocation tradeoffs
+- browser and mobile clients need different storage and attack-surface thinking
+- a good auth answer names client type, renewal path, revocation path, and the main attack tradeoff
+
+Small concrete example:
+
+- weak answer: "we use JWT auth"
+- stronger answer: "for browser login I prefer secure `HttpOnly` cookies or a secure refresh-cookie flow; for mobile I prefer short-lived bearer access tokens plus refresh token in secure OS storage"
+
+Interview-ready takeaway:
+
+> I do not start auth by asking sessions or JWT in the abstract. I start with
+> client type, token or cookie storage, renewal, revocation, and the main web
+> risks such as `XSS`, `CSRF`, and public-client constraints.
+
 ---
 
 ## 1. What The Auth Decision Actually Is

@@ -9,6 +9,71 @@ serialization, and dependencies.
 
 ---
 
+## Why This Matters
+
+Spring security discussions go wrong when people assume the framework default is
+the same as a safe application design.
+
+This topic matters because many real AppSec bugs in Spring services are not
+crypto mistakes.
+They are normal engineering mistakes such as:
+
+- request-level auth without object-level authorization
+- accepting too much input through binding
+- leaking internals through serialization or error handling
+- storing secrets badly
+- trusting dependency hygiene to happen automatically
+
+If you can explain where authorization, validation, serialization, secrets, and
+dependency controls live, you already have a much stronger AppSec answer.
+
+## Smallest Mental Model
+
+For Spring and JVM applications, the practical AppSec surface is usually:
+
+- who can call this action
+- which object or workflow state they can affect
+- what input is accepted and validated
+- what output or error detail is exposed
+- where secrets come from
+- how dependency risk is controlled
+
+Strong default:
+
+- explicit security config
+- method-level authorization for business actions
+- explicit DTOs and validation
+- sanitized errors
+- secrets from a proper secret source
+- dependency scanning in CI
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Spring Security is enabled, so authorization is mostly solved
+- if the endpoint is authenticated, the main security work is done
+- serialization and binding are convenience topics, not security topics
+
+Better mental model:
+
+- framework defaults reduce boilerplate, but business authorization still needs explicit design
+- authenticated users can still abuse object access and workflow transitions
+- binding, serialization, secret handling, and dependency hygiene are part of the attack surface
+
+Small concrete example:
+
+- weak approach: `/api/orders/**` requires login, but any logged-in user can fetch or refund any order ID
+- stronger approach: request security is combined with method-level authorization, object-level ownership checks, DTO validation, and sanitized error handling
+
+Interview-ready takeaway:
+
+> In Spring apps I do not stop at "security enabled." I check where business
+> authorization lives, what binding and serialization expose, how secrets are
+> loaded, and whether dependency risk is controlled in CI.
+
+---
+
 ## 1. The Main Principle
 
 Secure frameworks reduce boilerplate.
@@ -333,6 +398,14 @@ Good short answer:
 > the right place. I want authentication, authorization, validation, safe error
 > handling, and dependency hygiene to be explicit. The framework helps, but the
 > important part is still designing the boundaries correctly.
+
+## What To Internalize
+
+- framework help is not the same thing as safe business authorization
+- method-level checks matter when URL rules are too coarse
+- DTO validation and deliberate mapping reduce binding and over-posting risk
+- serialization and error handling are part of the attack surface
+- secrets and dependency hygiene are normal backend security work, not cleanup tasks
 
 ---
 

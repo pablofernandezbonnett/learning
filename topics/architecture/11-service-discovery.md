@@ -5,6 +5,62 @@ You do not need to become a service-mesh specialist.
 What you do need is a clean explanation of how one service finds another when
 instances move, restart, and scale.
 
+## Why This Matters
+
+Service discovery matters because distributed systems stop being stable the
+moment you assume instance addresses stay fixed.
+
+This topic is really about a practical runtime question:
+
+- how does one service find the current healthy instance of another service
+
+It connects directly to:
+
+- scaling
+- rolling deploys
+- failover
+- load balancing
+- readiness and health checks
+
+## Smallest Mental Model
+
+The smallest useful model is:
+
+1. service instances come and go
+2. something needs to know which ones are healthy now
+3. clients need a stable name or stable entrypoint
+4. traffic must route only to healthy instances
+
+Strong default:
+
+- in Kubernetes, think DNS name plus readiness-based routing
+- separate discovery from health checking, but remember they depend on each other
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- service discovery is just a fancy registry feature
+- DNS name alone solves the whole runtime problem
+- once a service is registered, traffic can safely flow to it
+
+Better mental model:
+
+- discovery is how clients find the current healthy endpoints behind a stable name
+- health checks decide whether an instance should stay in rotation
+- discovery, load balancing, and readiness are one runtime story
+
+Small concrete example:
+
+- weak approach: call one hardcoded Inventory instance address from Order Service
+- stronger approach: call a stable service name and let infrastructure route only to ready instances
+
+Interview-ready takeaway:
+
+> Service discovery is the mechanism that lets callers use a stable name while
+> infrastructure tracks which instances are alive and ready right now. In
+> Kubernetes that usually means DNS plus readiness-based routing.
+
 ## The Problem
 
 In a monolith, your application has one address. In microservices, you have dozens of services, each running multiple instances that scale up and down dynamically. Container orchestrators (Kubernetes, ECS) assign ephemeral IPs to each instance — the IP changes every time a container restarts.
@@ -232,3 +288,16 @@ This exposes:
 | Liveness | App is alive (not deadlocked) | Restart container |
 | Readiness | App is ready for traffic | Remove from Service endpoints (no restart) |
 | Startup | App has finished starting | Hold liveness/readiness checks until passed |
+
+---
+
+## Practical Rule
+
+When explaining service discovery, always answer these together:
+
+- what stable name the caller uses
+- who resolves that name to current instances
+- how unhealthy instances leave rotation
+- where load balancing happens
+
+If one of those is missing, the explanation is incomplete.

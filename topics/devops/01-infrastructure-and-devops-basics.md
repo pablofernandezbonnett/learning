@@ -8,6 +8,66 @@ Here are the bare minimum concepts you need to understand to comfortably discuss
 
 ---
 
+## Why This Matters
+
+This topic matters because backend work does not stop at "the code compiles."
+
+If you cannot explain how code is packaged, tested, released, and kept running,
+you usually miss the practical costs of your own design choices:
+
+- deploy risk
+- rollback difficulty
+- runtime drift between environments
+- weak failure recovery after a node or pod dies
+
+Good infrastructure basics are really about understanding the execution path
+from commit to running service.
+
+## Smallest Mental Model
+
+The smallest useful production path is:
+
+1. code is validated automatically
+2. code is packaged with a predictable runtime
+3. the artifact is promoted through environments
+4. the platform keeps the desired number of instances alive
+5. traffic is routed to healthy instances
+
+That maps cleanly to:
+
+- `CI` for validation
+- container image for packaging
+- registry for artifact storage
+- orchestrator for runtime control
+- gateway or load balancer for traffic entry
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- DevOps means "someone else runs the servers"
+- Docker is just a command-line tool for local development
+- Kubernetes is the main story, so the rest is less important
+
+Better mental model:
+
+- DevOps basics are about release safety, runtime consistency, and recovery
+- containers solve packaging and environment parity, not deployment on their own
+- orchestration only helps after CI, artifacts, health checks, and traffic flow are clear
+
+Small concrete example:
+
+- weak approach: build on a laptop, copy a `.jar` to a server, restart manually, and hope it works there too
+- stronger approach: CI validates the change, builds one immutable image, stores it in a registry, and the orchestrator rolls it out to healthy instances
+
+Interview-ready takeaway:
+
+> I think of infrastructure basics as the path from commit to running service:
+> validate automatically, package predictably, promote one artifact, keep
+> healthy instances alive, and route traffic safely.
+
+---
+
 ## 1. Containerization (Docker)
 
 **The Problem:** "It works on my machine!" (But fails on the server because the server has Java 11 and you built it with Java 17).
@@ -134,3 +194,37 @@ Spring Boot services, containers are the right trade-off."
 If someone asks, "How does code reach production?", this is your answer:
 
 > "I commit my code to a feature branch, and open a PR. The **CI pipeline** automatically runs tests and linters. Once approved and merged to `main`, the **CD pipeline** builds a **Docker image** containing my application and its dependencies, and pushes it to a registry. Finally, our orchestrator, like **Kubernetes**, pulls that new image and performs a rolling update to the cluster, replacing old Pods with the new ones without dropping traffic. External traffic enters through an Ingress or Gateway controller."
+
+---
+
+## Practical Rule
+
+Do not memorize tooling first.
+Follow the artifact and the traffic.
+
+Ask:
+
+- where is the code validated
+- what exact artifact gets deployed
+- how do we know the runtime matches what we tested
+- who replaces failed instances
+- how does traffic reach only healthy instances
+
+If you can answer those five questions, your infrastructure explanation is
+already useful.
+
+## 20-Second Answer
+
+> DevOps basics are the mechanics of getting one tested artifact from source
+> control into a reliable runtime. CI validates the change, Docker packages the
+> app with its runtime, a registry stores the image, and Kubernetes or another
+> orchestrator keeps the right number of healthy instances running while routing
+> traffic safely through a gateway or load balancer.
+
+## What To Internalize
+
+- containers solve packaging and environment parity
+- CI reduces release risk before deployment starts
+- a registry gives you one deployable artifact instead of rebuild-per-environment drift
+- orchestration keeps desired instances alive and replaces failed ones
+- traffic management and health checks are part of delivery safety, not an afterthought

@@ -18,6 +18,60 @@ This follows the same reusable study shape used elsewhere in the repo:
 
 ---
 
+## Why This Matters
+
+This topic matters because teams often frame it as a maturity badge instead of
+as a boundary and operating-cost decision.
+
+The real cost of getting it wrong is high:
+
+- splitting too early creates remote-call, tracing, and consistency overhead with little benefit
+- splitting too late can leave teams blocked by one release train or one overloaded codebase
+- keeping one shared database after the split creates a distributed monolith instead of real autonomy
+
+The useful question is not "are microservices better?"
+It is "which boundary is worth paying distributed-systems cost for?"
+
+## Smallest Mental Model
+
+The real decision is usually this:
+
+- monolith keeps deployment, debugging, and local transactions simpler
+- microservices buy independent ownership and deployment
+- the price of the split is remote calls, weaker local reasoning, and harder cross-service correctness
+
+Strong default:
+
+- start with a modular monolith
+- extract only where domain, scale, or team boundaries are already real
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- monolith means legacy and microservices mean scale
+- the moment a system gets big, the senior answer is to split it
+- separate repos or deployments automatically mean good service boundaries
+
+Better mental model:
+
+- a modular monolith is often the strongest first architecture
+- microservices are justified when ownership, release cadence, or scaling boundaries are real and stable
+- the split is only good if each service can own its data and operate with clear boundaries
+
+Small concrete example:
+
+- weak answer: "we should use microservices because checkout is important"
+- stronger answer: "I would keep a modular monolith until payments, inventory, or another domain has a clear ownership or scaling reason to stand alone"
+
+Interview-ready takeaway:
+
+> I do not treat microservices as the default. I start with boundary clarity,
+> team friction, and data ownership. If those are not real yet, a modular
+> monolith is usually the stronger engineering choice.
+
+---
+
 ## 1. Definition
 
 ### Monolith

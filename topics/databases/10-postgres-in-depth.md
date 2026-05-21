@@ -15,6 +15,66 @@ common production pitfalls.
 
 ---
 
+## Why This Matters
+
+Postgres matters because it is still the strongest default for many correctness-
+critical backend systems, but teams often use it well at the feature level and
+poorly at the concurrency or operational level.
+
+This topic matters in practice because Postgres decisions directly affect:
+
+- correctness under concurrent writes
+- request latency
+- lock contention
+- pool saturation
+- failover and stale-read behavior
+
+If you understand transactions, locking, plans, pools, and replica tradeoffs,
+you can explain not just why Postgres is chosen, but how to use it safely.
+
+## Smallest Mental Model
+
+The smallest useful Postgres model is:
+
+- Postgres is a transactional source of truth
+- reads and writes interact through MVCC and transaction rules
+- performance depends on query shape, indexes, vacuum health, and pool behavior
+- replicas help reads and failover, but the primary still owns the write truth
+
+Strong default:
+
+- use Postgres when correctness and relational integrity matter
+- keep transactions short
+- design indexes for real queries
+- measure plans before tuning
+
+## Bad Mental Model vs Better Mental Model
+
+Bad mental model:
+
+- Postgres is just a relational database, so the main job is writing SQL
+- ACID means concurrency problems are mostly solved automatically
+- replicas mean horizontal scaling and availability are basically handled
+
+Better mental model:
+
+- Postgres is a correctness engine whose behavior depends on transaction and lock design
+- ACID does not remove race conditions caused by weak application logic
+- replicas add read scale and failover options, but also add lag and routing tradeoffs
+
+Small concrete example:
+
+- weak approach: move reads to replicas everywhere and assume order-status reads stay correct immediately after write
+- stronger approach: keep read-after-write-sensitive flows on the primary and use replicas only where stale reads are acceptable
+
+Interview-ready takeaway:
+
+> I default to Postgres when transactional correctness matters, but I keep the
+> real risks in view: lock shape, query plans, pool pressure, vacuum health, and
+> replica lag under real traffic.
+
+---
+
 ## 1. When Postgres Is the Right Choice
 
 Use Postgres when you need:
@@ -378,3 +438,11 @@ Good short answer:
 > concurrency control. The main things I keep in mind are transaction boundaries,
 > locking strategy, indexing based on real query patterns, and measuring with
 > EXPLAIN ANALYZE before tuning.
+
+## What To Internalize
+
+- Postgres is a strong default for correctness-critical domains
+- MVCC explains both concurrency behavior and why vacuum matters
+- isolation level alone does not fix weak write logic
+- indexes and plans should follow real query patterns
+- replicas help, but primary truth and replica lag must stay explicit

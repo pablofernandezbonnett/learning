@@ -29,6 +29,39 @@ Most backend design reduces to five recurring questions:
 - how retries and duplicates stay safe
 - which complexity is actually justified
 
+## What Makes A System Good In Practice
+
+When people ask whether a backend system is good, scalable, reliable, or
+secure, the practical answer is usually not one magic technology choice.
+
+A good system is usually:
+
+- correct on the critical write path
+- clear about the source of truth
+- safe under retry, timeout, duplicate delivery, and partial failure
+- observable enough to explain slowness, errors, and stuck work
+- efficient with shared resources such as DB connections, threads, and cache capacity
+- protected by authorization, limits, and explicit trust boundaries
+- able to degrade gracefully before overload becomes full collapse
+- simple enough that the team can operate and recover it
+
+Plain-English version:
+
+> A good system is one that stays understandable and trustworthy when real
+> traffic, retries, failures, and abuse arrive.
+
+## Practical Review Questions
+
+Use these when reviewing a design, request path, or system change:
+
+- what business invariant must never break?
+- what is the source of truth when cache, queue, or provider disagrees?
+- what happens if the client retries or the provider callback arrives twice?
+- what is the first bottleneck under 10x traffic: CPU, DB pool, lock contention, queue lag, or downstream limit?
+- which expensive or dangerous path still lacks authz, limits, or abuse controls?
+- how would we detect degradation before users fully lose the flow?
+- what can fail fast or degrade so the most important workflow stays alive?
+
 ## Bad Mental Model vs Better Mental Model
 
 Bad mental model:
