@@ -74,6 +74,36 @@ Interview-ready takeaway:
 
 ---
 
+## How To Use This As A Secure-Coding Companion
+
+If you are studying a secure-Java course such as `SJD-100`, use this note as
+the Spring and JVM anchor, not as the whole study set.
+
+This note is strongest for:
+
+- request and method authorization
+- DTO validation and binding risk
+- serialization and deserialization boundaries
+- secret handling and dependency hygiene
+
+Pair it with these repo notes for the rest of the secure-coding picture:
+
+- [`01-auth-sessions-vs-jwt.md`](./01-auth-sessions-vs-jwt.md): cookies, sessions, token tradeoffs, and browser security constraints
+- [`02-web-and-api-security.md`](./02-web-and-api-security.md): trust boundaries, abuse cases, rate limits, and `SSRF`
+- [`07-secrets-logging-and-secure-sdlc.md`](./07-secrets-logging-and-secure-sdlc.md): secret handling, logging, and delivery hygiene
+- [`../../topics/appsec/07-sql-injection.md`](../../topics/appsec/07-sql-injection.md): SQL injection and safe database query habits
+- [`../../topics/appsec/08-cross-site-scripting-xss.md`](../../topics/appsec/08-cross-site-scripting-xss.md): output handling and browser injection risk
+- [`../../topics/appsec/09-csrf.md`](../../topics/appsec/09-csrf.md): cookie-backed request integrity and CSRF
+- [`../../topics/spring-boot/02-exception-handling.md`](../../topics/spring-boot/02-exception-handling.md): sanitized error handling for APIs
+
+Plain-English version:
+
+> use this note for the framework-specific secure-coding decisions, and use the
+> neighboring security and AppSec notes to fill in cookies, sessions, XSS, CSRF,
+> SQL injection, and secure operational habits.
+
+---
+
 ## 1. The Main Principle
 
 Secure frameworks reduce boilerplate.
