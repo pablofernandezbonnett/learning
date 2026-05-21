@@ -54,5 +54,4 @@ Most topic folders use the same order:
 When a topic has runnable examples, its `README` should point to the matching
 lab.
 
-See `docs/migration-status.md` for migration scope and cleanup rules.
-See `CONTRIBUTING.md` and `LICENSE` for contribution and usage details.
+See `CONTRIBUTING.md` and `LICENSE.md` for contribution and usage details.
