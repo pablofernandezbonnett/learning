@@ -43,9 +43,16 @@ Use [../../labs/java-modern-features/README.md](../../labs/java-modern-features/
 for a small Java `21` example focused on records, sealed types, pattern
 matching, and virtual threads.
 
+Use `VirtualThreadsRequestBudgetLab` inside that lab when you want the
+backend-specific virtual-thread example rather than only the language-feature
+walkthrough.
+
 For concurrency drills with runnable output, also use
 [../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md)
 topics `jvm/concurrency` and `jvm/concurrency-production`.
+
+For the Kotlin coroutine model, use
+[../kotlin/03-kotlin-coroutines-for-backend.md](../kotlin/03-kotlin-coroutines-for-backend.md).
 
 ## Core Rule
 

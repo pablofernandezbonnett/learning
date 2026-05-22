@@ -22,8 +22,9 @@ Working style:
 ## Recommended Order
 
 1. [01-kotlin-for-backend-vs-java.md](./01-kotlin-for-backend-vs-java.md): translate Java and Spring instincts into Kotlin
-2. [../../labs/kotlin-basics/README.md](../../labs/kotlin-basics/README.md): language basics, null safety, collections, and coroutines
-3. [02-kotlin-backend-idioms-and-gotchas.md](./02-kotlin-backend-idioms-and-gotchas.md): value classes, `Result` as a success-or-failure wrapper, Java interop, and avoiding clever Kotlin
+2. [03-kotlin-coroutines-for-backend.md](./03-kotlin-coroutines-for-backend.md): structured async orchestration, dispatchers, cancellation, and backend coroutine judgment
+3. [../../labs/kotlin-basics/README.md](../../labs/kotlin-basics/README.md): language basics, null safety, collections, and coroutines
+4. [02-kotlin-backend-idioms-and-gotchas.md](./02-kotlin-backend-idioms-and-gotchas.md): value classes, `Result` as a success-or-failure wrapper, Java interop, and avoiding clever Kotlin
 
 ## Working Loop
 
@@ -34,6 +35,16 @@ Working style:
 
 If a Kotlin feature feels clever but does not improve clarity or correctness,
 this repo treats that as a warning sign rather than a style goal.
+
+## Coroutines Companion
+
+Use [03-kotlin-coroutines-for-backend.md](./03-kotlin-coroutines-for-backend.md)
+as the main note.
+
+Use the lab after that when you want runnable examples:
+
+- [../../labs/kotlin-basics/README.md](../../labs/kotlin-basics/README.md)
+- [../../topics/spring-boot/15-kotlin-spring-idioms.md](../../topics/spring-boot/15-kotlin-spring-idioms.md) for Spring-specific coroutine boundaries
 
 ## Core Rule
 

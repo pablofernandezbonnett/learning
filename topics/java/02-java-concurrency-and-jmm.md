@@ -19,8 +19,8 @@ Production follow-up:
 
 Reading rule:
 
-- use the Kotlin sketch as the fast mental anchor
-- open the Java block when you want the direct Java/JMM version
+- use the small Kotlin snippets only when they still model the same JVM primitive clearly
+- use the Java blocks when you want the direct Java/JMM version
 
 ---
 
@@ -43,6 +43,31 @@ Typical examples:
 Short rule:
 
 > concurrency is mostly about shared mutable state, visibility, and blocking
+
+---
+
+## 1.1 What Good Looks Like In Modern Java
+
+Strong default:
+
+- keep most state request-local or immutable
+- use `synchronized` for small critical sections
+- use atomics for one independently changing value
+- use executors, `CompletableFuture`, or virtual-thread executors instead of hand-made thread management
+- treat inventory, money, and shared business truth as durable-boundary problems, not just in-memory locking problems
+
+Bad vs better:
+
+- bad: "modern Java concurrency means I should create threads in a cleverer way"
+- better: "modern Java concurrency means I should keep shared state small, choose the right coordination tool, and run blocking work with explicit capacity awareness"
+
+- bad: "virtual threads make the old concurrency problems disappear"
+- better: "virtual threads make blocking cheaper, but shared mutable state, locks, downstream bottlenecks, and capacity limits still matter"
+
+Small practical rule:
+
+- first choose the safety model for shared state
+- then choose the execution model for waiting and parallel work
 
 ---
 
@@ -391,13 +416,16 @@ Short rule:
 Minimal `CompletableFuture` example:
 
 ```kotlin
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 
-suspend fun buildCheckout(userId: String): CheckoutView = coroutineScope {
-    val cart = async { cartClient.getCart(userId) } // start cart fetch in parallel
-    val pricing = async { pricingClient.getPricing(userId) } // start pricing fetch in parallel
-    CheckoutView(cart.await(), pricing.await()) // wait for both results, then build one response
+fun buildCheckout(userId: String, executor: ExecutorService): CompletableFuture<CheckoutView> {
+    val cartFuture =
+        CompletableFuture.supplyAsync({ cartClient.getCart(userId) }, executor) // start cart fetch in parallel
+    val pricingFuture =
+        CompletableFuture.supplyAsync({ pricingClient.getPricing(userId) }, executor) // start pricing fetch in parallel
+
+    return cartFuture.thenCombine(pricingFuture, ::CheckoutView) // wait for both results, then build one response
 }
 ```
 
@@ -429,6 +457,7 @@ What to say carefully:
 - do not hide blocking calls inside a fancy async chain
 - know which executor runs the work
 - timeouts and fallbacks still matter
+- `CompletableFuture` helps with composition, but it does not by itself solve overload or pool saturation
 
 ---
 
@@ -444,14 +473,15 @@ The practical idea is simple:
 Minimal example:
 
 ```kotlin
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import java.util.concurrent.Executors
 
-suspend fun authorizeCheckout(): Unit = coroutineScope {
-    val payment = async { paymentClient.authorize() } // run one remote call concurrently
-    val inventory = async { inventoryClient.reserve() } // run another call without a platform-thread-per-task model
-    payment.await()
-    inventory.await()
+fun authorizeCheckout() {
+    Executors.newVirtualThreadPerTaskExecutor().use { executor ->
+        val payment = executor.submit { paymentClient.authorize() } // one blocking call in one virtual thread
+        val inventory = executor.submit { inventoryClient.reserve() } // another call without one heavyweight platform thread per task
+        payment.get()
+        inventory.get()
+    }
 }
 ```
 
@@ -480,6 +510,8 @@ What they do not solve:
 - race conditions
 - bad locking
 - missing backpressure
+- finite JDBC or HTTP connection pools
+- pinning problems when blocking work holds onto a carrier thread in the wrong places
 
 Short rule:
 

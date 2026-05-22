@@ -8,6 +8,7 @@ It demonstrates:
 - sealed types
 - pattern matching
 - virtual threads
+- virtual threads with a request budget mindset
 
 ## How To Run
 
@@ -15,7 +16,14 @@ From this folder:
 
 ```bash
 mvn compile
-java src/main/java/modernjava/ModernJavaFeatures.java
+java -cp target/classes modernjava.ModernJavaFeatures
+java -cp target/classes modernjava.VirtualThreadsRequestBudgetLab
 ```
 
-Use it as a supporting example, not as a full project template.
+What to observe:
+
+- `ModernJavaFeatures` shows the language and runtime features
+- `VirtualThreadsRequestBudgetLab` shows the backend point more clearly:
+  virtual threads make blocking waits cheaper, but request budgets still matter
+
+Use this lab as a supporting example, not as a full project template.

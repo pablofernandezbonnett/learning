@@ -132,6 +132,10 @@ Short rule:
 
 > use coroutines where they simplify concurrency, not where they only add novelty
 
+Use [03-kotlin-coroutines-for-backend.md](./03-kotlin-coroutines-for-backend.md)
+when you want the backend-specific coroutine mental model, defaults, and
+tradeoffs in one place.
+
 ---
 
 ## 6. Where Java Is Still A Good Choice

@@ -230,7 +230,26 @@ Java virtual threads:
 
 ---
 
-## 9. Which One Should You Prefer
+## 9. Bad Comparison vs Better Comparison
+
+Bad comparison:
+
+- "coroutines and virtual threads are basically the same thing"
+
+Better comparison:
+
+- coroutines are mainly a structured async programming model
+- virtual threads are mainly a runtime improvement for blocking-style JVM code
+- both can improve concurrency, but they improve different parts of the problem
+
+Small practical rule:
+
+- choose coroutines when async composition and cancellation structure are the main need
+- choose virtual threads when blocking-style JVM code is still the main shape and migration cost matters
+
+---
+
+## 10. Which One Should You Prefer
 
 The useful answer is not ideological.
 It depends on the workload and the surrounding stack.
@@ -261,7 +280,7 @@ Prefer Java virtual threads when:
 
 ---
 
-## 10. Short Answer Shape
+## 11. Short Answer Shape
 
 Good short answer:
 
