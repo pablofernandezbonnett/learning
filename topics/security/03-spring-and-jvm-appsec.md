@@ -45,7 +45,7 @@ Strong default:
 - explicit DTOs and validation
 - sanitized errors
 - secrets from a proper secret source
-- dependency scanning in CI
+- dependency scanning in `CI` (`continuous integration`)
 
 ## Bad Mental Model vs Better Mental Model
 
@@ -150,7 +150,7 @@ Useful pattern:
 
 ```kotlin
 @PreAuthorize("hasAuthority('ORDER_READ')")
-fun getOrder(orderId: Long): OrderDto = TODO()
+fun getOrder(orderId: Long): OrderDto = orderService.getVisibleOrder(orderId)
 ```
 
 <details>
@@ -199,7 +199,7 @@ That is why `hasAuthority(...)` is the most explicit check:
 
 ```kotlin
 @PreAuthorize("hasAuthority('ORDER_READ')")
-fun getOrder(orderId: Long): OrderDto = TODO()
+fun getOrder(orderId: Long): OrderDto = orderService.getVisibleOrder(orderId)
 ```
 
 Use this when you want the rule to match one exact permission string.
@@ -253,7 +253,7 @@ So a typical check becomes:
 
 ```kotlin
 @PreAuthorize("hasAuthority('SCOPE_orders.read')")
-fun getOrder(orderId: Long): OrderDto = TODO()
+fun getOrder(orderId: Long): OrderDto = orderService.getVisibleOrder(orderId)
 ```
 
 This is very common in OAuth2 bearer-token APIs.

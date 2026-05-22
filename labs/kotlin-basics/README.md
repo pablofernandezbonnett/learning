@@ -2,6 +2,17 @@
 
 This folder contains small standalone Kotlin files for quick refresh.
 
+Why this lab matters:
+
+- it is the fastest way to reopen Kotlin syntax without loading a full project
+- it helps separate language refresh from Spring or architecture complexity
+- it gives coroutines a small on-ramp before the more backend-shaped examples
+
+Use it after:
+
+- [../../topics/kotlin/README.md](../../topics/kotlin/README.md)
+- [../../topics/kotlin/03-kotlin-coroutines-for-backend.md](../../topics/kotlin/03-kotlin-coroutines-for-backend.md)
+
 Topics included:
 
 - language basics
@@ -28,3 +39,8 @@ Recommended coroutine order:
 1. `04-coroutines.kt`
 2. `05-coroutines-advanced.kt`
 3. `06-backend-coroutine-boundaries.kt`
+
+Rule:
+
+- use this folder for language reopen
+- use `labs/kotlin-backend-examples` when you want backend-shaped runtime behavior

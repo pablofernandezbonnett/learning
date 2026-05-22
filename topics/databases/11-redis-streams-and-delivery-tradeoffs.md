@@ -14,6 +14,12 @@ The real question is:
 
 > What delivery guarantees do I need, and what tradeoffs am I accepting?
 
+Short mental model:
+
+- Pub/Sub is for ephemeral fanout
+- Streams are for lightweight replayable async work
+- neither one removes the need for idempotent consumers
+
 ---
 
 ## 1. Redis Pub/Sub

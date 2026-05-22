@@ -6,6 +6,11 @@ relearn.
 This track is mainly about reopening the language changes that matter most if
 you last used Dart before the recent Dart 3 era.
 
+Why this folder matters:
+
+- Dart changes affect how you model state and control flow in Flutter code
+- reopening the language first makes the wider Flutter refresh much lighter
+
 ## Focus
 
 - modern value modeling

@@ -56,6 +56,7 @@ Smallest mental model:
 - [05-local-kubernetes-lab.md](./05-local-kubernetes-lab.md): a hands-on local cluster setup when the basic concepts are already clear
 - [06-container-sizing-cheatsheet.md](./06-container-sizing-cheatsheet.md): a compact reopen sheet for memory, CPU, and runtime sizing judgment
 - [07-serverless-cheatsheet.md](./07-serverless-cheatsheet.md): a short decision sheet for function-shaped workloads, async boundaries, and serverless tradeoffs
+- [08-aws-for-backend-engineers.md](./08-aws-for-backend-engineers.md): the AWS minimums that matter most for backend employability and interviews
 
 ## Core Rule
 

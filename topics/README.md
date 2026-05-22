@@ -5,6 +5,12 @@ Each topic folder should work as a practical re-entry point, not as a pile of
 links or shorthand that only makes sense if the topic is already fresh in your
 head.
 
+Why this matters:
+
+- the topic folders are the durable source notes of the repo
+- if a path gives order, the topic notes should still carry the meaning
+- reopening should be possible from the topic itself without hunting for context elsewhere
+
 Use this directory when:
 
 - you already know the topic you want to reopen
@@ -28,3 +34,11 @@ A good topic README should tell you three things quickly:
 
 When a topic has runnable companion code, the topic README should link to the
 matching lab in `labs/`.
+
+Current topic areas include:
+
+- `java`, `kotlin`, `spring-boot`, `databases`, `api`, `architecture`
+- `system-design`, `security`, `appsec`, `sre`, `solutions-architecture`
+- `cloud`, `devops`, `testing`, `algorithms`
+- `python`, `go`, `dart`, `flutter`, `lua`
+- `ai`

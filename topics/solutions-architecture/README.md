@@ -7,6 +7,11 @@ This topic is not a replacement for `architecture`, `system-design`, `cloud`,
 or `security`.
 It is the layer that connects them into a defensible end-to-end solution.
 
+Why this folder matters:
+
+- many engineers can explain one service well but struggle to defend a whole solution under business and migration constraints
+- this folder exists to connect technical design with constraints, tradeoffs, and stakeholder communication
+
 Focus:
 
 - what changes when you stop thinking only about one service and start shaping a whole solution

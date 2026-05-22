@@ -8,6 +8,17 @@ This file exists so system design does not stay as passive reading.
 Each drill is small on purpose.
 The goal is to practice the answer shape until the core moves become automatic.
 
+Why this matters:
+
+- system-design skill improves much more through repetition than through one more diagram
+- short drills expose whether you can actually state the invariant, source of truth, and recovery path
+- this file keeps practice small enough to repeat instead of only admire
+
+Smallest mental model:
+
+- one good drill answer should make the critical write path and failure shape visible fast
+- if the answer stays vague, adding more boxes usually does not help
+
 Working rule:
 
 1. clarify only what changes the design
@@ -15,6 +26,11 @@ Working rule:
 3. name the source of truth
 4. walk the critical write path
 5. explain retries, duplicates, and recovery
+
+Strong default:
+
+- answer each drill in 12-15 minutes
+- optimize for a clean correctness story, not diagram density
 
 ---
 

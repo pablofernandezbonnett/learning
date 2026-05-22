@@ -131,7 +131,7 @@ Backend rule:
 
 ### SSRF and Unsafe Outbound Calls
 
-If your backend fetches remote URLs, you have an SSRF risk.
+If your backend fetches remote URLs, you have an `SSRF` (`server-side request forgery`) risk.
 
 Examples:
 

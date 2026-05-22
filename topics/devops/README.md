@@ -33,6 +33,10 @@ Smallest mental model:
 - if a service cannot be deployed safely or debugged under failure, the job is
   still unfinished
 
+Short rule:
+
+- DevOps here means safer runtime ownership, not just CI/CD vocabulary
+
 ## Recommended Order
 
 1. [01-infrastructure-and-devops-basics.md](./01-infrastructure-and-devops-basics.md): what DevOps changes in practice for a backend engineer who owns code in production

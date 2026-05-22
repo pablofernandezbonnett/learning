@@ -14,6 +14,11 @@ The goal is to build a small but realistic deployment flow:
 - provision Kubernetes resources with Terraform
 - expose the system through a real cluster edge
 
+Smallest mental model:
+
+- this lab is not about simulating a cloud provider perfectly
+- it is about practicing the deploy chain from image to cluster to edge routing
+
 ---
 
 ## Why kind or k3d

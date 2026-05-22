@@ -136,3 +136,8 @@ Bad framing:
 - dynamic languages need deliberate discipline around typing and testing
 - FastAPI is a useful mental bridge from Spring controllers for small APIs
 - Python pays off quickly for automation, ETL, and AI-adjacent integration
+
+If your current goal is market-oriented backend growth, pair this folder with:
+
+- [../ai/README.md](../ai/README.md)
+- [../../paths/market-oriented-backend-growth.md](../../paths/market-oriented-backend-growth.md)

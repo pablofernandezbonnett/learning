@@ -7,6 +7,11 @@ Use this after reading [09-dynamodb.md](./09-dynamodb.md).
 
 This is the short version to retain and reopen quickly.
 
+Why this matters:
+
+- DynamoDB questions often sound easy until key design, hot partitions, or query shape appear
+- this cheatsheet exists to keep the right defaults warm without rereading the longer note first
+
 ---
 
 ## The Core Idea
@@ -23,6 +28,10 @@ It is:
 Short version:
 
 > Design the table around the queries, not around the entities.
+
+Main trap:
+
+- treating DynamoDB like a relational database with nicer scaling
 
 ---
 
@@ -94,3 +103,7 @@ Good short answer:
 > system needs joins, ad-hoc querying, or strong relational integrity. The main
 > design risk is bad partition-key choice, because that hurts both scalability
 > and correctness expectations.
+
+Short rule:
+
+> if the query patterns are still fuzzy, DynamoDB is usually the wrong early default

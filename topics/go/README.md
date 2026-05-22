@@ -112,3 +112,7 @@ This refresh is most useful when you want to understand:
 - how a small JSON API feels without a heavy framework layer
 - how much framework you actually need before `Gin` becomes useful
 - when goroutines and channels feel cleaner than thread-pool thinking
+
+In the current repo, `Go` is best treated as a secondary growth lane unless you
+are deliberately moving toward platform, infrastructure, or Go-heavy backend
+teams.

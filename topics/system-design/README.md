@@ -6,6 +6,12 @@ The focus is not abstract box-drawing.
 It is reasoning about the concrete rules and failure cases that decide
 whether a backend flow is trustworthy.
 
+Why this folder matters:
+
+- many system-design answers sound organized but still miss correctness
+- backend design becomes much stronger when the invariant and source of truth are explicit early
+- this folder keeps the topic anchored in real write paths, retries, and recovery
+
 Focus:
 
 - invariants: the business rules that must always stay true, such as "do not charge twice" or "do not oversell final stock"
@@ -21,6 +27,12 @@ Working style:
 - keep answers close to write paths, state transitions, and recovery behavior
 - prefer a small defensible design over a large diagram with vague correctness
 
+Smallest mental model:
+
+- first protect one important write path
+- then explain retries, async boundaries, and recovery
+- only then add scale or convenience components
+
 ## Recommended Order
 
 1. [backend-system-principles.md](./backend-system-principles.md): the core rules behind safe backend design, written as short but fully explained principles
@@ -32,6 +44,24 @@ Working style:
 7. [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md): a way to keep framework lifecycle, transaction lifecycle, and business lifecycle clearly separated
 8. [worked-diagrams.md](./worked-diagrams.md): companion diagrams for checkout, inventory, and order flows, with the write path and failure path in view
 9. [checkout-to-fulfillment-end-to-end.md](./checkout-to-fulfillment-end-to-end.md): one concrete flow that ties API design, AppSec, DDD, outbox, read models, deployment boundaries, and observability together
+
+## Refresh
+
+- [backend-system-principles.md](./backend-system-principles.md)
+- [system-design-guide.md](./system-design-guide.md)
+- [practical-checkout-design.md](./practical-checkout-design.md)
+
+## Required
+
+- [system-design-drills.md](./system-design-drills.md)
+- [distributed-workflow-case-studies.md](./distributed-workflow-case-studies.md)
+- [checkout-to-fulfillment-end-to-end.md](./checkout-to-fulfillment-end-to-end.md)
+
+## Growth
+
+- [system-design-decision-cheatsheet.md](./system-design-decision-cheatsheet.md)
+- [lifecycles-and-flows-cheatsheet.md](./lifecycles-and-flows-cheatsheet.md)
+- [worked-diagrams.md](./worked-diagrams.md)
 
 ## Working Rule
 

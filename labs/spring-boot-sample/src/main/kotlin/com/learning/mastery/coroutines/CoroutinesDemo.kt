@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional
  * 1. suspend functions in @Service
  * 2. @Transactional on suspend functions (Spring 6+ support)
  * 3. coroutineScope {} for parallel service calls
- * 4. Flow as a replacement for reactive streams
+ * 4. Flow as the coroutine-native async stream type
  * 5. withContext(Dispatchers.IO) for blocking operations
  *
  * Build requirements (build.gradle.kts):
@@ -84,8 +84,10 @@ class ProductAggregatorService(
         }
 
     // ── 4. Flow — lazy asynchronous stream ───────────────────────────────────
-    // Flow is Kotlin's coroutine-based equivalent of RxJava Observable / Reactor Flux.
-    // Useful for streaming large result sets without loading everything into memory.
+    // Flow is Kotlin's coroutine-native async stream type.
+    // In Spring work, it often plays a role similar to Reactor Flux, but the
+    // important point here is not "replacement" rhetoric. The useful point is
+    // that it gives you a stream-shaped API with coroutine-style code.
 
     fun streamAllProducts(): Flow<ProductDetail> = flow {
         log.info("[ProductAggregatorService] Starting product stream")

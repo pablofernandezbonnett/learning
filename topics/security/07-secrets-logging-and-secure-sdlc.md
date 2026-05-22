@@ -1,5 +1,7 @@
 # Secrets, Logging, and Secure SDLC
 
+`SDLC` means `software development lifecycle`.
+
 AppSec is not only endpoint design.
 
 A backend engineer also needs to handle three operational realities well:
@@ -35,7 +37,7 @@ Good rules:
 What this means in practice:
 
 - apps fetch secrets at runtime
-- CI/CD should not spray secrets across logs and job output
+- `CI/CD` (`continuous integration / continuous delivery`) should not spray secrets across logs and job output
 - production secrets should be auditable and revocable
 
 ---

@@ -12,6 +12,26 @@ backend engineer should be able to discuss in real projects.
 
 ---
 
+## Why This Matters
+
+Kubernetes and Terraform often show up in interviews and projects as if they
+were just tool names to memorize.
+
+The real value is different:
+
+- Kubernetes explains how services run, scale, restart, and receive traffic
+- Terraform explains how infrastructure changes become reviewable and repeatable
+
+If you can explain those two boundaries clearly, your answer is already much stronger.
+
+## Smallest Useful Mental Model
+
+- Docker packages the app
+- Kubernetes runs and manages the app
+- Terraform provisions the infrastructure around the app
+
+---
+
 ## First: Docker vs Kubernetes vs Terraform
 
 These tools solve different problems.

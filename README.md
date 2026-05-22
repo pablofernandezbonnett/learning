@@ -42,11 +42,11 @@ Less ideal fit:
 
 Pick the entry point that matches your goal:
 
-- `paths/general-refresh.md`: broad backend refresh
-- `paths/java-spring-dart-flutter-refresh.md`: deep refresh across Java, Spring Boot, and Dart/Flutter-oriented work
+- `paths/market-oriented-backend-growth.md`: main growth path for a senior backend engineer who wants one route that already includes refresh mode
 - `paths/appsec-for-software-engineers.md`: AppSec from a developer point of view
 - `paths/sre-from-backend-engineers.md`: backend to reliability ownership
 - `paths/solutions-architect-from-backend.md`: backend to end-to-end solution design
+- `paths/appsec-in-product-teams.md`: broader AppSec path inside product delivery
 - `topics/`: topic-by-topic entrypoints when you already know what you want to study
 - `labs/`: runnable companion material
 
@@ -54,7 +54,7 @@ Pick the entry point that matches your goal:
 
 Strong default:
 
-1. start with a path if your goal is broad or role-based
+1. start with `paths/market-oriented-backend-growth.md` if you want one main backend path that already includes refresh mode
 2. start with a topic folder if you already know the concept you want to reopen
 3. use labs when the topic benefits from code and runtime behavior
 
@@ -78,6 +78,7 @@ Practical rule:
 - [SRE](./topics/sre/README.md)
 - [Solutions Architecture](./topics/solutions-architecture/README.md)
 - [Cloud](./topics/cloud/README.md)
+- [AI](./topics/ai/README.md)
 - [DevOps](./topics/devops/README.md)
 - [Testing](./topics/testing/README.md)
 - [Algorithms](./topics/algorithms/README.md)

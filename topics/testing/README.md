@@ -5,6 +5,12 @@ The goal is not to maximize test count.
 The goal is to choose the smallest test surface that gives real confidence for
 the risk you are carrying.
 
+Why this folder matters:
+
+- many teams confuse more tests with more confidence
+- weak code shape often creates weak tests and noisy reviews
+- testing judgment is usually about risk, boundaries, and side effects, not about one ideology
+
 Focus:
 
 - test levels by risk
@@ -16,6 +22,12 @@ Working style:
 - describe the smallest useful meaning of testing terms before adding taxonomy
 - tie each test choice back to the failure you are trying to catch
 - keep the discussion grounded in backend change risk, not abstract purity
+
+Smallest mental model:
+
+- testing is evidence for risk reduction
+- code review is where you catch weak shape before it becomes production risk
+- code that hides side effects usually produces weaker tests
 
 ## Recommended Order
 

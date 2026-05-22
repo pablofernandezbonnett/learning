@@ -6,6 +6,12 @@ coding, debugging, and data-structure reasoning.
 This is not meant to become a full puzzle bank.
 The goal is a small repeatable set with Java and Kotlin awareness.
 
+Why this folder matters:
+
+- interview pressure often exposes weak explanation quality more than missing syntax
+- the right reusable patterns beat a huge random problem list
+- this folder exists to keep pattern recognition warm without turning the repo into a coding-site clone
+
 Focus:
 
 - the highest-value data structures and algorithms (`DSA`) patterns
