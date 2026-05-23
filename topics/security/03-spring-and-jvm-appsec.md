@@ -66,7 +66,7 @@ Small concrete example:
 - weak approach: `/api/orders/**` requires login, but any logged-in user can fetch or refund any order ID
 - stronger approach: request security is combined with method-level authorization, object-level ownership checks, DTO validation, and sanitized error handling
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > In Spring apps I do not stop at "security enabled." I check where business
 > authorization lives, what binding and serialization expose, how secrets are
@@ -488,7 +488,7 @@ In Spring systems, strong AppSec habits look like this:
 
 ## 5. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In Spring applications, security is mostly about putting the right controls in
 > the right place. I want authentication, authorization, validation, safe error

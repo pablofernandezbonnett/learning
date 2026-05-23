@@ -282,7 +282,7 @@ Prefer Java virtual threads when:
 
 ## 11. Short Answer Shape
 
-Good short answer:
+Practical summary:
 
 > I choose the concurrency model based on the workload and the stack around it.
 > Coroutines are strong for structured async orchestration. Goroutines are strong

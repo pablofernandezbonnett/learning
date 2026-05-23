@@ -57,7 +57,7 @@ Strong default:
   important, assume retries will happen and design the write path around stable
   request identity from the start
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > Idempotency is how I make retries safe: I give the business action a stable
 > identity, claim it durably, and return or continue the same logical attempt

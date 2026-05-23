@@ -53,7 +53,7 @@ Small concrete example:
 - weak choice: expose GraphQL for a simple partner API that mostly needs stable resource reads and easy HTTP caching
 - stronger choice: keep partner APIs as REST, but use GraphQL in a BFF for a complex mobile or SPA client that needs several data shapes
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I do not choose REST vs GraphQL by trend. I ask whether the contract is
 > mostly resource-shaped and cache-friendly, or whether one frontend really

@@ -197,6 +197,6 @@ That is often more realistic than trying to make one store fit every access patt
 
 ## 8. Interview Conversion
 
-Good short answer:
+Practical summary:
 
 > I do not group Postgres, MongoDB, and Redis into one vague "database choice". Postgres is my default for transactional truth and relational consistency. MongoDB fits document-shaped application data when one object is usually read as one object. Redis is usually a speed and shared-state tool for cache, sessions, counters, and coordination. I choose between them based on source of truth, access pattern, and latency, not on the NoSQL label.

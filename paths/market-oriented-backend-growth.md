@@ -148,7 +148,7 @@ Growth after that:
 
 Outcome:
 
-- your backend fundamentals become easier to defend in interviews and stronger under production-style questions
+- your backend fundamentals become easier to apply, explain, and revisit under production-style questions
 
 ### Phase 2. Add runtime ownership and reliability
 
@@ -221,7 +221,7 @@ Growth after that:
 
 Outcome:
 
-- you gain a more defensible `secure backend engineer` narrative instead of treating security as a side topic
+- you gain a stronger `secure backend engineer` profile instead of treating security as a side topic
 
 ### Phase 5. Add Python as the first adjacent language
 
@@ -247,6 +247,15 @@ Outcome:
 
 ### Phase 6. Build practical AI fluency
 
+This phase does not replace the backend or cloud work earlier in the path.
+It sits on top of it.
+
+Use it as:
+
+- backend plus AI system design
+- cloud/runtime plus AI serving judgment
+- security plus tool and model boundaries
+
 Refresh first:
 
 32. [../topics/ai/README.md](../topics/ai/README.md)
@@ -254,28 +263,35 @@ Refresh first:
 
 Required next:
 
-34. [../topics/ai/02-prompting-and-evals.md](../topics/ai/02-prompting-and-evals.md)
-35. [../topics/ai/03-tools-agents-and-guardrails.md](../topics/ai/03-tools-agents-and-guardrails.md)
+34. [../topics/ai/04-ml-and-ai-pipelines-for-jvm-backend.md](../topics/ai/04-ml-and-ai-pipelines-for-jvm-backend.md)
+35. [../topics/ai/02-prompting-and-evals.md](../topics/ai/02-prompting-and-evals.md)
+36. [../topics/ai/05-ai-serving-observability-and-rollout.md](../topics/ai/05-ai-serving-observability-and-rollout.md)
+37. [../topics/ai/03-tools-agents-and-guardrails.md](../topics/ai/03-tools-agents-and-guardrails.md)
 
 Growth after that:
 
-36. [../topics/architecture/13-enterprise-integration-patterns.md](../topics/architecture/13-enterprise-integration-patterns.md)
+38. [../topics/architecture/13-enterprise-integration-patterns.md](../topics/architecture/13-enterprise-integration-patterns.md)
+
+Runnable companion:
+
+- [../labs/kotlin-backend-examples/README.md](../labs/kotlin-backend-examples/README.md): run `./run-topic.sh integration/ai-boundary` after `04` and `05`
 
 Outcome:
 
-- you can discuss AI features as systems with contracts, evals, tools, and guardrails instead of as prompt demos
+- you can discuss AI features as systems with offline pipelines, online serving boundaries, contracts, evals, tools, and guardrails instead of as prompt demos
+- you add market-relevant AI/platform fluency without abandoning your Java backend core
 
 ### Phase 7. Strengthen the communication layer around the technical depth
 
 Refresh first:
 
-37. [../topics/testing/02-clean-code-and-code-review.md](../topics/testing/02-clean-code-and-code-review.md)
-38. [../topics/system-design/system-design-guide.md](../topics/system-design/system-design-guide.md)
+39. [../topics/testing/02-clean-code-and-code-review.md](../topics/testing/02-clean-code-and-code-review.md)
+40. [../topics/system-design/system-design-guide.md](../topics/system-design/system-design-guide.md)
 
 Required next:
 
-39. [../topics/sre/06-postmortems-and-operational-review.md](../topics/sre/06-postmortems-and-operational-review.md)
-40. [../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md](../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md)
+41. [../topics/sre/06-postmortems-and-operational-review.md](../topics/sre/06-postmortems-and-operational-review.md)
+42. [../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md](../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md)
 
 Outcome:
 

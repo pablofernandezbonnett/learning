@@ -391,6 +391,6 @@ Good default:
 
 ## 12. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In Spring Boot, I use DDD by keeping packages aligned to bounded contexts, putting business invariants in aggregates, use-case orchestration in application services, and Spring-specific infrastructure around the edge. I do not let controllers own domain rules, and I do not let JPA entities become the whole architecture by accident.

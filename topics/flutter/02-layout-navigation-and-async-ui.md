@@ -214,6 +214,6 @@ For most product screens:
 
 ## 9. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In Flutter, layout means handling real constraints, navigation means owning the user flow, and async UI means making loading, stale, empty, and failure states explicit. I try to keep useful data visible when possible instead of turning every delay into a full-screen spinner.

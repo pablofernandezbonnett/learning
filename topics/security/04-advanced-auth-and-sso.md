@@ -63,7 +63,7 @@ Strong default:
 - server-side code exchange plus secure session for confidential web clients or
   BFFs
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I choose auth by caller type and token location: API keys for external machine
 > access, client credentials for service-to-service trust, and OIDC code flow

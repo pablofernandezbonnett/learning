@@ -54,7 +54,7 @@ Strong default:
 - learn the concerns first, then map them to Spring Cloud, Kubernetes, or
   managed platform tools depending on the environment
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I do not optimize for memorizing Spring Cloud components. I optimize for the
 > distributed-systems concerns underneath them: gateway boundaries, remote-call

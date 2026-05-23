@@ -70,7 +70,7 @@ Strong default:
 - start by naming the business invariant, then choose optimistic or pessimistic
   control based on contention and conflict cost
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I frame database concurrency around protecting one business invariant under
 > competing writers, then choose optimistic locking for rarer collisions or

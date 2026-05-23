@@ -449,7 +449,7 @@ Good sentence:
 
 ## 11. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I think about testing by risk. Unit tests cover business logic quickly, integration
 > tests prove real boundary behaviour with engines like Postgres or Redis, and I keep

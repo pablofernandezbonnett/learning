@@ -228,6 +228,6 @@ Examples:
 
 ## 8. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I use OWASP Top 10 and API Top 10 for awareness, Cheat Sheets for implementation guidance, ASVS for web and API requirements, MASVS and MASTG for mobile, and SAMM for secure SDLC maturity. Then I practice on real labs so the standards turn into engineering judgment instead of vocabulary.

@@ -545,7 +545,7 @@ Good mental flow:
 
 ## 11. Practical Answer Shape
 
-Good short answer:
+Practical summary:
 
 > I think about resiliency in layers. First I bound waiting time with timeouts,
 > then I retry only transient failures with backoff and jitter, use circuit

@@ -62,7 +62,7 @@ Strong default:
 - use Redis as a support layer for cache, counters, sessions, or short-lived
   coordination
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I choose the database by business truth and access pattern first: SQL for
 > correctness-critical relational writes, document stores for denormalized read

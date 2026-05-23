@@ -64,7 +64,7 @@ Small concrete example:
 - weak answer: "we should use microservices because checkout is important"
 - stronger answer: "I would keep a modular monolith until payments, inventory, or another domain has a clear ownership or scaling reason to stand alone"
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I do not treat microservices as the default. I start with boundary clarity,
 > team friction, and data ownership. If those are not real yet, a modular
@@ -558,7 +558,7 @@ Official source trail:
 
 ## 8. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I do not default to microservices. I usually start with a modular monolith,
 > keep business boundaries explicit, and only split services when team autonomy,

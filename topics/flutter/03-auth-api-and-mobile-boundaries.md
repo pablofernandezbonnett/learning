@@ -192,6 +192,6 @@ For Flutter mobile clients:
 
 ## 8. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In Flutter, I treat the app as a public client. The client should handle session UX, token storage, and protected API calling consistently, but the backend still owns authorization and critical workflow rules. I keep auth-aware transport near the client layer instead of scattering it across screens.

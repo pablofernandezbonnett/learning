@@ -166,7 +166,7 @@ Avoid it when:
 
 ## Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I would consider embedded scripting, such as Lua, only for narrow rule-heavy domains
 > like promotions or pricing where the rule layer changes frequently. The benefit is

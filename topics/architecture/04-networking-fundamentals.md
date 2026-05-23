@@ -53,7 +53,7 @@ Small concrete example:
 - weak approach: one timeout for every outbound call and no idea whether the delay is DNS, connect, TLS, or upstream response time
 - stronger approach: reason about where the request spends time and place timeouts, retries, and rate limits at the right layer
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I do not treat networking as separate from backend design. I use it to reason
 > about traffic path, latency, retries, and which layer owns routing, auth, and

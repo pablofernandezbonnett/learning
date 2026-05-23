@@ -96,7 +96,7 @@ In those cases, Postgres is often the better answer.
 
 ## Short Answer Shape
 
-Good short answer:
+Practical summary:
 
 > I would consider DynamoDB when the access patterns are known up front and the workload is
 > key-based, high-throughput, and operationally simple. I would avoid it when the

@@ -493,7 +493,7 @@ Important reminder:
 
 ## 7. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In backend work, clean code means the intent, state transitions, and side
 > effects are obvious enough that another engineer can change the code safely.

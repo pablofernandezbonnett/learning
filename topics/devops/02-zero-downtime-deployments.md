@@ -61,7 +61,7 @@ Strong default:
 - use canary or blue/green when blast radius or rollback speed matters more
 - always treat destructive schema change as a multi-step rollout
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat zero-downtime release as a compatibility problem. The app rollout
 > strategy matters, but the critical question is whether old and new code can

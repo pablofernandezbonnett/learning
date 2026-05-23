@@ -327,6 +327,6 @@ For a product team building this flow:
 
 ## 14. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In a checkout-to-fulfillment flow, I start from invariants: do not charge twice and do not oversell. I protect the local commit path with idempotency and explicit state, publish follow-up work through an outbox, keep dashboards and search off the write path, and split deployment or data boundaries only when ownership and operational pressure make that tradeoff worth it.

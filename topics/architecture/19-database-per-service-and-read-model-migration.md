@@ -332,6 +332,6 @@ Not before.
 
 ## 10. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > Database per service is mainly about clean write ownership. After that, cross-domain reads need an explicit strategy: live API composition for smaller fresh reads, and projections or read models for hot denormalized queries. The mistake is thinking the old joins will somehow disappear without replacing them with a real read design.

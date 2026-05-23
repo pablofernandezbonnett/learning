@@ -49,7 +49,7 @@ Strong default:
 
 - understand conditions first, override second, exclude third
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > Spring Boot auto-configuration is conditional registration, not random magic.
 > It activates when the right classes, properties, and missing beans line up,

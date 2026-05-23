@@ -92,7 +92,7 @@ Strong default:
 - be skeptical when the workload is always hot, long-lived, highly stateful, or
   extremely latency-sensitive
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat serverless as a runtime tradeoff, not a maturity badge. It fits
 > stateless and event-driven workloads well, but I still need to reason about

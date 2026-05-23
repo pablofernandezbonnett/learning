@@ -264,6 +264,6 @@ That is usually stronger than:
 
 ## 10. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > A modular monolith in Spring Boot is one deployable app with explicit internal business-module boundaries. I package by capability, keep write ownership clear even with one database, and avoid cross-module repository access so the codebase stays understandable now and easier to split later if real service boundaries emerge.

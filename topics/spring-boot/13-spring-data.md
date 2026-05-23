@@ -64,7 +64,7 @@ Strong default:
 - step outside the abstraction once the query or storage behavior becomes the
   real problem
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I use Spring Data repositories for the simple path, but I do not confuse the
 > shared abstraction with shared storage behavior. Once query shape or backend

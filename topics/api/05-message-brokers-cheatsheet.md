@@ -115,7 +115,7 @@ Short explanation:
 
 ## Interview Answer Shape
 
-Good short answer:
+Practical summary:
 
 > If the only problem is background work, I prefer a simple queue like SQS or
 > RabbitMQ. If the event is a domain fact that multiple systems consume and may

@@ -48,7 +48,7 @@ Strong default:
 - keep your own authoritative payment and order state instead of trusting the
   PSP response alone
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat payment integration as a correctness problem: safe payment attempt
 > creation, idempotent provider calls, asynchronous confirmation, and strict

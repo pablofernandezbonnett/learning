@@ -67,7 +67,7 @@ Small concrete example:
   times out, the order stays `PENDING` and later moves by webhook or
   reconciliation"
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > In backend system design, I first anchor on the invariant, the source of
 > truth, and the critical write path. Then I explain retries, async boundaries,

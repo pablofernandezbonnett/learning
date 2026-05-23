@@ -86,7 +86,7 @@ Main tradeoff or failure mode:
 - the common failure is handling the happy path only and then discovering that
   a valid duplicate event can still break business state
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat webhook handling as a correctness and security boundary: verify the
 > sender, deduplicate the delivery, enforce valid state transitions, and keep

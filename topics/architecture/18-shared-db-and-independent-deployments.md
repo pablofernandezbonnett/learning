@@ -342,6 +342,6 @@ Why this is weak:
 
 ## 10. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > Separate deployables and separate data ownership are not the same decision. A backend plus worker can share one database safely for a while if one team still owns the domain and the shared tables are narrow and explicit, such as outbox or job records. But if several services freely share the same business schema, that is usually a distributed monolith, not clean microservices.

@@ -58,7 +58,7 @@ Strong default:
   service
 - treat destructive schema change as a later cleanup step, not the first move
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I use Flyway to make schema change explicit and reviewable, but the key safety
 > rule is expand-and-contract so old and new app versions can coexist during a

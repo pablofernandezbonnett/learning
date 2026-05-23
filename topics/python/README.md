@@ -14,6 +14,7 @@ Focus:
 - automation
 - lightweight internal APIs
 - ML or AI-adjacent integration
+- secure boundary handling when Python exposes an API or model helper
 - not as a replacement for every Spring Boot service
 
 Working style:
@@ -78,6 +79,7 @@ Good use cases:
 - one-off automation
 - lightweight internal API
 - model or embedding integration
+- small model-serving or eval-support tools around a larger JVM system
 
 Bad use cases:
 
@@ -136,6 +138,7 @@ Bad framing:
 - dynamic languages need deliberate discipline around typing and testing
 - FastAPI is a useful mental bridge from Spring controllers for small APIs
 - Python pays off quickly for automation, ETL, and AI-adjacent integration
+- if Python serves AI or ML traffic, the same backend rules still apply: typed boundaries, auth, limits, and explicit side effects
 
 If your current goal is market-oriented backend growth, pair this folder with:
 

@@ -15,7 +15,7 @@ The overlap is large, but the center of gravity changes:
 - backend engineers optimize service behavior, correctness, and implementation shape
 - `Solutions Architects` optimize end-to-end fit, tradeoffs, integration boundaries, migration path, and operating reality
 - backend engineers ask "how should this service work?"
-- `Solutions Architects` ask "what whole solution is defensible here, and how do we adopt it safely?"
+- `Solutions Architects` ask "what whole solution fits this problem and these constraints, and how do we adopt it safely?"
 
 ## What Already Transfers Well
 
@@ -76,7 +76,7 @@ Outcome:
 
 Outcome:
 
-- you can defend service boundaries, integration styles, consistency models, and recovery shapes instead of only describing them
+- you can reason clearly about service boundaries, integration styles, consistency models, and recovery shapes instead of only describing them
 
 ### Phase 3. Expand solution-level platform judgment
 

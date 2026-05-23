@@ -167,7 +167,80 @@ But do keep the path from input to decision to side effect obvious.
 
 ---
 
-## 7. Honest Positioning
+## 7. AI-Adjacent Python Shape
+
+For your current career direction, one of the most useful Python roles is not
+"new backend stack".
+
+It is:
+
+- eval scripts
+- retrieval or embedding helpers
+- lightweight model-serving tools
+- data prep around AI or ML workflows
+
+Good default:
+
+- let Python own the thin AI-adjacent helper where the ecosystem advantage is real
+- let the main JVM backend keep owning identity, business workflows, and stronger product-serving boundaries unless there is a clear reason to move them
+
+Small word example:
+
+- weak approach: "the whole support platform is now in Python because the model code started there"
+- better approach: "Python owns the eval and model-helper layer, while the main Java service still owns auth, case workflow, audit trail, and final action control"
+
+---
+
+## 8. Security Baseline For Small Python APIs
+
+If a small Python service starts serving AI or ML traffic, the baseline should
+still look like backend engineering, not notebook culture.
+
+Keep these defaults:
+
+- validate request bodies with typed models
+- use explicit auth dependencies instead of ad hoc header parsing
+- return typed responses where possible
+- bound request size, concurrency, and timeout
+- treat model output as untrusted before side effects
+- avoid leaking prompts, secrets, or private source documents in logs
+
+Plain-English version:
+
+- Python can be quick without being sloppy
+
+Small code example:
+
+```python
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+app = FastAPI()
+
+
+class ClassificationRequest(BaseModel):
+    text: str
+
+
+@app.post("/classify")
+async def classify(
+    payload: ClassificationRequest,
+    token: str = Depends(oauth2_scheme),
+) -> dict[str, str]:
+    return {"status": "accepted"}
+```
+
+Why it is better:
+
+- request shape is explicit
+- auth boundary is explicit
+- the route can stay thin while service logic remains testable elsewhere
+
+---
+
+## 9. Honest Positioning
 
 Good sentence:
 
@@ -180,9 +253,10 @@ Bad sentence:
 
 ---
 
-## 8. What To Internalize
+## 10. What To Internalize
 
 - Python speed comes from less ceremony, not from skipping engineering judgment
 - a small toolchain gives back a lot of the safety you miss from the JVM
 - typed boundaries matter more than internal cleverness
 - once Python is more than a throwaway script, project shape matters quickly
+- AI-adjacent Python still needs normal backend controls around auth, limits, and side effects

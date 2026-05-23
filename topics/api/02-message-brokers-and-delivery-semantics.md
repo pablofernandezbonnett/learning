@@ -78,7 +78,7 @@ Small concrete example:
 - weak approach: checkout calls email, analytics, and warehouse synchronously before returning
 - stronger approach: checkout commits the critical write, publishes `OrderPlaced`, and lets later consumers process independently
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I choose brokers when I want to shrink the critical request path, buffer
 > spikes, or let several consumers react later. Then I pick queue or log based

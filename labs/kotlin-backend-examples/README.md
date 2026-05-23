@@ -35,6 +35,7 @@ Run one topic:
 ./run-topic.sh correctness/idempotency
 ./run-topic.sh correctness/locking
 ./run-topic.sh integration/async-boundaries
+./run-topic.sh integration/ai-boundary
 ./run-topic.sh integration/kafka-patterns
 ./run-topic.sh data/cache
 ./run-topic.sh jvm/concurrency
@@ -70,7 +71,7 @@ Companion for:
 
 Focus:
 
-- timed coding shapes with the kind of edge cases that usually cause mistakes under interview pressure
+- timed coding shapes with the kind of edge cases that usually cause mistakes under time pressure
 - one runnable drill per major pattern family so the set stays small and repeatable
 
 ### `correctness/idempotency`
@@ -143,6 +144,21 @@ Focus:
 - at-least-once event handling, meaning the system assumes an event may arrive more than once and still processes it safely
 - outbox-style thinking, meaning "save the business write and the event record together, then publish later"
 - retry and fallback mindset, meaning you decide which failures should be retried, which should stop, and what reduced behavior is acceptable meanwhile
+
+### `integration/ai-boundary`
+
+Companion for:
+
+- `../../topics/ai/04-ml-and-ai-pipelines-for-jvm-backend.md`
+- `../../topics/ai/05-ai-serving-observability-and-rollout.md`
+- `../../topics/security/02-web-and-api-security.md`
+
+Focus:
+
+- timeout budget and fallback, meaning the backend should stop waiting before one slow model call burns the whole request budget
+- admission control, meaning expensive model work must be bounded instead of letting every request pile up
+- policy gate, meaning model output is treated like untrusted input until deterministic backend rules approve the action
+- local backend boundary shape, meaning the JVM service still owns auth, rate, policy, and side-effect control even when a model helps with classification
 
 ### `integration/kafka-patterns`
 

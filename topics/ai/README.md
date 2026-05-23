@@ -17,6 +17,7 @@ Focus:
 - prompt quality
 - structured output and tool use
 - agents, workflows, and handoffs
+- offline pipelines and online serving boundaries
 - evaluation and guardrails
 - backend integration boundaries
 
@@ -30,8 +31,10 @@ Working style:
 ## Recommended Order
 
 1. [01-ai-fluency-for-backend-engineers.md](./01-ai-fluency-for-backend-engineers.md): the smallest useful mental model for LLMs, agents, and product-fit judgment
-2. [02-prompting-and-evals.md](./02-prompting-and-evals.md): how to prompt more reliably and how to test whether the prompt actually works
-3. [03-tools-agents-and-guardrails.md](./03-tools-agents-and-guardrails.md): how agentic systems use tools, why guardrails matter, and what a good skill or agent definition looks like
+2. [04-ml-and-ai-pipelines-for-jvm-backend.md](./04-ml-and-ai-pipelines-for-jvm-backend.md): where offline pipelines, online inference, Java serving, Ollama, ONNX, and workflow orchestration actually fit
+3. [02-prompting-and-evals.md](./02-prompting-and-evals.md): how to prompt more reliably and how to test whether the prompt actually works
+4. [05-ai-serving-observability-and-rollout.md](./05-ai-serving-observability-and-rollout.md): what you need to observe, gate, and roll out safely so an AI feature behaves like a production system
+5. [03-tools-agents-and-guardrails.md](./03-tools-agents-and-guardrails.md): how agentic systems use tools, why guardrails matter, and what a good skill or agent definition looks like
 
 ## Refresh
 
@@ -39,16 +42,24 @@ Working style:
 
 ## Required
 
+- [04-ml-and-ai-pipelines-for-jvm-backend.md](./04-ml-and-ai-pipelines-for-jvm-backend.md)
 - [02-prompting-and-evals.md](./02-prompting-and-evals.md)
+- [05-ai-serving-observability-and-rollout.md](./05-ai-serving-observability-and-rollout.md)
 - [03-tools-agents-and-guardrails.md](./03-tools-agents-and-guardrails.md)
 
 ## Growth
 
 - [../python/README.md](../python/README.md): Python as the fastest glue language for AI-adjacent backend work
 - [../architecture/13-enterprise-integration-patterns.md](../architecture/13-enterprise-integration-patterns.md): where AI belongs in backend integration systems and where it should stay outside the core write path
+- [../cloud/README.md](../cloud/README.md): runtime, Kubernetes, and ownership choices around containerized workflow execution
+
+## Runnable Companion
+
+- [../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md): run `./run-topic.sh integration/ai-boundary` after reading `04` and `05`
 
 ## Core Rule
 
 - AI fluency is mainly about reliability and boundary judgment, not about sounding futuristic
 - prompt quality matters, but evaluation matters more
+- pipeline shape and serving boundaries matter more than AI buzzwords
 - tools, retrieval, and agents help only when they reduce real product or workflow friction

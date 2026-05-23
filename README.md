@@ -13,7 +13,7 @@ The goal is to help you answer questions such as:
 - why does it matter in real systems?
 - what is the strong default?
 - what usually goes wrong?
-- how would I explain or defend this in code review, design review, or interview?
+- how does this show up in code, design, or production decisions?
 
 What you will find here:
 
@@ -109,7 +109,7 @@ Common note shape:
 
 ## Core Rule
 
-- the repo should help you understand, reopen, and defend ideas
+- the repo should help you understand, reopen, and reuse ideas
 - practical topic notes are the main source of truth
 - paths help with order, but should not become the only place where meaning lives
 - examples matter: use code when code teaches best, and word examples when code would only add noise

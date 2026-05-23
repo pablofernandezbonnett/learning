@@ -163,6 +163,6 @@ These are the failures worth testing intentionally.
 
 ## 6. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In Flutter, I keep platform plugins behind boundaries I control, test feature logic directly, use widget tests for local UI behavior, and reserve integration tests for the highest-risk app flows such as login, session restore, checkout, and deep links. The goal is not maximum test count; it is confidence at the boundaries where real failures happen.

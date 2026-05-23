@@ -224,7 +224,7 @@ Small practical rule:
 
 ## 9. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > Mobile AppSec is mostly about respecting the public-client model. The app runs on an untrusted device, so I keep secrets out of the package, use safe login and token patterns, store sensitive material with platform protections, and keep the real authorization and workflow enforcement on the server.
 

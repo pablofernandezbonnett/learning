@@ -91,7 +91,7 @@ Patterns that fit:
 - stronger correctness and recovery
 - more workflow state, async reasoning, and observability burden
 
-### Interview-ready takeaway
+### Reusable takeaway
 
 > I would treat checkout as a correctness-critical state machine, not one big transaction. Each service keeps local correctness, and the wider workflow reaches a safe final state through explicit states, idempotency, and compensation.
 
@@ -135,7 +135,7 @@ Strong shape:
 - honest uncertainty and safer correctness
 - more state transitions and a less "clean" synchronous API
 
-### Interview-ready takeaway
+### Reusable takeaway
 
 > I would rather return `PENDING` than lie about final success or failure while the provider boundary is uncertain.
 
@@ -182,7 +182,7 @@ Strong shape:
 - lower coupling and better fan-out
 - replay, idempotency, and consumer monitoring now matter
 
-### Interview-ready takeaway
+### Reusable takeaway
 
 > Once several systems care about the same business fact, I prefer a durable event flow over a long synchronous request chain. The key is making publication reliable and consumers replay-safe.
 
@@ -226,7 +226,7 @@ Strong shape:
 - safer intake and replay handling
 - more bookkeeping and support for stuck callbacks
 
-### Interview-ready takeaway
+### Reusable takeaway
 
 > I assume webhook delivery is at-least-once, verify authenticity first, acknowledge quickly, and make the business effect idempotent.
 
@@ -268,7 +268,7 @@ Strong shape:
 - faster and more specialized reads
 - sync lag, more storage, and more projection logic
 
-### Interview-ready takeaway
+### Reusable takeaway
 
 > I would not jump to `CQRS` just because reads are annoying. I would use it when the write model and read model are truly diverging and heavy reads are starting to threaten critical writes.
 
@@ -308,7 +308,7 @@ Strong default:
 - stronger immediate certainty often costs throughput
 - async smoothing often costs immediacy
 
-### Interview-ready takeaway
+### Reusable takeaway
 
 > I would choose the reservation boundary based on whether the user needs immediate stock certainty or can accept a pending state while the system serializes contention safely.
 

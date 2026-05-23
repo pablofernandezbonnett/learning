@@ -109,7 +109,7 @@ Strong default:
 - do not reach for choreography, orchestration, CQRS, or event sourcing just
   because the names sound more advanced
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > In distributed workflows, I first ask whether the problem is workflow
 > recovery, dual-write safety, read/write divergence, or audit-grade history.

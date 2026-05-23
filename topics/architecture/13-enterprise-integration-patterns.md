@@ -59,7 +59,7 @@ Strong default:
 - keep the internal model clean, translate at the boundary, and choose the sync
   style based on business urgency rather than taste
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > For enterprise integration, I optimize for clear boundaries first. I keep our
 > domain model separate, translate at the edge, and choose batch or near-real
@@ -454,7 +454,7 @@ Short rule:
 
 ## 10. Short Answer Shape
 
-Good short answer:
+Practical summary:
 
 > When our service integrates with SAP or another core platform, I want a
 > clean boundary layer, an explicit choice between batch and near-real-time sync, and a

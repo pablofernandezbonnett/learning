@@ -54,7 +54,7 @@ Strong default:
 - start security reviews from authorization, workflow abuse, resource limits,
   and external trust boundaries before worrying about rarer edge cases
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > For backend security, I start with who can do what, which state transitions
 > must stay protected, and which inputs or callbacks cross a trust boundary.
@@ -250,7 +250,7 @@ Small practical review loop:
 
 ## 6. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > For backend and API security, I focus first on authorization, trust boundaries,
 > and abuse cases. In real product systems the biggest risks are often not

@@ -166,7 +166,7 @@ CREATE INDEX idx_orders_store_status_date
 ON orders(store_id, status, created_at DESC);
 ```
 
-Why this is a good answer:
+Why this shape is strong in practice:
 
 - equality columns first
 - sort column after

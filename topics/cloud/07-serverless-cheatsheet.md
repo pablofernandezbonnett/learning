@@ -142,7 +142,7 @@ Example:
 
 ## Short Answer Shape
 
-Good short answer:
+Practical summary:
 
 > I would use serverless when the workload is event-driven, bursty, or operationally
 > simple enough to benefit from managed scaling. I would still design it like any

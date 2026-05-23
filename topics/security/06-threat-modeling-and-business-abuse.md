@@ -52,7 +52,7 @@ Strong default:
 - for any important flow, identify the asset, boundary, dangerous state
   transition, and likely abuse path before implementation gets too far
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I use threat modeling as a lightweight way to map assets, boundaries, and
 > abuse paths, then convert them into explicit controls and tests.
@@ -198,7 +198,7 @@ If the table is concrete, it is already useful.
 
 ## 5. Interview Framing
 
-Good short answer:
+Practical summary:
 
 > I use threat modeling to make security practical. I identify the assets, trust
 > boundaries, and dangerous state transitions in the flow, then turn those risks

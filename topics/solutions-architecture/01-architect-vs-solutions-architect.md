@@ -206,7 +206,7 @@ The most common additions are:
 Plain-English version:
 
 - backend often asks "how do we build this service safely?"
-- solutions architecture often asks "what whole solution is actually defensible here, and how do we get there from what we have now?"
+- solutions architecture often asks "what whole solution actually fits here, and how do we get there from what we have now?"
 
 That second question is broader because it includes:
 

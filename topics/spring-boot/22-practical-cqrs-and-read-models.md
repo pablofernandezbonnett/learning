@@ -316,6 +316,6 @@ Good practical line:
 
 ## 10. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In Spring Boot, I start by keeping the write side clean with aggregates and application services. If read-heavy endpoints want a very different shape, I move them to projections, DTO queries, or a dedicated read model. I only call it fuller CQRS when that read/write split becomes substantial enough to justify separate read storage or event-fed projections.

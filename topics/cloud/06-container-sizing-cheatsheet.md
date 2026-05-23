@@ -196,7 +196,7 @@ Use this order:
 5. metrics to watch
 6. refinement loop
 
-Good short answer:
+Practical summary:
 
 > I would not guess a fixed size. I would classify the workload, set a safe
 > first request and limit, run a realistic load test, and watch memory working

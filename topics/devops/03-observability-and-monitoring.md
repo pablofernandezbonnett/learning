@@ -66,7 +66,7 @@ Strong default:
 - start with structured logs, correlation IDs, latency/error/saturation
   metrics, and request traces on critical flows
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I use observability to explain failure, not just notice it. Traces show one
 > request path, metrics show trends and alerting, and logs provide detailed

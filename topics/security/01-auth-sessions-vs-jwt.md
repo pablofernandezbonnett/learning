@@ -74,7 +74,7 @@ Small concrete example:
 - weak answer: "we use JWT auth"
 - stronger answer: "for browser login I prefer secure `HttpOnly` cookies or a secure refresh-cookie flow; for mobile I prefer short-lived bearer access tokens plus refresh token in secure OS storage"
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I do not start auth by asking sessions or JWT in the abstract. I start with
 > client type, token or cookie storage, renewal, revocation, and the main web

@@ -58,7 +58,7 @@ Strong default:
 - separate build from runtime, run as non-root, keep config external, and
   understand networking and persistence boundaries clearly
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat Docker as part of the production runtime contract, not just local
 > tooling. I care about build/runtime separation, non-root execution, config

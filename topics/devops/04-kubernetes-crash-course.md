@@ -53,7 +53,7 @@ That is **Container Orchestration**. Kubernetes (K8s) is the tool that automates
 
 ## Practical Summary
 
-Good short answer:
+Practical summary:
 
 > If we are already containerized and need replica management, rolling updates,
 > internal service discovery, and health-aware traffic routing, Kubernetes is a strong fit.

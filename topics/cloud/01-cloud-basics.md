@@ -56,7 +56,7 @@ Strong default:
 - explain cloud choices in terms of responsibility, operational burden, and fit
   for the workload, not just provider names
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat cloud basics as responsibility choices: who manages compute, data,
 > scaling, and failover, and which parts still belong to the application team.
@@ -352,7 +352,7 @@ That is already a credible cloud story for many backend systems.
 
 ## 9. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I think about cloud first in terms of responsibility boundaries. For a typical backend
 > service I prefer managed compute, managed databases, object storage for files, and a

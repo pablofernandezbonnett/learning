@@ -384,6 +384,6 @@ Why this shape works:
 
 ## 10. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I use a gateway when I need one public entry point with shared edge concerns such as routing, auth, TLS termination, and rate limits. I add a BFF only when one client type genuinely needs different aggregation, payload shape, or latency behavior. I do not use a BFF as a default architecture layer, and I do not rely on edge auth as a replacement for backend authorization.

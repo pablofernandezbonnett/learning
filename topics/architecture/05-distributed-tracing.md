@@ -289,7 +289,7 @@ Answer shape:
 
 ## 10. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > Distributed tracing lets me follow one request across services and see where the time
 > went or where the failure happened. I think in terms of trace, span, and passing the

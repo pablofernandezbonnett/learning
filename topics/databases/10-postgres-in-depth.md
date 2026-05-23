@@ -67,7 +67,7 @@ Small concrete example:
 - weak approach: move reads to replicas everywhere and assume order-status reads stay correct immediately after write
 - stronger approach: keep read-after-write-sensitive flows on the primary and use replicas only where stale reads are acceptable
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I default to Postgres when transactional correctness matters, but I keep the
 > real risks in view: lock shape, query plans, pool pressure, vacuum health, and
@@ -431,7 +431,7 @@ Use this when thinking about Postgres in a backend design:
 
 ## 13. Interview Framing
 
-Good short answer:
+Practical summary:
 
 > Postgres is usually my default for critical backend domains because it gives me
 > ACID transactions, strong consistency, mature query capabilities, and reliable

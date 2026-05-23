@@ -60,7 +60,7 @@ Small concrete example:
 - weak approach: build on a laptop, copy a `.jar` to a server, restart manually, and hope it works there too
 - stronger approach: CI validates the change, builds one immutable image, stores it in a registry, and the orchestrator rolls it out to healthy instances
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I think of infrastructure basics as the path from commit to running service:
 > validate automatically, package predictably, promote one artifact, keep

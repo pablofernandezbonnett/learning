@@ -214,9 +214,35 @@ Why this matters:
 
 ## 7. What A Backend Engineer Should Be Able To Say
 
-Good short answer:
+Practical summary:
 
 > For backend work in AWS, I focus first on IAM, compute choice, data placement, observability, and secrets. I want to be able to explain why a service runs on ECS, EKS, Lambda, or EC2, how it reaches RDS or S3 safely, how workload identity is handled, and how we observe and audit it.
+
+---
+
+## 8. How This Connects To AI and ML Workloads
+
+If the market discussion shifts toward `AI`, `ML`, or `LLMOps`, these same AWS
+fundamentals still apply.
+
+The difference is usually not "new cloud".
+It is:
+
+- more expensive compute choices
+- more batch or workflow orchestration
+- stronger observability and cost pressure
+- stricter data and identity boundaries around model inputs and outputs
+
+Practical examples:
+
+- `S3` stores model artifacts, datasets, prompt assets, or evaluation data
+- `ECS` or `EKS` may run model-serving or AI-adjacent helper services
+- `CloudWatch` becomes more important because latency and cost variance are higher
+- `IAM` matters even more because model helpers, indexes, and private data paths should not share loose credentials
+
+Short rule:
+
+> AI workloads still sit on normal cloud decisions: identity, runtime, storage, observability, and security
 
 ---
 
@@ -227,3 +253,4 @@ Good short answer:
 - Amazon ECS docs: https://aws.amazon.com/documentation-overview/ecs/
 - Amazon EKS docs: https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
 - AWS security best practices whitepaper: https://docs.aws.amazon.com/pdfs/whitepapers/latest/aws-security-best-practices/aws-security-best-practices.pdf
+- KServe overview: https://kserve.github.io/website/docs/concepts/architecture

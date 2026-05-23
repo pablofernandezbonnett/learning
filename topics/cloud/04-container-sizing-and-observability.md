@@ -72,7 +72,7 @@ Strong default:
 - treat memory as the sharper edge and confirm that latency behavior under load
   matches the business target
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I size containers from workload shape and telemetry, not habit. I care about
 > memory headroom, CPU throttling, latency, and downstream contention because

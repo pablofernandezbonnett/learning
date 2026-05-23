@@ -86,7 +86,7 @@ Strong default:
 - do not let cache become the final authority for money, final order state, or
   high-contention write decisions unless that is a deliberate system design
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat caching as a latency optimization over a clear source of truth. The
 > real decision is how much staleness the business can tolerate and how the

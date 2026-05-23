@@ -55,7 +55,7 @@ Small concrete example:
 - weak approach: call one hardcoded Inventory instance address from Order Service
 - stronger approach: call a stable service name and let infrastructure route only to ready instances
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > Service discovery is the mechanism that lets callers use a stable name while
 > infrastructure tracks which instances are alive and ready right now. In

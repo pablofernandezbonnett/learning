@@ -42,7 +42,7 @@ Strong default:
 - use typed domain exceptions plus one central advice layer for API error
   mapping
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat exception handling as part of the API contract: controllers stay thin,
 > domain exceptions stay typed, and one central advice layer returns a
@@ -168,7 +168,7 @@ How the pieces connect:
 3. Spring routes that exception to the matching method in `@RestControllerAdvice`
 4. that handler returns a `ProblemDetail`, which Spring serializes as the HTTP error response
 
-Why this is already a good answer:
+Why this shape is already strong in practice:
 
 - one place owns API error mapping
 - business exceptions become clean status codes
@@ -429,7 +429,7 @@ Short rule:
 
 ## 12. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I centralize API error handling with `@RestControllerAdvice`, map typed business and
 > validation exceptions to consistent HTTP responses, and use `ProblemDetail` so clients

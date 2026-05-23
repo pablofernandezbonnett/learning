@@ -148,7 +148,7 @@ If you forget everything else, remember these four.
 
 ## Short Answer Shape
 
-Good short answer:
+Practical summary:
 
 > I want structured logs with trace IDs, metrics for the golden signals (latency, traffic, errors, saturation), and
 > distributed tracing for critical paths. I alert on p99 latency, error rate,

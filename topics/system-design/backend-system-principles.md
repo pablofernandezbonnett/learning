@@ -256,7 +256,7 @@ If you need a quick reset, come back to these five:
 4. make retries safe
 5. keep the design simpler than your first impulse
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > My default backend lens is simple: define the source of truth, make retries
 > safe, design for failure, and keep the write path simpler than the first

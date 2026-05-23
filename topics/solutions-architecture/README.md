@@ -5,11 +5,11 @@ solution-level design across systems, teams, and constraints.
 
 This topic is not a replacement for `architecture`, `system-design`, `cloud`,
 or `security`.
-It is the layer that connects them into a defensible end-to-end solution.
+It is the layer that connects them into a workable end-to-end solution.
 
 Why this folder matters:
 
-- many engineers can explain one service well but struggle to defend a whole solution under business and migration constraints
+- many engineers can explain one service well but struggle to shape a whole solution under business and migration constraints
 - this folder exists to connect technical design with constraints, tradeoffs, and stakeholder communication
 
 Focus:
@@ -25,7 +25,7 @@ Working style:
 
 - explain architecture jargon before relying on it
 - keep examples close to business flows, integration boundaries, and operational tradeoffs
-- prefer "why this solution shape is defensible" over product-name memorization or diagram theater
+- prefer "why this solution shape fits the constraints" over product-name memorization or diagram theater
 
 Short rule:
 
@@ -63,7 +63,7 @@ If your goal is the role transition from backend engineer to `Solutions Architec
 
 ## Related Internal Topics
 
-- [../system-design/README.md](../system-design/README.md): correctness, invariants, source of truth, and defensible design shape
+- [../system-design/README.md](../system-design/README.md): correctness, invariants, source of truth, and fit-for-purpose design shape
 - [../architecture/README.md](../architecture/README.md): service boundaries, resiliency, events, networking, caching, and integration
 - [../cloud/README.md](../cloud/README.md): responsibility boundaries, compute models, and platform tradeoffs
 - [../security/README.md](../security/README.md): trust boundaries, auth models, payment-adjacent correctness, and secure delivery

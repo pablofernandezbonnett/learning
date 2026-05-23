@@ -59,7 +59,7 @@ Small concrete example:
 - weak approach: add replicas while one expensive query is still scanning a large table badly
 - stronger approach: fix the query and index first, then add replicas only if read pressure is still the real bottleneck
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I treat database scaling as a progression from cheapest to most dangerous:
 > query and index fixes first, then vertical scaling or replicas, and only then

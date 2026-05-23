@@ -277,6 +277,6 @@ That default is usually stronger than:
 
 ## 9. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > In Flutter, I prefer package-by-feature, keep state as local as possible, and keep API and storage details out of widgets. The architecture matters less as a pattern name and more as a way to keep feature boundaries, state ownership, and backend contract changes understandable.

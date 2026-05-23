@@ -76,7 +76,7 @@ Small concrete example:
 - weak approach: one `Product` model is shared across catalogue, inventory, and order history even though each context needs different meaning
 - stronger approach: each context owns its own model and translates across boundaries
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I use DDD mainly to keep domain language and boundaries honest. The biggest
 > value is not ceremony. It is stopping one shared technical model from leaking

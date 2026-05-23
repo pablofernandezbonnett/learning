@@ -47,7 +47,7 @@ Strong default:
 - do not cache payment truth, final order truth, or high-contention write
   decisions unless the whole design is built around that
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I decide caching by staleness tolerance and source of truth first. Spring and
 > Redis help implement it, but the real design question is what may be cached

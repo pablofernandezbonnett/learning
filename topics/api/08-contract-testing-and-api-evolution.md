@@ -286,6 +286,6 @@ Short rule:
 
 ## 11. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > I use contract tests when an independent boundary matters enough that request, response, or event shape drift would hurt us, but full end-to-end tests would be too slow or brittle. I try to evolve contracts additively, version only when the change is truly breaking, and treat contract tests as boundary-compatibility checks rather than total integration proof.

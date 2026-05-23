@@ -160,7 +160,7 @@ If you only remember one AWS AppSec rule, remember this:
 
 ## 8. Interview Framing
 
-Good short answer:
+Practical summary:
 
 > I treat AppSec as part of the delivery lifecycle, not just endpoint design.
 > That means handling secrets properly, logging the events that matter,

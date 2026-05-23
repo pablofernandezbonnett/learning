@@ -53,7 +53,7 @@ Small concrete example:
 - weak approach: store final payment truth only in Redis because reads are fast
 - stronger approach: keep final payment truth in Postgres, and use Redis for throttling, cache, or short-lived coordination around that workflow
 
-Interview-ready takeaway:
+Reusable takeaway:
 
 > I use Redis when I need fast shared state such as cache, counters, rate
 > limits, or short-lived coordination. I do not treat it as the primary durable
@@ -445,7 +445,7 @@ Interview rule:
 
 ## 13. Practical Summary
 
-Good short answer:
+Practical summary:
 
 > Redis is great for fast shared state: cache, counters, rate limits, short-lived
 > coordination, and ephemeral one-to-many messaging. I would not use it as the primary durable source
