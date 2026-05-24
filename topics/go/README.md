@@ -14,6 +14,7 @@ Focus:
 - small standard-library HTTP services
 - lightweight concurrency with goroutines and channels
 - where a small framework such as `Gin` helps and where plain `net/http` is enough
+- the minimum project-shape and `context` habits that keep Go code idiomatic
 
 ## Recommended Order
 
@@ -58,6 +59,16 @@ Outcome:
 - compare Go concurrency with threads and coroutines more clearly
 - know when message passing fits better than shared-state locking
 
+### 5. [05-project-shape-errors-and-context.md](./05-project-shape-errors-and-context.md)
+
+Read this once the runnable examples feel familiar.
+
+Outcome:
+
+- understand the minimum Go project shape that works well in backend code
+- know where interfaces belong and how to avoid Java-shaped abstraction
+- use `errors.Is`, wrapping, and `context.Context` in a way that scales past toy examples
+
 ## How To Run
 
 From [go](.):
@@ -87,6 +98,7 @@ The main trade is simple:
 - HTTP, JSON, and validation are usually more explicit than in Spring
 - one framework is enough for this repo; `Gin` is the practical one we cover
 - goroutines are lightweight, but concurrency design still needs discipline
+- package shape, `context`, and error flow matter more than design-pattern vocabulary
 
 ## What To Practice
 
@@ -99,6 +111,7 @@ If you want this folder to stay practical:
    and graceful shutdown path
 4. run `02-concurrency` and compare the flow where one request branches into
    several parallel calls to executors or coroutines
+5. read [05-project-shape-errors-and-context.md](./05-project-shape-errors-and-context.md) and rewrite one small service boundary without over-abstracting it
 
 The goal is not to learn Go academically.
 The goal is to feel how Go changes backend design choices.

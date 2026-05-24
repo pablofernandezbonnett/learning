@@ -37,6 +37,7 @@ The biggest differences for a JVM developer are:
 - dynamic runtime by default
 - stronger scripting and data tooling culture
 - faster iteration for small tasks
+- Python uses lighter structure than Java, so you need to be deliberate about where you add types, models, and tests
 
 The biggest carryovers are still:
 
@@ -96,6 +97,7 @@ Short rule:
 | File | Why start here | Run |
 |---|---|---|
 | [examples/01-basics.py](./examples/01-basics.py) | syntax refresher for Java and Kotlin developers | `python examples/01-basics.py` |
+| [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md) | minimum modern Python mental model from a Java backend starting point | read as guide |
 | [04-project-shape-and-quality.md](./04-project-shape-and-quality.md) | typing, tooling, testing, and project shape when Python is rusty | read as guide |
 | [examples/02-data-scripts.py](./examples/02-data-scripts.py) | data and ETL style work | `python examples/02-data-scripts.py` |
 | [examples/03-fastapi-app.py](./examples/03-fastapi-app.py) | lightweight API mental bridge from Spring Boot | `uvicorn examples.03-fastapi-app:app --reload` |
@@ -139,6 +141,7 @@ Bad framing:
 - FastAPI is a useful mental bridge from Spring controllers for small APIs
 - Python pays off quickly for automation, ETL, and AI-adjacent integration
 - if Python serves AI or ML traffic, the same backend rules still apply: typed boundaries, auth, limits, and explicit side effects
+- if you want the shortest Java-to-Python bridge, read [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md) early
 
 If your current goal is market-oriented backend growth, pair this folder with:
 

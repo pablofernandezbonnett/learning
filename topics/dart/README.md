@@ -17,6 +17,7 @@ Why this folder matters:
 - pattern matching and destructuring
 - sealed-state design
 - language features that change day-to-day Flutter code
+- async, null-safety, tooling, and boundary habits that make Dart feel current again
 
 Working style:
 
@@ -27,6 +28,8 @@ Working style:
 ## Recommended Order
 
 1. [01-dart3-features.md](./01-dart3-features.md): records, patterns, sealed classes, and class modifiers
+2. [02-async-null-safety-and-collections.md](./02-async-null-safety-and-collections.md): async flow, streams, null safety, and collection shaping
+3. [03-tooling-json-and-boundaries.md](./03-tooling-json-and-boundaries.md): `dart pub`, analyzer, tests, JSON boundaries, and extension types
 
 ## Related Reading
 
@@ -36,3 +39,4 @@ Working style:
 
 - refresh the language first, then decide whether any broader Flutter refresh is needed
 - focus on modeling and control flow changes before UI framework details
+- treat async, null safety, and typed boundaries as part of the language refresh, not optional extras
