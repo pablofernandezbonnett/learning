@@ -11,6 +11,12 @@ import (
  *
  * Logic: "Do not communicate by sharing memory; instead, share memory by communicating."
  * This is the CSP (Communicating Sequential Processes) model.
+ *
+ * Backend note:
+ * Goroutines are cheap, but not free.
+ * They reduce the cost of concurrent work in one process. They do not remove
+ * downstream limits such as database pools, provider rate limits, network
+ * latency, or request timeouts.
  */
 
 func main() {
@@ -19,7 +25,7 @@ func main() {
 	go func() {
 		fmt.Println("Hello from a background Goroutine!")
 	}()
-	time.Sleep(100 * time.Millisecond) // Give it time to run
+	time.Sleep(100 * time.Millisecond) // Demo-only pause; not real coordination
 
 	// 2. Channels: Signaling between goroutines
 	fmt.Println("\n=== 2. Channels (Synchronization) ===")
@@ -65,10 +71,18 @@ func main() {
 }
 
 /*
+ * Practical note: Avoid using time.Sleep for real synchronization logic.
+ * In service code, prefer channels, WaitGroups, contexts, or explicit request
+ * ownership so cancellation and timeout behavior stay meaningful.
+ *
  * Practical note: When to use Mutex vs Channels?
  * - Channels: Orchestrating complexity, passing ownership of data, distribution of work.
  * - Mutex (sync.Mutex): Small critical sections, shared state inside a struct (like a cache map).
  *
  * Example: Use a Channel to stream orders from a web server to a warehouse processor.
  * Use a Mutex to protect a local 'Memory Cache' of product prices.
+ *
+ * Another backend rule:
+ * If one request fans out to several goroutines, you still need a request
+ * budget, timeout, and bounded ownership of the downstream work.
  */

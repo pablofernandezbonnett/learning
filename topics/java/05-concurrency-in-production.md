@@ -45,6 +45,11 @@ You care less about:
 - hand-creating threads
 - academic taxonomy for its own sake
 
+Virtual-thread reminder:
+
+- virtual threads reduce the cost of blocking per task
+- they do not remove connection-pool limits, downstream rate limits, lock contention, or request-budget pressure
+
 ---
 
 ## 2. Pool Saturation Is A Real Failure Mode
@@ -168,6 +173,7 @@ Why this matters:
 - per-call timeouts are not enough if the whole request still waits forever
 - the budget belongs to the user-facing request, not to each child call independently
 - fan-out is only useful if the calls are actually independent
+- cheap task creation is not permission to multiply downstream load without a budget
 
 Do not parallelize when:
 
@@ -325,6 +331,8 @@ Good signals:
 - semaphore permits in use
 - timeout count
 - retry count
+- JDBC connection pool usage
+- outbound HTTP connection usage
 - lock wait time
 - business metrics such as "stuck pending payments" or "inventory conflicts"
 

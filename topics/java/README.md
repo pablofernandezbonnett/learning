@@ -15,6 +15,7 @@ Working style:
 - explain runtime behavior before language trivia
 - keep concurrency tied to real backend failure modes instead of academic examples
 - prefer the Java `17-21` baseline that is most useful in current backend work
+- treat records, sealed types, pattern matching, and virtual threads as the modern stable baseline to reopen first
 
 ## Recommended Order
 
@@ -33,9 +34,11 @@ Working style:
 
 If time is limited:
 
-1. read `02` first
-2. read `01` second
-3. skim `03` last
+1. read `03` first
+2. read `02` second
+3. read `05` third
+4. read `01` fourth if JVM/runtime behavior feels rusty
+5. treat `04` as awareness material after the stable baseline is warm
 
 ## Companion Lab
 
@@ -53,6 +56,42 @@ topics `jvm/concurrency` and `jvm/concurrency-production`.
 
 For the Kotlin coroutine model, use
 [../kotlin/03-kotlin-coroutines-for-backend.md](../kotlin/03-kotlin-coroutines-for-backend.md).
+
+## Stable Modern Baseline
+
+The modern Java backend baseline worth treating as normal and usable today is:
+
+- records
+- sealed types
+- pattern matching for `switch`
+- virtual threads
+
+That is the part to internalize first.
+
+Treat these as secondary awareness until the baseline above feels natural:
+
+- structured concurrency
+- scoped values
+
+Why:
+
+- the first group already changes day-to-day modeling and concurrency style
+- the second group is useful, but you do not need it before you can write or review modern backend code well
+
+## If You Are A Spring Boot Engineer
+
+After this folder, reopen these next:
+
+1. [../spring-boot/01-spring-boot-fast-review.md](../spring-boot/01-spring-boot-fast-review.md)
+2. [../spring-boot/03-transactions-and-isolation.md](../spring-boot/03-transactions-and-isolation.md)
+3. [../spring-boot/04-jpa-hibernate-performance-traps.md](../spring-boot/04-jpa-hibernate-performance-traps.md)
+
+That is where the Java refresh reconnects to:
+
+- request handling
+- transactions
+- persistence behavior
+- runtime tradeoffs in real services
 
 ## Core Rule
 

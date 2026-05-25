@@ -2,12 +2,14 @@
 FastAPI — Lightweight REST API
 The Python equivalent of Spring Boot for quick, well-documented APIs.
 
-Run:  uvicorn examples.03-fastapi-app:app --reload
+Run:  uvicorn fastapi_app:app --app-dir topics/python/examples --reload
 Docs: http://localhost:8000/docs  (auto-generated OpenAPI UI — like Springdoc)
 
 Requires: pip install fastapi uvicorn
 """
 
+from contextlib import asynccontextmanager
+import asyncio
 from fastapi import FastAPI, HTTPException, Depends, Query, status
 from pydantic import BaseModel, Field, field_validator
 from typing import Annotated
@@ -18,10 +20,18 @@ from enum import Enum
 # ─── APP SETUP ────────────────────────────────────────────────────────────────
 # Like @SpringBootApplication — creates the app instance
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print(f"Catalogue API starting with {len(_db)} products")
+    print("Docs: http://localhost:8000/docs")
+    yield
+
+
 app = FastAPI(
     title="Product Catalogue API",
     description="Retail product API — FastAPI demo",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # ─── MODELS (PYDANTIC) ────────────────────────────────────────────────────────
@@ -204,7 +214,6 @@ Middleware            @Component WebFilter              @app.middleware("http")
 """
 
 # ─── ASYNC ENDPOINT EXAMPLE ───────────────────────────────────────────────────
-import asyncio
 
 @app.get("/products/{product_id}/stock", response_model=dict)
 async def get_stock(product: Annotated[ProductRecord, Depends(require_product)]):
@@ -217,10 +226,4 @@ async def get_stock(product: Annotated[ProductRecord, Depends(require_product)])
     return {"sku": product.sku, "stock": 42, "reserved": 5, "available": 37}
 
 
-# ─── STARTUP EVENT ────────────────────────────────────────────────────────────
-# Like @PostConstruct in Spring — runs once when the app starts.
-
-@app.on_event("startup")
-async def startup():
-    print(f"🚀 Catalogue API started — {len(_db)} products loaded")
-    print("📖 Docs: http://localhost:8000/docs")
+# FastAPI now recommends lifespan for startup/shutdown instead of startup events.

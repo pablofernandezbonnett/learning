@@ -7,6 +7,35 @@ Quick REST refresher: `@GetMapping` reads, `@PostMapping` creates, `@PutMapping`
 
 Beyond those common REST mappings, here are the higher-value annotations that matter in real Spring APIs.
 
+## Controller Boundary Rule
+
+Before the annotations, keep the controller job clear.
+
+Good controller responsibilities:
+
+- parse HTTP input
+- validate request shape
+- call the service or use-case boundary
+- return a stable response shape and status
+
+Bad controller responsibilities:
+
+- business rules
+- transaction orchestration
+- direct entity exposure
+- persistence decisions
+- ad hoc retry or cache logic
+
+Short rule:
+
+> a Spring controller is an HTTP boundary, not the place where business or
+> persistence policy should accumulate
+
+Small concrete example:
+
+- weak approach: controller loads entity, mutates it, saves it, catches every exception, and decides cache behavior
+- better approach: controller validates input and delegates one use case to a service that owns the business and transaction boundary
+
 ### 📍 1. Exception Handling: `@RestControllerAdvice`
 Don't use `try-catch` in controllers. Use a global handler.
 

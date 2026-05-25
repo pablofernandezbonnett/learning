@@ -15,9 +15,19 @@ the next useful layer is:
 - how to avoid "clever Kotlin"
 - which features actually help on the JVM
 
+Keep the hierarchy clear:
+
+- baseline first: null safety, data classes, sealed classes, plain service code, and Java/Spring interop
+- second layer after that: value classes, `Result`, scope functions, and other convenience features
+
+If the baseline is still rusty, do not spend too much time on the second layer
+yet.
+
 ---
 
 ## 1. Value Classes
+
+This is useful after the core Kotlin backend baseline is already comfortable.
 
 Kotlin value classes are useful for lightweight domain wrappers.
 
@@ -60,6 +70,8 @@ Useful in real backend code:
 
 ## 2. `Result` and `runCatching`
 
+This is another second-layer tool, not the first thing to learn.
+
 Kotlin `Result` is useful, but it is easy to overuse badly.
 
 Good uses:
@@ -94,6 +106,8 @@ Useful in real backend code:
 ---
 
 ## 3. Scope Functions
+
+Scope functions are also optional polish, not core Kotlin backend literacy.
 
 The main scope functions are:
 
@@ -227,6 +241,10 @@ The goal is clearer backend code.
 
 ## 9. What To Keep Ready
 
+- null safety and explicit signatures first
+- data classes for request, response, and simple state
+- sealed types plus `when` for closed workflow outcomes
+- Java and Spring boundaries adapted early
 - value classes for stronger IDs and small domain wrappers
 - `Result` as a boundary tool, not a religion
 - scope functions used sparingly

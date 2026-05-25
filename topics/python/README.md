@@ -96,11 +96,22 @@ Short rule:
 
 | File | Why start here | Run |
 |---|---|---|
-| [examples/01-basics.py](./examples/01-basics.py) | syntax refresher for Java and Kotlin developers | `python examples/01-basics.py` |
 | [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md) | minimum modern Python mental model from a Java backend starting point | read as guide |
 | [04-project-shape-and-quality.md](./04-project-shape-and-quality.md) | typing, tooling, testing, and project shape when Python is rusty | read as guide |
+| [examples/01-basics.py](./examples/01-basics.py) | syntax refresher for Java and Kotlin developers after the mental model is clear | `python examples/01-basics.py` |
 | [examples/02-data-scripts.py](./examples/02-data-scripts.py) | data and ETL style work | `python examples/02-data-scripts.py` |
-| [examples/03-fastapi-app.py](./examples/03-fastapi-app.py) | lightweight API mental bridge from Spring Boot | `uvicorn examples.03-fastapi-app:app --reload` |
+| [examples/fastapi_app.py](./examples/fastapi_app.py) | lightweight API mental bridge from Spring Boot | `uvicorn fastapi_app:app --app-dir topics/python/examples --reload` |
+
+## If You Want To Get Productive Fast
+
+1. read [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md)
+2. read [04-project-shape-and-quality.md](./04-project-shape-and-quality.md)
+3. run [examples/01-basics.py](./examples/01-basics.py) for syntax refresh only where needed
+4. run [examples/02-data-scripts.py](./examples/02-data-scripts.py) if your likely use case is ETL, reporting, or automation
+5. run [examples/fastapi_app.py](./examples/fastapi_app.py) if your likely use case is a small internal API or AI-adjacent helper
+
+This order keeps Python in its most useful role for a JVM backend engineer:
+mental model first, quality bar second, examples third.
 
 ## Setup
 

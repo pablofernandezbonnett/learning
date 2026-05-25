@@ -186,10 +186,16 @@ If you are refreshing from Java 8 or 11, the priority order is still:
 1. records
 2. sealed types and pattern matching
 3. virtual threads
-4. awareness of structured concurrency
-5. awareness of scoped values
+4. awareness of scoped values
+5. awareness of structured concurrency
 
 Everything after that is secondary.
+
+Why this order:
+
+- the first three are already part of the practical stable baseline
+- scoped values are now stable in JDK 25 but still optional for many teams
+- structured concurrency is promising, but still preview and not yet a default production baseline
 
 One more practical rule:
 
@@ -221,7 +227,7 @@ It is also a runtime behavior refresh.
 
 - "Virtual threads are the main operational shift. Structured concurrency and scoped values are the next concepts to know."
 - "Structured concurrency improves how related concurrent tasks fail and cancel together, but it is still a preview API."
-- "Scoped values are the more modern answer to some ThreadLocal-style context propagation problems."
+- "Scoped values are the more modern answer to some ThreadLocal-style context propagation problems, and they are finalized in JDK 25."
 - "String templates are interesting historically, but I would not treat them as part of the stable Java backend baseline."
 
 ---

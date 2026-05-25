@@ -87,6 +87,32 @@ pytest
 pyright
 ```
 
+Minimal `pyproject.toml` example:
+
+```toml
+[project]
+name = "python-tool"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.122.0",
+  "pydantic>=2.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+  "pyright>=1.1",
+]
+```
+
+Why this matters:
+
+- one file owns dependency intent
+- the Python version is explicit
+- the quality tools stop being optional memory
+
 ---
 
 ## 4. The Rules Worth Keeping
@@ -144,6 +170,22 @@ Why it is better:
 - failure rule is explicit
 - the function is easy to test
 
+Tiny `pytest` example:
+
+```python
+import pytest
+
+
+def test_line_total_rejects_non_positive_quantity() -> None:
+    with pytest.raises(ValueError):
+        line_total(LineItem(price_jpy=2990, quantity=0))
+```
+
+Why this matters:
+
+- the rule is executable, not just written in prose
+- Python quality improves fast once tests become a normal habit
+
 ---
 
 ## 6. FastAPI Boundary Rule
@@ -164,6 +206,12 @@ That is the same mental model as:
 
 Do not turn a small FastAPI tool into a pseudo-Spring clone.
 But do keep the path from input to decision to side effect obvious.
+
+Practical rule:
+
+- use `def` for ordinary blocking code paths
+- use `async def` when the route really awaits non-blocking I/O
+- do not mark a route `async` if the important work is still blocking JDBC, blocking file I/O, or a blocking HTTP client under the hood
 
 ---
 

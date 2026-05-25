@@ -12,6 +12,11 @@ import (
  * - No classes, only Structs + Methods.
  * - Error handling is explicit (no exceptions).
  * - Pointers exist but are safe (no pointer arithmetic).
+ *
+ * Backend note:
+ * This file is only the syntax warmup.
+ * The real backend learning starts when the later examples add HTTP, JSON,
+ * context propagation, package shape, and explicit boundary design.
  */
 
 // 1. Structs (Like Data Classes)
@@ -62,6 +67,10 @@ func main() {
 	} else {
 		fmt.Printf("Items per box: %d\n", items)
 	}
+
+	// This explicit "value or error" flow is one of the biggest backend
+	// differences from Java/Kotlin. Later examples build HTTP and service
+	// boundaries around this style instead of exceptions.
 
 	// 4. Pointers (The '*' and '&')
 	// Used to modify an object without copying it

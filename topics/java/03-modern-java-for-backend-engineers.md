@@ -47,6 +47,18 @@ Why these matter:
 
 Everything else is secondary until this baseline is clear.
 
+Stable status worth remembering:
+
+- records are stable and normal
+- sealed types are stable and normal
+- pattern matching for `switch` is part of the Java 21 baseline
+- virtual threads are stable in Java 21 and are the main concurrency shift for blocking service code
+
+Plain-English version:
+
+> If you are reopening Java for backend work today, these are not "experimental
+> new toys." They are the practical modern baseline.
+
 ---
 
 ## 2. Records: The Smallest Useful Example
@@ -87,6 +99,7 @@ Bad use:
 
 - forcing records into rich mutable domain entities
 - assuming they are a good JPA entity default
+- using them only because they are newer syntax when a richer domain type is actually clearer
 
 Short rule:
 
@@ -201,6 +214,17 @@ What virtual threads do **not** solve:
 - bad locking design
 - unbounded downstream latency
 - poor backpressure strategy
+- JDBC pool limits, HTTP client limits, or provider rate limits
+
+One very practical caution:
+
+- virtual threads let more work start cheaply
+- they do not increase the capacity of the database, connection pool, or remote dependency on the other side
+
+Small word example:
+
+- weak view: "we enabled virtual threads, so checkout can now safely fan out to everything"
+- better view: "we enabled virtual threads, so blocking request concurrency is cheaper, but we still need request budgets, bounded fan-out, and downstream limits"
 
 Short rule:
 

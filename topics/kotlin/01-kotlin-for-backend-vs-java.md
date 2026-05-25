@@ -58,6 +58,17 @@ coroutines.
 
 ## 3. The Biggest Improvements Over Java
 
+If you only want the shortest useful Kotlin backend baseline, start here:
+
+- explicit nullability in method signatures
+- `data class` for DTOs and simple responses
+- sealed classes plus `when` for closed states such as payment or validation results
+- straightforward collection and mapping code
+- Spring-aware interop details, especially validation, Jackson, and proxy-related setup
+
+That set is enough to write normal Kotlin service code productively without
+reaching for advanced language features.
+
 ### Null safety
 
 This is the highest-value difference.
@@ -109,9 +120,35 @@ Kotlin plus Spring is productive, but there are a few rules you must remember:
 
 That means the language is cleaner, but the framework still has runtime rules.
 
+Practical consequence:
+
+- Kotlin is excellent for request and response models
+- Kotlin is excellent for service-layer branching and workflow modeling
+- JPA entities still deserve care because the persistence model has framework constraints, not just language syntax
+
 ---
 
-## 5. Coroutines: Useful, Not Mandatory Everywhere
+## 5. What To Use First In A Real Service
+
+Strong default:
+
+- use Kotlin data classes for request and response models
+- make nullability explicit instead of relying on convention
+- use sealed results when the set of outcomes is genuinely closed
+- keep controller and service code straightforward before reaching for advanced idioms
+- adapt Java or Spring boundaries into explicit Kotlin types early
+
+Weak approach:
+
+- trying to use every interesting Kotlin feature immediately
+
+Better approach:
+
+- use the two or three language features that remove the most Java ceremony and reduce the most ambiguity
+
+---
+
+## 6. Coroutines: Useful, Not Mandatory Everywhere
 
 Coroutines are one of Kotlin's strongest features, but they are not a reason to rewrite
 every backend in async style.
@@ -138,7 +175,7 @@ tradeoffs in one place.
 
 ---
 
-## 6. Where Java Is Still A Good Choice
+## 7. Where Java Is Still A Good Choice
 
 A strong answer is not "Kotlin good, Java bad."
 
@@ -152,7 +189,7 @@ That is both more accurate and more useful in practice.
 
 ---
 
-## 7. 20-Second Answer
+## 8. 20-Second Answer
 
 > My Java backend experience transfers directly to Kotlin. The main improvements are
 > explicit null safety, less DTO ceremony with data classes, and stronger workflow modeling
@@ -161,7 +198,7 @@ That is both more accurate and more useful in practice.
 
 ---
 
-## 8. 1-Minute Answer
+## 9. 1-Minute Answer
 
 > Kotlin does not replace backend engineering judgment; it changes how clearly and safely I
 > express it. The biggest practical gains over Java are null safety in the type system,
@@ -175,7 +212,7 @@ That is both more accurate and more useful in practice.
 
 ---
 
-## 9. Further Reading
+## 10. Further Reading
 
 - Kotlin null safety:
   https://kotlinlang.org/docs/null-safety.html

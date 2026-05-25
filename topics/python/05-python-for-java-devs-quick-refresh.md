@@ -256,6 +256,16 @@ Better mental model:
 
 - "async helps when the code waits on I/O and I keep the boundary model clear"
 
+In small API work, keep this practical split:
+
+- `def` is fine for normal blocking handlers and utility code
+- `async def` is for real async boundaries that await network, database, or other I/O without blocking the worker the whole time
+- wrapping blocking code inside `async def` does not make the dependency non-blocking
+
+Short rule:
+
+> use `async` when the stack is actually async, not as a badge that the code is modern
+
 ---
 
 ## 7. Project And Tooling Defaults

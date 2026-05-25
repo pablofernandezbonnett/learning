@@ -16,6 +16,20 @@ Focus:
 - where a small framework such as `Gin` helps and where plain `net/http` is enough
 - the minimum project-shape and `context` habits that keep Go code idiomatic
 
+## Stable Practical Baseline
+
+If your goal is to become productive in Go backend work quickly, keep this
+baseline warm first:
+
+- explicit error handling with wrapped semantic errors
+- `net/http` request and response flow without hidden framework behavior
+- `context.Context` passed through real request-scoped work
+- small package and module shape that avoids Java-style over-abstraction
+- goroutines and channels used with request timeouts, ownership, and downstream limits in mind
+
+That baseline already covers most of the day-to-day engineering judgment that
+matters when you first start writing Go services.
+
 ## Recommended Order
 
 ### 1. [01-basics/main.go](./01-basics/main.go)
@@ -69,6 +83,17 @@ Outcome:
 - know where interfaces belong and how to avoid Java-shaped abstraction
 - use `errors.Is`, wrapping, and `context.Context` in a way that scales past toy examples
 
+## If You Want To Get Productive Fast
+
+1. run [01-basics/main.go](./01-basics/main.go) only to warm up on syntax and explicit errors
+2. run [03-http-json/main.go](./03-http-json/main.go) to understand the normal handler and JSON flow
+3. read [05-project-shape-errors-and-context.md](./05-project-shape-errors-and-context.md) before you design your own small service
+4. run [04-gin-service/README.md](./04-gin-service/README.md) to see one realistic service slice
+5. run [02-concurrency/main.go](./02-concurrency/main.go) after that, so goroutines and channels are anchored in service behavior instead of treated as a toy feature
+
+This order keeps the Go path focused on backend judgment first and language
+novelty second.
+
 ## How To Run
 
 From [go](.):
@@ -91,6 +116,12 @@ The main trade is simple:
 - less magic and smaller runtime surface
 - more explicit handling for errors, HTTP, and concurrency boundaries
 
+Plain-English version:
+
+> Go backend code is usually easier to read because less is hidden for you, but
+> that also means you must be deliberate about errors, `context`, timeouts, and
+> package shape.
+
 ## What To Internalize
 
 - Go optimizes for simplicity and concurrency, not OOP expressiveness
@@ -99,6 +130,7 @@ The main trade is simple:
 - one framework is enough for this repo; `Gin` is the practical one we cover
 - goroutines are lightweight, but concurrency design still needs discipline
 - package shape, `context`, and error flow matter more than design-pattern vocabulary
+- cheap goroutines do not remove database, provider, or network bottlenecks
 
 ## What To Practice
 

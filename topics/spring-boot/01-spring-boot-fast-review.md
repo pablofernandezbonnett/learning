@@ -455,7 +455,77 @@ Main points:
 
 ---
 
-## 9. Virtual Threads Note
+## 9. Runtime Readiness and Observability
+
+Reopen:
+
+- [../devops/03-observability-and-monitoring.md](../devops/03-observability-and-monitoring.md)
+- [../architecture/05-distributed-tracing.md](../architecture/05-distributed-tracing.md)
+
+Main points:
+
+- `Spring Boot Actuator` is part of the normal production baseline, not a niche extra
+- health endpoints help decide whether the app is alive and whether it should receive traffic
+- Micrometer metrics help turn JVM, HTTP, pool, and custom signals into something observable
+- traces and correlation IDs help connect one Spring request to downstream calls and logs
+
+Smallest practical baseline:
+
+- expose health intentionally
+- know `/actuator/health`, `/actuator/health/liveness`, and `/actuator/health/readiness`
+- know that `/actuator/metrics` is a diagnostic surface when exposed
+- keep logs, metrics, and traces tied together by request or trace context
+
+Why this matters:
+
+- a controller-service-repository stack is not enough if the platform cannot tell whether the service is healthy
+- production incidents are often diagnosed through metrics first, then traces, then logs
+- Spring Boot already gives a strong baseline here; you do not need to invent it from scratch
+
+Short rule:
+
+> a Spring Boot service is not operationally ready until health, metrics, and
+> request correlation are part of the design story
+
+Tiny config example:
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+```
+
+What this gives you:
+
+- `/actuator/health`
+- `/actuator/health/liveness`
+- `/actuator/health/readiness`
+
+Those are the normal Spring Boot shapes you would connect to Kubernetes probes
+or other runtime health checks.
+
+If you expose metrics as well, the diagnostic shape becomes richer:
+
+- JVM memory and GC
+- HTTP request latency and error signals
+- connection pool and executor pressure
+- app-specific counters and timers
+
+Operational caution:
+
+- do not expose every actuator endpoint publicly
+- do not confuse "the JVM is up" with "the service is ready for traffic"
+- do not stop at logs when the real issue is visible first in metrics or traces
+
+---
+
+## 10. Virtual Threads Note
 
 Spring Boot supports virtual threads when running on Java 21+.
 
@@ -474,7 +544,7 @@ Practical point:
 
 ---
 
-## 10. What To Practice
+## 11. What To Practice
 
 If you want a practical Spring Boot refresh:
 
@@ -483,12 +553,14 @@ If you want a practical Spring Boot refresh:
 3. explain how authentication enters the request and where authorization is enforced
 4. pick one hot read endpoint and decide whether it needs projection, cache, or query tuning first
 5. compare one Postgres use case, one Mongo use case, and one Redis use case without forcing the same abstraction on all three
+6. explain which actuator health endpoint a platform should use for liveness vs readiness
+7. name one metric, one trace, and one business signal you would watch on a hot endpoint
 
 That is a better refresh than reopening annotations in isolation.
 
 ---
 
-## 11. Best Reopen Order for a Quick Refresh
+## 12. Best Reopen Order for a Quick Refresh
 
 If you have limited time:
 
@@ -512,8 +584,10 @@ If your next project is more data-heavy, use this order instead:
 
 ---
 
-## 12. Further Reading
+## 13. Further Reading
 
 - [Spring Boot Virtual Threads](https://docs.spring.io/spring-boot/reference/features/spring-application.html)
+- [Spring Boot Actuator Endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html)
+- [Spring Boot Metrics](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)
 - [Spring Boot Task Execution and Scheduling](https://docs.spring.io/spring-boot/reference/features/task-execution-and-scheduling.html)
 - [Spring Data JPA Auditing](https://docs.spring.io/spring-data/jpa/reference/auditing.html)

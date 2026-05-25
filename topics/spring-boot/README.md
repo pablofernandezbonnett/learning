@@ -18,6 +18,7 @@ Focus:
 - error handling
 - JPA and Hibernate tradeoffs
 - platform wiring, configuration, and Spring cloud-facing concerns
+- runtime readiness, health, and observability basics for real services
 
 Working style:
 
@@ -31,6 +32,7 @@ Smallest mental model:
 - Spring Boot adds defaults, packaging, and wiring conventions
 - the useful refresh is about boundaries: web, transaction, proxy, data, and
   configuration boundaries
+- a production-ready Spring service also needs health, metrics, and trace-aware runtime thinking
 
 ## Recommended Order
 
@@ -38,6 +40,32 @@ Smallest mental model:
 2. [02-exception-handling.md](./02-exception-handling.md): consistent error handling with `@RestControllerAdvice` and `ProblemDetail`
 3. [03-transactions-and-isolation.md](./03-transactions-and-isolation.md): local transaction boundaries, isolation, and propagation
 4. [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md): ORM behavior, query shape, and common production traps
+
+## If You Want To Get Productive Fast
+
+For the shortest "I can work in a Spring Boot service again" loop:
+
+1. [01-spring-boot-fast-review.md](./01-spring-boot-fast-review.md)
+2. [11-web-annotations.md](./11-web-annotations.md)
+3. [02-exception-handling.md](./02-exception-handling.md)
+4. [03-transactions-and-isolation.md](./03-transactions-and-isolation.md)
+5. [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md)
+6. [12-caching-and-redis.md](./12-caching-and-redis.md)
+7. [16-appsec-authz-lab.md](./16-appsec-authz-lab.md)
+8. [19-flyway-and-schema-migrations.md](./19-flyway-and-schema-migrations.md)
+9. [20-spring-cloud-and-service-integration.md](./20-spring-cloud-and-service-integration.md)
+
+That path covers the questions that most often decide whether a Spring service
+is merely running or actually trustworthy:
+
+- how HTTP boundaries are shaped
+- how failures are returned
+- how data changes stay correct
+- how persistence behaves under load
+- what may be cached safely
+- how authz is enforced
+- how schema change stays safe
+- how remote dependencies and runtime concerns are handled
 
 ## Refresh
 
@@ -82,3 +110,4 @@ and coroutine-oriented examples.
 - keep the mental model focused on runtime behavior, not annotations alone
 - remember that proxies explain many Spring surprises
 - treat JPA convenience and SQL reality as two different layers
+- treat health, metrics, and request tracing as part of the service baseline, not as afterthoughts
