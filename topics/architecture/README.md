@@ -25,6 +25,7 @@ Focus:
 8. [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md): how to choose between gateway, `BFF`, reverse proxy, and service mesh without adding edge layers by default
 9. [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md): how to reason about transitional architectures where deploys are split before data ownership is cleanly split
 10. [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md): how to replace old shared-database joins with API composition, projections, or read models once write ownership is split
+11. [20-self-service-edge-platforms.md](./20-self-service-edge-platforms.md): how to give many teams safe self-service edge capability without exposing raw infrastructure power or turning platform into a ticket bottleneck
 
 ## Refresh
 
@@ -38,6 +39,7 @@ Focus:
 - [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md)
 - [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md)
 - [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md)
+- [20-self-service-edge-platforms.md](./20-self-service-edge-platforms.md)
 
 ## Required
 
@@ -56,6 +58,7 @@ Focus:
 - [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md): edge-boundary decision help for public APIs, web, mobile, and partner flows
 - [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md): practical guidance for awkward middle-stage architectures and distributed-monolith smells
 - [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md): practical guidance for replacing old relational joins once services own writes separately
+- [20-self-service-edge-platforms.md](./20-self-service-edge-platforms.md): case-study pattern for programmable edge, control planes, and self-service platform governance
 
 ## Core Rule
 
