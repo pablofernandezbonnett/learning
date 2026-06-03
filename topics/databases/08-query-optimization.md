@@ -174,6 +174,94 @@ Why this shape is strong in practice:
 
 ---
 
+## 4.1 Index Defaults When You Add a New Transactional Table
+
+When a new table is created, you do not need to guess every future index on day
+one. You do need a strong starting point.
+
+Good practical default in Postgres:
+
+- rely on the index already created by the `PRIMARY KEY`
+- rely on the index already created by each real `UNIQUE` constraint
+- consider an index for each foreign key that matters for joins, parent deletes, parent updates, or listing children by parent
+- add lookup indexes for true business keys such as `external_id`, `idempotency_key`, `email`, or `sku`
+- add one composite index for the dominant list query, not one single-column index for every field
+
+Concrete example:
+
+If your common screen is:
+
+```sql
+SELECT id, status, created_at
+FROM orders
+WHERE tenant_id = 42 AND status = 'PAID'
+ORDER BY created_at DESC
+LIMIT 50;
+```
+
+A stronger starting index is usually:
+
+```sql
+CREATE INDEX idx_orders_tenant_status_created
+ON orders (tenant_id, status, created_at DESC);
+```
+
+Why this is stronger than three separate indexes:
+
+- the filter columns and sort order live in one index path
+- the planner does not have to improvise from partial pieces
+- the index matches the endpoint you actually care about
+
+---
+
+## 4.2 Common Index Anti-Patterns
+
+Weak habits:
+
+- indexing every column "just in case"
+- adding both a `UNIQUE` constraint and a duplicate manual index on the same columns
+- indexing a low-cardinality flag like `is_active` by itself without a real access pattern
+- adding several single-column indexes when the hot query always filters on the same combination of columns
+- keeping old overlapping indexes after the query shape changed
+
+Why this hurts:
+
+- writes get slower
+- vacuum and maintenance get heavier
+- storage use grows
+- the planner gets more choices, not always better choices
+
+Practical rule:
+
+> every index should be able to answer the question: which real query becomes
+> cheaper because this index exists?
+
+---
+
+## 4.3 How Index Strategy Should Grow Over Time
+
+Index strategy should evolve with evidence, not with imagination.
+
+Good progression:
+
+1. start with primary key, unique constraints, and the most obvious lookup keys
+2. add one composite index per hot read pattern that appears in production or clear product requirements
+3. add partial indexes when only a hot subset of rows matters often
+4. add covering or `INCLUDE` columns only when the plan shows that an index-only path would help enough to justify the extra write cost
+5. review overlapping indexes when write latency or storage starts to matter
+
+Small concrete example:
+
+- first version: `payments(id, order_id, provider_reference, status, created_at)`
+- day-one indexes: primary key, `UNIQUE(provider_reference)`, maybe `INDEX(order_id)`
+- later, if backoffice often queries recent failed payments by merchant:
+  `INDEX(merchant_id, status, created_at DESC) WHERE status IN ('FAILED', 'PENDING_REVIEW')`
+
+That is much stronger than trying to predict every future screen before the
+system has any real usage.
+
+---
+
 ## 5. Pagination: OFFSET vs Keyset
 
 Offset pagination is one of the most common practical query traps.

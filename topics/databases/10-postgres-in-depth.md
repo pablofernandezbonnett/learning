@@ -227,7 +227,65 @@ Rule:
 
 ---
 
-## 6. EXPLAIN ANALYZE — Measure Before Fixing
+## 6. Table Design Defaults For Transactional Postgres Tables
+
+Good schema design prevents application work later.
+
+The smallest useful model is:
+
+- model current business truth first
+- make invalid states harder to store
+- add indexes and read shapes after the write model is honest
+
+Good default checklist for a new transactional table:
+
+- a stable primary key
+- `created_at` for creation time
+- `updated_at` when the row is expected to change over time
+- `NOT NULL` on fields that are required by the business rule
+- `CHECK` constraints for simple invariants such as non-negative quantity or amount
+- `UNIQUE` constraints for real business identities such as external references, emails, or idempotency keys
+- foreign keys when the relationship is real inside the same service boundary
+- a `version` column when optimistic locking is likely to matter
+
+Small concrete example:
+
+```sql
+CREATE TABLE orders (
+  id BIGSERIAL PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  external_order_id TEXT NOT NULL,
+  customer_id BIGINT NOT NULL REFERENCES customers(id),
+  status TEXT NOT NULL,
+  total_amount_cents BIGINT NOT NULL CHECK (total_amount_cents >= 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  version BIGINT NOT NULL DEFAULT 0,
+  UNIQUE (tenant_id, external_order_id)
+);
+```
+
+Why this is a strong starting point:
+
+- the row has a clear identity
+- required business fields cannot silently disappear into `NULL`
+- one external order cannot be created twice for the same tenant
+- simple money invariants are protected in the database, not only in app code
+
+Practical cautions:
+
+- do not make columns nullable by habit
+- do not skip constraints just because the app also validates
+- do not copy current truth into several tables unless the copy is an intentional snapshot or read model
+
+Useful nuance:
+
+- some duplication is correct, such as storing the price charged on an order line even if the catalog price changes later
+- the rule is not "never copy data"; the rule is "do not duplicate current truth without a reason"
+
+---
+
+## 7. EXPLAIN ANALYZE — Measure Before Fixing
 
 When a query is slow, do not guess.
 
@@ -255,7 +313,7 @@ Good backend habit:
 
 ---
 
-## 7. Connection Pooling
+## 8. Connection Pooling
 
 Postgres is powerful, but connections are not free.
 
@@ -280,7 +338,7 @@ Rule of thumb:
 
 ---
 
-## 8. Autovacuum and Table Health
+## 9. Autovacuum and Table Health
 
 Because of MVCC, Postgres accumulates dead tuples.
 
@@ -300,7 +358,7 @@ You do not need to be a DBA, but you should know:
 
 ---
 
-## 9. Replicas, Failover, and Read Consistency
+## 10. Replicas, Failover, and Read Consistency
 
 You will often hear designs like:
 
@@ -358,7 +416,76 @@ For most product backends, the strong default is:
 
 ---
 
-## 10. JSONB — Useful, But Not an Excuse
+## 11. Views and Materialized Views
+
+Views are one of the simplest ways to keep read logic cleaner without changing
+the base tables.
+
+Plain-English version:
+
+- a `view` stores the query definition, not separate data
+- a `materialized view` stores the query result and must be refreshed later
+
+Use a normal view when:
+
+- the main win is readability
+- you want to hide join complexity from backoffice or reporting queries
+- you want a stable read shape without duplicating data
+
+Use a materialized view when:
+
+- the query is expensive
+- the result is reused often
+- some staleness is acceptable
+
+Small concrete example:
+
+- a support dashboard that repeatedly aggregates yesterday's orders may be a good materialized-view candidate
+- a read model that simply joins `orders` and `customers` for admin search may only need a normal view
+
+Strong default:
+
+> use normal views for reusable read logic and materialized views for genuinely
+> expensive reports where refresh lag is acceptable
+
+Main caution:
+
+- materialized views are not self-refreshing
+- if you do not have a refresh plan, you do not really have a production design yet
+
+---
+
+## 12. Roles and Least Privilege
+
+Database roles are not just DBA ceremony.
+They are one of the easiest ways to reduce accidental damage.
+
+Good practical default:
+
+- keep migration or admin privileges separate from the runtime application role
+- give read-only jobs read-only access
+- avoid using one broad super-role for app traffic, scripts, reports, and support tasks
+
+Small concrete example:
+
+- the app that serves customer checkout probably needs `SELECT`, `INSERT`, `UPDATE`, and maybe limited `DELETE`
+- a reporting job may only need `SELECT`
+- a schema migration pipeline may need `ALTER`, `CREATE`, and `DROP`, which the runtime app should not have
+
+Why this matters:
+
+- limits blast radius
+- reduces accidental schema or data damage
+- makes security reviews easier to reason about
+
+Practical rule:
+
+> separate who can change data, who can read data, and who can change schema
+> before you need an incident to teach the lesson
+
+---
+
+## 13. JSONB — Useful, But Not an Excuse
 
 Postgres supports `JSONB`, which is excellent for:
 
@@ -385,10 +512,19 @@ Rule:
 
 ---
 
-## 11. Partitioning
+## 14. Partitioning
 
 Partitioning becomes useful when one table grows large enough that operational
 maintenance, deletes, or scans become painful.
+
+Bad mental model:
+
+- partitioning is a smart default because bigger systems are "more scalable"
+
+Better mental model:
+
+- partitioning is an operational tool for very large tables with a natural partition key, often time-based
+- it helps most when retention, maintenance, and large-range reads are the real problem
 
 Typical candidates:
 
@@ -410,26 +546,36 @@ Benefit:
 But:
 
 - it adds operational complexity
-- you do not need it early
+- it does not fix bad query shape by itself
+- you do not need it early for ordinary order, payment, or user tables
+
+Strong default:
+
+> partition only when one large-table pain is already real: retention, maintenance
+> windowing, or large-range access on a natural partition key
 
 ---
 
-## 12. Practical Checklist
+## 15. Practical Checklist
 
 Use this when thinking about Postgres in a backend design:
 
 - Does this domain require transactional integrity?
+- Is the write model clear before I optimize reporting?
+- Are `NOT NULL`, `UNIQUE`, `CHECK`, and foreign keys carrying the important local rules?
 - Do I understand the most important queries?
 - Are the right indexes in place for those queries?
 - Could concurrency create lost updates or race conditions?
 - Is the transaction short and well-bounded?
 - Is connection pool size intentional?
 - Could MVCC/vacuum health affect this workload?
+- Do I need a normal view, a materialized view, or neither?
+- Are runtime, reporting, and migration roles separated enough?
 - Am I using JSONB for the right reasons?
 
 ---
 
-## 13. Interview Framing
+## 16. Interview Framing
 
 Practical summary:
 
@@ -444,5 +590,21 @@ Practical summary:
 - Postgres is a strong default for correctness-critical domains
 - MVCC explains both concurrency behavior and why vacuum matters
 - isolation level alone does not fix weak write logic
+- a good Postgres table starts with honest constraints before clever optimization
 - indexes and plans should follow real query patterns
+- views help read clarity; materialized views help repeated heavy reads when stale data is acceptable
+- least-privilege roles are part of practical design, not only security theater
 - replicas help, but primary truth and replica lag must stay explicit
+
+---
+
+## Further Reading
+
+- PostgreSQL constraints:
+  https://www.postgresql.org/docs/current/ddl-constraints.html
+- PostgreSQL `CREATE INDEX`:
+  https://www.postgresql.org/docs/current/sql-createindex.html
+- PostgreSQL materialized views:
+  https://www.postgresql.org/docs/16/rules-materializedviews.html
+- PostgreSQL table partitioning:
+  https://www.postgresql.org/docs/current/ddl-partitioning.html
