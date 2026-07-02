@@ -6,6 +6,9 @@
 Slow query diagnosis is one of the highest-value senior backend topics because it tests
 whether you can reason from symptoms to evidence instead of guessing.
 
+This note only uses Java and Kotlin side by side where ORM or repository shape
+is part of the teaching point. Pure SQL examples stay language-neutral.
+
 This note follows the same reusable pattern:
 
 - what query optimization actually means
@@ -78,6 +81,13 @@ It is N+1.
 val orders = orderRepository.findAll()
 orders.forEach { order ->
     println(order.items.size)
+}
+```
+
+```java
+List<Order> orders = orderRepository.findAll();
+for (Order order : orders) {
+    System.out.println(order.getItems().size());
 }
 ```
 

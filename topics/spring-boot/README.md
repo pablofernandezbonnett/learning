@@ -19,6 +19,7 @@ Focus:
 - JPA and Hibernate tradeoffs
 - platform wiring, configuration, and Spring cloud-facing concerns
 - runtime readiness, health, and observability basics for real services
+- service baseline discipline around security, actuator exposure, and testing
 
 Working style:
 
@@ -40,6 +41,7 @@ Smallest mental model:
 2. [02-exception-handling.md](./02-exception-handling.md): consistent error handling with `@RestControllerAdvice` and `ProblemDetail`
 3. [03-transactions-and-isolation.md](./03-transactions-and-isolation.md): local transaction boundaries, isolation, and propagation
 4. [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md): ORM behavior, query shape, and common production traps
+5. [24-spring-security-actuator-and-testing-baseline.md](./24-spring-security-actuator-and-testing-baseline.md): minimum credible service posture for route security, actuator exposure, and verification
 
 ## If You Want To Get Productive Fast
 
@@ -50,10 +52,11 @@ For the shortest "I can work in a Spring Boot service again" loop:
 3. [02-exception-handling.md](./02-exception-handling.md)
 4. [03-transactions-and-isolation.md](./03-transactions-and-isolation.md)
 5. [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md)
-6. [12-caching-and-redis.md](./12-caching-and-redis.md)
-7. [16-appsec-authz-lab.md](./16-appsec-authz-lab.md)
-8. [19-flyway-and-schema-migrations.md](./19-flyway-and-schema-migrations.md)
-9. [20-spring-cloud-and-service-integration.md](./20-spring-cloud-and-service-integration.md)
+6. [24-spring-security-actuator-and-testing-baseline.md](./24-spring-security-actuator-and-testing-baseline.md)
+7. [12-caching-and-redis.md](./12-caching-and-redis.md)
+8. [16-appsec-authz-lab.md](./16-appsec-authz-lab.md)
+9. [19-flyway-and-schema-migrations.md](./19-flyway-and-schema-migrations.md)
+10. [20-spring-cloud-and-service-integration.md](./20-spring-cloud-and-service-integration.md)
 
 That path covers the questions that most often decide whether a Spring service
 is merely running or actually trustworthy:
@@ -62,6 +65,7 @@ is merely running or actually trustworthy:
 - how failures are returned
 - how data changes stay correct
 - how persistence behaves under load
+- how route policy, actuator exposure, and tests hold the service boundary together
 - what may be cached safely
 - how authz is enforced
 - how schema change stays safe
@@ -73,6 +77,7 @@ is merely running or actually trustworthy:
 - [02-exception-handling.md](./02-exception-handling.md)
 - [03-transactions-and-isolation.md](./03-transactions-and-isolation.md)
 - [04-jpa-hibernate-performance-traps.md](./04-jpa-hibernate-performance-traps.md)
+- [24-spring-security-actuator-and-testing-baseline.md](./24-spring-security-actuator-and-testing-baseline.md)
 
 ## Required
 
@@ -86,6 +91,7 @@ is merely running or actually trustworthy:
 - [12-caching-and-redis.md](./12-caching-and-redis.md)
 - [13-spring-data.md](./13-spring-data.md)
 - [19-flyway-and-schema-migrations.md](./19-flyway-and-schema-migrations.md)
+- [24-spring-security-actuator-and-testing-baseline.md](./24-spring-security-actuator-and-testing-baseline.md)
 
 ## Growth
 
@@ -102,8 +108,11 @@ is merely running or actually trustworthy:
 ## Companion Lab
 
 Use [../../labs/spring-boot-sample/README.md](../../labs/spring-boot-sample/README.md)
-for a small Kotlin + Spring Boot sample that covers web, JPA, config, caching,
-and coroutine-oriented examples.
+for a small Kotlin-first Spring Boot sample that covers web, JPA, config,
+caching, and service-boundary basics.
+
+Keep the topic notes themselves friendly to Java-first comparison when a Spring
+concept benefits from seeing both languages.
 
 ## Core Rule
 

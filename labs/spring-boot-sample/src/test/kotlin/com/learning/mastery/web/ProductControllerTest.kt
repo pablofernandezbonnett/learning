@@ -6,12 +6,15 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import com.learning.mastery.config.SecurityConfig
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -31,6 +34,7 @@ import java.time.Instant
  *   org.mockito.kotlin:mockito-kotlin transitive dependency.
  */
 @WebMvcTest(ProductController::class)
+@Import(SecurityConfig::class)
 class ProductControllerTest {
 
     @Autowired
@@ -42,6 +46,7 @@ class ProductControllerTest {
     // ── GET /api/products/{id} ────────────────────────────────────────────────
 
     @Test
+    @WithMockUser
     fun `getById returns 200 with product when found`() {
         val product = ProductResponse(
             id = "J0001",
@@ -65,6 +70,16 @@ class ProductControllerTest {
     }
 
     @Test
+    fun `getById returns 401 for anonymous caller`() {
+        mockMvc.get("/api/products/J0001") {
+            accept(MediaType.APPLICATION_JSON)
+        }.andExpect {
+            status { isUnauthorized() }
+        }
+    }
+
+    @Test
+    @WithMockUser
     fun `getById returns 404 ProblemDetail when product not found`() {
         whenever(productService.findById("J9999")).thenThrow(ProductNotFoundException("J9999"))
 
@@ -82,6 +97,7 @@ class ProductControllerTest {
     // ── GET /api/products ─────────────────────────────────────────────────────
 
     @Test
+    @WithMockUser
     fun `list returns 200 with empty page`() {
         whenever(
             productService.findAll(
@@ -100,6 +116,7 @@ class ProductControllerTest {
     // ── POST /api/products ────────────────────────────────────────────────────
 
     @Test
+    @WithMockUser
     fun `create returns 201 with Location header`() {
         val created = ProductResponse(
             id = "T0001",
@@ -129,6 +146,7 @@ class ProductControllerTest {
     }
 
     @Test
+    @WithMockUser
     fun `create returns 422 when request body is invalid`() {
         mockMvc.post("/api/products") {
             contentType = MediaType.APPLICATION_JSON

@@ -4,6 +4,8 @@
 
 
 Use this after reading [02-message-brokers-and-delivery-semantics.md](./02-message-brokers-and-delivery-semantics.md).
+It is a reopen note, not a replacement for the fuller broker explanation or the
+Kafka-specific follow-up.
 
 This is the short version to retain and reopen quickly.
 
@@ -113,9 +115,9 @@ Short explanation:
 
 ---
 
-## Interview Answer Shape
+## Practical Summary
 
-Practical summary:
+If you need the shortest reliable answer, use this:
 
 > If the only problem is background work, I prefer a simple queue like SQS or
 > RabbitMQ. If the event is a domain fact that multiple systems consume and may

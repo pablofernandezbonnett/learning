@@ -1,6 +1,8 @@
 # Tools, Agents, and Guardrails
 
 Use this note when the conversation moves from "one prompt" to "a system that acts".
+For this repo's main AI lane, treat it as optional growth once local/private
+serving, prompting, and evaluation basics are already clear.
 
 ---
 

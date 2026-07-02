@@ -3,8 +3,9 @@
 Use this note when you want the minimum modern Python mental model from a Java
 backend starting point.
 
-This is not a language history or a full Python course.
-It is the fast bridge from Java habits to useful Python 3 code.
+This is not a language history, a syntax walkthrough, or a full Python course.
+It is the fast bridge from Java habits to useful Python 3 code when Python is
+mainly a support language for backend, automation, or AI-adjacent work.
 
 ---
 

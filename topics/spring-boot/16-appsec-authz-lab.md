@@ -13,6 +13,10 @@ The scenario is intentionally simple:
 This lab is not about building a full auth system.
 It is about enforcing the right access rule in the backend.
 
+This lab uses Java and Kotlin side by side in the main authorization examples
+because service-layer authorization rules are a common comparison point in
+mixed Spring teams.
+
 ---
 
 ## Goal
@@ -45,6 +49,20 @@ data class AppPrincipal(
 )
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+public record AppPrincipal(
+    long userId,
+    String email,
+    Set<String> roles
+) {
+}
+```
+
+</details>
+
 In a real app, this could be mapped from:
 
 - a session-backed user
@@ -67,6 +85,18 @@ This is not enough:
 fun getOrder(@PathVariable orderId: Long): OrderDto =
     orderService.getOrder(orderId)
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@GetMapping("/api/orders/{orderId}")
+public OrderDto getOrder(@PathVariable Long orderId) {
+    return orderService.getOrder(orderId);
+}
+```
+
+</details>
 
 Even if the frontend hides the button, a caller can still invoke the endpoint.
 
@@ -99,6 +129,41 @@ class OrderService(
 }
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+
+    public OrderService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
+
+    public OrderDto getOrder(long orderId, AppPrincipal principal) {
+        Order order = orderRepository.findById(orderId);
+        if (order == null) {
+            throw new OrderNotFoundException(orderId);
+        }
+
+        boolean isOwner = order.getUserId() == principal.userId();
+        boolean isSupport =
+            principal.roles().contains("SUPPORT") ||
+            principal.roles().contains("ADMIN");
+
+        if (!isOwner && !isSupport) {
+            throw new AccessDeniedException("Not allowed to read this order");
+        }
+
+        return order.toDto();
+    }
+}
+```
+
+</details>
+
 This is explicit and easy to reason about.
 
 ---
@@ -111,6 +176,16 @@ Method security can help, but do not use it as magic decoration.
 @PreAuthorize("@orderAuthorization.canRead(#orderId, authentication)")
 fun getOrder(orderId: Long): OrderDto { ... }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@PreAuthorize("@orderAuthorization.canRead(#orderId, authentication)")
+public OrderDto getOrder(Long orderId) { ... }
+```
+
+</details>
 
 That is fine if the referenced logic is real and testable.
 
@@ -140,6 +215,21 @@ fun `normal user cannot read another user's order`() {
     }
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@Test
+void normalUserCannotReadAnotherUsersOrder() throws Exception {
+    mockMvc.perform(get("/api/orders/42")
+            .header("X-Demo-User-Id", "100")
+            .header("X-Demo-Roles", "USER"))
+        .andExpect(status().isForbidden());
+}
+```
+
+</details>
 
 The exact auth setup does not matter for the lab.
 The authorization outcome does.

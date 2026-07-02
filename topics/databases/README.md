@@ -27,6 +27,7 @@ Working style:
 - explain the first useful meaning of the jargon before going deeper
 - prefer short practical definitions over telegraphic shorthand
 - connect DB mechanics back to checkout, payments, orders, and inventory
+- use plain SQL first, and add Java or Kotlin only when application-level read shape or ORM behavior is the real teaching point
 
 Smallest mental model:
 
@@ -34,17 +35,26 @@ Smallest mental model:
 - then protect the write path
 - then optimize query shape and scale without breaking correctness
 
+Decision boundary for SQL performance material:
+
+- use `03` when your SQL language and read-shape intuition feels rusty
+- use `13` when you want the fastest reopen of plan reading and index review
+- use `08` when you need the deeper performance diagnosis loop, including `N+1`, connection wait, and application read shape
+- use `10` when the question is PostgreSQL-specific rather than generic SQL tuning
+
 ## Recommended Order
 
 1. [01-idempotency-and-transaction-safety.md](./01-idempotency-and-transaction-safety.md): request identity, deduplication, and transaction boundaries
 2. [02-database-locks-and-concurrency.md](./02-database-locks-and-concurrency.md): lost updates, optimistic locking, pessimistic locking, and isolation
 3. [03-sql-refresh-for-backend-engineers.md](./03-sql-refresh-for-backend-engineers.md): joins, aggregation, CTEs, window functions, and pagination shape
+4. [13-explain-indexes-and-query-review-baseline.md](./13-explain-indexes-and-query-review-baseline.md): fast reopen of `EXPLAIN`, index review, and practical tuning judgment
 
 ## Refresh
 
 - [01-idempotency-and-transaction-safety.md](./01-idempotency-and-transaction-safety.md)
 - [02-database-locks-and-concurrency.md](./02-database-locks-and-concurrency.md)
 - [03-sql-refresh-for-backend-engineers.md](./03-sql-refresh-for-backend-engineers.md)
+- [13-explain-indexes-and-query-review-baseline.md](./13-explain-indexes-and-query-review-baseline.md)
 - [04-sql-vs-nosql.md](./04-sql-vs-nosql.md)
 
 ## Required
@@ -72,3 +82,7 @@ Smallest mental model:
 Use [../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md)
 topics `correctness/idempotency` and `correctness/locking` after the first two
 core notes.
+
+Use [../../labs/sql-query-review/README.md](../../labs/sql-query-review/README.md)
+after `13`, `08`, or `10` when you want to inspect real PostgreSQL plans,
+composite indexes, and pagination tradeoffs instead of only reading about them.

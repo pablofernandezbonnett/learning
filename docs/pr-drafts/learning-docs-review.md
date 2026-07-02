@@ -55,7 +55,7 @@ The repo had three main issues:
 
 ## How to Review
 
-1. Start with `README.md`, `paths/market-oriented-backend-growth.md`, `paths/sre-from-backend-engineers.md`, and `paths/solutions-architect-from-backend.md`.
+1. Start with `README.md`, `paths/senior-java-backend-growth-plan-roadmap.md`, `paths/adjacent/sre-from-backend-engineers.md`, and `paths/adjacent/solutions-architect-from-backend.md`.
 2. Review `topics/sre/` and `topics/solutions-architecture/` as the main role-path and teaching-style upgrade in this PR.
 3. Review `topics/architecture/16-distributed-workflow-pattern-choice.md`, `topics/api/07-sync-vs-async-integration-choice.md`, and `topics/system-design/distributed-workflow-case-studies.md` as the main decision-synthesis additions.
 4. Spot check older docs such as `topics/architecture/03-distributed-transactions-and-events.md`, `topics/security/02-web-and-api-security.md`, `topics/devops/02-zero-downtime-deployments.md`, and `topics/spring-boot/13-spring-data.md` to confirm the teaching pattern is now more consistent.

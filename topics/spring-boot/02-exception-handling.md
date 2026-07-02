@@ -13,6 +13,10 @@ You do need one clean mental model:
 This topic matters because API quality gets shallow fast when error handling is
 treated as an afterthought.
 
+This note uses Java and Kotlin side by side in the main Spring examples because
+the framework behavior is the same, but many backend engineers still compare
+the wiring mentally through Java first.
+
 ---
 
 ## Bad Mental Model vs Better Mental Model
@@ -72,6 +76,27 @@ fun getProduct(@PathVariable id: String): Product {
     }
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@GetMapping("/{id}")
+public Product getProduct(@PathVariable String id) {
+    try {
+        return productService.findById(id);
+    } catch (ProductNotFoundException e) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (Exception e) {
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "Unexpected error"
+        );
+    }
+}
+```
+
+</details>
 
 This works once, but at scale every controller starts inventing its own error style.
 
@@ -161,6 +186,78 @@ class GlobalExceptionHandler {
 }
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+public class ProductNotFoundException extends RuntimeException {
+    private final String productId;
+
+    public ProductNotFoundException(String productId) {
+        super("Product not found: " + productId);
+        this.productId = productId;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+}
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping("/{id}")
+    public ProductDto getById(@PathVariable String id) {
+        ProductDto product = productService.findById(id);
+        if (product == null) {
+            throw new ProductNotFoundException(id);
+        }
+        return product;
+    }
+}
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ProblemDetail handleNotFound(
+        ProductNotFoundException ex,
+        HttpServletRequest request
+    ) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.NOT_FOUND,
+            ex.getMessage()
+        );
+        problem.setTitle("Product Not Found");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        problem.setProperty("productId", ex.getProductId());
+        return problem;
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ProblemDetail handleGeneric(Exception ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "An unexpected error occurred. Please try again later."
+        );
+        problem.setTitle("Internal Server Error");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+}
+```
+
+</details>
+
 How the pieces connect:
 
 1. the controller calls the service normally
@@ -205,6 +302,25 @@ fun handleNotFound(ex: ProductNotFoundException): ProblemDetail {
     }
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@ExceptionHandler(ProductNotFoundException.class)
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public ProblemDetail handleNotFound(ProductNotFoundException ex) {
+    ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+        HttpStatus.NOT_FOUND,
+        ex.getMessage() != null ? ex.getMessage() : "Product not found"
+    );
+    problem.setTitle("Product Not Found");
+    problem.setProperty("productId", ex.getProductId());
+    return problem;
+}
+```
+
+</details>
 
 Standard fields you should recognize:
 

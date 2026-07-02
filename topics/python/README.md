@@ -7,15 +7,22 @@ Python in this repo is not positioned as a primary backend stack.
 It is positioned as a high-leverage language for tasks where speed,
 data tooling, or library reach matter more than the stronger compile-time
 guardrails of Java or Kotlin.
+It is also not meant to duplicate a general Python course.
 
 Focus:
 
 - data scripts
 - automation
 - lightweight internal APIs
-- ML or AI-adjacent integration
+- AI-adjacent helper services and tooling
 - secure boundary handling when Python exposes an API or model helper
 - not as a replacement for every Spring Boot service
+
+Out of scope:
+
+- beginner Python syntax taught from zero
+- general OOP or web-programming curriculum
+- broad language coverage better handled by a dedicated external course
 
 Working style:
 
@@ -96,9 +103,8 @@ Short rule:
 
 | File | Why start here | Run |
 |---|---|---|
-| [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md) | minimum modern Python mental model from a Java backend starting point | read as guide |
+| [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md) | backend-oriented delta note, not a full Python course | read as guide |
 | [04-project-shape-and-quality.md](./04-project-shape-and-quality.md) | typing, tooling, testing, and project shape when Python is rusty | read as guide |
-| [examples/01-basics.py](./examples/01-basics.py) | syntax refresher for Java and Kotlin developers after the mental model is clear | `python examples/01-basics.py` |
 | [examples/02-data-scripts.py](./examples/02-data-scripts.py) | data and ETL style work | `python examples/02-data-scripts.py` |
 | [examples/fastapi_app.py](./examples/fastapi_app.py) | lightweight API mental bridge from Spring Boot | `uvicorn fastapi_app:app --app-dir topics/python/examples --reload` |
 
@@ -106,12 +112,14 @@ Short rule:
 
 1. read [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md)
 2. read [04-project-shape-and-quality.md](./04-project-shape-and-quality.md)
-3. run [examples/01-basics.py](./examples/01-basics.py) for syntax refresh only where needed
-4. run [examples/02-data-scripts.py](./examples/02-data-scripts.py) if your likely use case is ETL, reporting, or automation
-5. run [examples/fastapi_app.py](./examples/fastapi_app.py) if your likely use case is a small internal API or AI-adjacent helper
+3. run [examples/02-data-scripts.py](./examples/02-data-scripts.py) if your likely use case is ETL, reporting, or automation
+4. run [examples/fastapi_app.py](./examples/fastapi_app.py) if your likely use case is a small internal API or AI-adjacent helper
 
 This order keeps Python in its most useful role for a JVM backend engineer:
 mental model first, quality bar second, examples third.
+
+If you are already doing a general Python course elsewhere, treat this folder as
+the backend-specific supplement, not as parallel primary study.
 
 ## Setup
 
@@ -153,8 +161,9 @@ Bad framing:
 - Python pays off quickly for automation, ETL, and AI-adjacent integration
 - if Python serves AI or ML traffic, the same backend rules still apply: typed boundaries, auth, limits, and explicit side effects
 - if you want the shortest Java-to-Python bridge, read [05-python-for-java-devs-quick-refresh.md](./05-python-for-java-devs-quick-refresh.md) early
+- the Python folder should stay narrow enough that it does not duplicate a full language course
 
-If your current goal is market-oriented backend growth, pair this folder with:
+If your current goal is senior backend growth with selective AI support, pair this folder with:
 
 - [../ai/README.md](../ai/README.md)
-- [../../paths/market-oriented-backend-growth.md](../../paths/market-oriented-backend-growth.md)
+- [../../paths/senior-java-backend-growth-plan-roadmap.md](../../paths/senior-java-backend-growth-plan-roadmap.md)

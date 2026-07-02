@@ -66,10 +66,10 @@ For each topic:
 
 ### Phase 1. Shift from code ownership to runtime ownership
 
-1. [../topics/devops/01-infrastructure-and-devops-basics.md](../topics/devops/01-infrastructure-and-devops-basics.md)
-2. [../topics/cloud/01-cloud-basics.md](../topics/cloud/01-cloud-basics.md)
-3. [../topics/architecture/04-networking-fundamentals.md](../topics/architecture/04-networking-fundamentals.md)
-4. [../topics/devops/03-observability-and-monitoring.md](../topics/devops/03-observability-and-monitoring.md)
+1. [../../topics/devops/01-infrastructure-and-devops-basics.md](../../topics/devops/01-infrastructure-and-devops-basics.md)
+2. [../../topics/cloud/01-cloud-basics.md](../../topics/cloud/01-cloud-basics.md)
+3. [../../topics/architecture/04-networking-fundamentals.md](../../topics/architecture/04-networking-fundamentals.md)
+4. [../../topics/devops/03-observability-and-monitoring.md](../../topics/devops/03-observability-and-monitoring.md)
 
 Outcome:
 
@@ -77,12 +77,12 @@ Outcome:
 
 ### Phase 2. Learn reliability through backend failure modes you already know
 
-5. [../topics/architecture/02-resiliency-patterns.md](../topics/architecture/02-resiliency-patterns.md)
-6. [../topics/databases/01-idempotency-and-transaction-safety.md](../topics/databases/01-idempotency-and-transaction-safety.md)
-7. [../topics/databases/02-database-locks-and-concurrency.md](../topics/databases/02-database-locks-and-concurrency.md)
-8. [../topics/architecture/03-distributed-transactions-and-events.md](../topics/architecture/03-distributed-transactions-and-events.md)
-9. [../topics/api/02-message-brokers-and-delivery-semantics.md](../topics/api/02-message-brokers-and-delivery-semantics.md)
-10. [../topics/api/03-webhooks-basics.md](../topics/api/03-webhooks-basics.md)
+5. [../../topics/architecture/02-resiliency-patterns.md](../../topics/architecture/02-resiliency-patterns.md)
+6. [../../topics/databases/01-idempotency-and-transaction-safety.md](../../topics/databases/01-idempotency-and-transaction-safety.md)
+7. [../../topics/databases/02-database-locks-and-concurrency.md](../../topics/databases/02-database-locks-and-concurrency.md)
+8. [../../topics/architecture/03-distributed-transactions-and-events.md](../../topics/architecture/03-distributed-transactions-and-events.md)
+9. [../../topics/api/02-message-brokers-and-delivery-semantics.md](../../topics/api/02-message-brokers-and-delivery-semantics.md)
+10. [../../topics/api/03-webhooks-basics.md](../../topics/api/03-webhooks-basics.md)
 
 Outcome:
 
@@ -90,10 +90,10 @@ Outcome:
 
 ### Phase 3. Build the production debugging toolkit
 
-11. [../topics/architecture/05-distributed-tracing.md](../topics/architecture/05-distributed-tracing.md)
-12. [../topics/cloud/04-container-sizing-and-observability.md](../topics/cloud/04-container-sizing-and-observability.md)
-13. [../topics/devops/06-observability-cheatsheet.md](../topics/devops/06-observability-cheatsheet.md)
-14. [../labs/kotlin-backend-examples/README.md](../labs/kotlin-backend-examples/README.md)
+11. [../../topics/architecture/05-distributed-tracing.md](../../topics/architecture/05-distributed-tracing.md)
+12. [../../topics/cloud/04-container-sizing-and-observability.md](../../topics/cloud/04-container-sizing-and-observability.md)
+13. [../../topics/devops/06-observability-cheatsheet.md](../../topics/devops/06-observability-cheatsheet.md)
+14. [../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md)
 
 Use these runnable topics:
 
@@ -109,12 +109,12 @@ Outcome:
 
 ### Phase 4. Learn safe change and safe runtime operation
 
-15. [../topics/devops/02-zero-downtime-deployments.md](../topics/devops/02-zero-downtime-deployments.md)
-16. [../topics/devops/05-docker-runtime-practices.md](../topics/devops/05-docker-runtime-practices.md)
-17. [../topics/devops/04-kubernetes-crash-course.md](../topics/devops/04-kubernetes-crash-course.md)
-18. [../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md](../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md)
-19. [../topics/cloud/05-local-kubernetes-lab.md](../topics/cloud/05-local-kubernetes-lab.md)
-20. [../topics/architecture/11-service-discovery.md](../topics/architecture/11-service-discovery.md)
+15. [../../topics/devops/02-zero-downtime-deployments.md](../../topics/devops/02-zero-downtime-deployments.md)
+16. [../../topics/devops/05-docker-runtime-practices.md](../../topics/devops/05-docker-runtime-practices.md)
+17. [../../topics/devops/04-kubernetes-crash-course.md](../../topics/devops/04-kubernetes-crash-course.md)
+18. [../../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md](../../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md)
+19. [../../topics/cloud/05-local-kubernetes-lab.md](../../topics/cloud/05-local-kubernetes-lab.md)
+20. [../../topics/architecture/11-service-discovery.md](../../topics/architecture/11-service-discovery.md)
 
 Outcome:
 
@@ -122,11 +122,11 @@ Outcome:
 
 ### Phase 5. Push toward stronger SRE judgment
 
-21. [../topics/architecture/07-caching-strategies.md](../topics/architecture/07-caching-strategies.md)
-22. [../topics/databases/05-database-scaling.md](../topics/databases/05-database-scaling.md)
-23. [../topics/architecture/10-consistent-hashing.md](../topics/architecture/10-consistent-hashing.md)
-24. [../topics/architecture/12-consensus-and-leader-election.md](../topics/architecture/12-consensus-and-leader-election.md)
-25. [../topics/testing/01-testing-strategies.md](../topics/testing/01-testing-strategies.md)
+21. [../../topics/architecture/07-caching-strategies.md](../../topics/architecture/07-caching-strategies.md)
+22. [../../topics/databases/05-database-scaling.md](../../topics/databases/05-database-scaling.md)
+23. [../../topics/architecture/10-consistent-hashing.md](../../topics/architecture/10-consistent-hashing.md)
+24. [../../topics/architecture/12-consensus-and-leader-election.md](../../topics/architecture/12-consensus-and-leader-election.md)
+25. [../../topics/testing/01-testing-strategies.md](../../topics/testing/01-testing-strategies.md)
 
 Outcome:
 
@@ -136,12 +136,12 @@ Outcome:
 
 The repo now includes an `SRE` topic folder for the operational layer that was previously missing:
 
-1. [../topics/sre/01-backend-engineer-vs-sre.md](../topics/sre/01-backend-engineer-vs-sre.md)
-2. [../topics/sre/02-sli-slo-and-error-budgets.md](../topics/sre/02-sli-slo-and-error-budgets.md)
-3. [../topics/sre/03-alerting-and-on-call.md](../topics/sre/03-alerting-and-on-call.md)
-4. [../topics/sre/04-incident-response-and-triage.md](../topics/sre/04-incident-response-and-triage.md)
-5. [../topics/sre/05-capacity-planning-and-load-shedding.md](../topics/sre/05-capacity-planning-and-load-shedding.md)
-6. [../topics/sre/06-postmortems-and-operational-review.md](../topics/sre/06-postmortems-and-operational-review.md)
+1. [../../topics/sre/01-backend-engineer-vs-sre.md](../../topics/sre/01-backend-engineer-vs-sre.md)
+2. [../../topics/sre/02-sli-slo-and-error-budgets.md](../../topics/sre/02-sli-slo-and-error-budgets.md)
+3. [../../topics/sre/03-alerting-and-on-call.md](../../topics/sre/03-alerting-and-on-call.md)
+4. [../../topics/sre/04-incident-response-and-triage.md](../../topics/sre/04-incident-response-and-triage.md)
+5. [../../topics/sre/05-capacity-planning-and-load-shedding.md](../../topics/sre/05-capacity-planning-and-load-shedding.md)
+6. [../../topics/sre/06-postmortems-and-operational-review.md](../../topics/sre/06-postmortems-and-operational-review.md)
 
 That fills the main conceptual gap between backend reliability foundations and day-to-day `SRE` operating practice.
 

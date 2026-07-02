@@ -6,6 +6,7 @@ You do not need to be an SRE, but you do need a clear mental model for how to
 notice, narrow, and debug a production failure.
 
 Use this after reading [03-observability-and-monitoring.md](./03-observability-and-monitoring.md).
+It is a reopen sheet, not a replacement for the fuller observability note.
 
 This is the short version to retain and reopen quickly.
 

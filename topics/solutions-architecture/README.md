@@ -59,7 +59,7 @@ Short rule:
 
 If your goal is the role transition from backend engineer to `Solutions Architect`, start with:
 
-- [../../paths/solutions-architect-from-backend.md](../../paths/solutions-architect-from-backend.md)
+- [../../paths/adjacent/solutions-architect-from-backend.md](../../paths/adjacent/solutions-architect-from-backend.md)
 
 ## Related Internal Topics
 

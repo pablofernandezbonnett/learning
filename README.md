@@ -19,11 +19,13 @@ What you will find here:
 
 - topic-first notes for fast reopening
 - practical docs that explain failure modes, tradeoffs, and better defaults
-- small runnable labs in Java and Kotlin where code helps more than prose
+- small runnable labs, with Java as the main backend baseline and Kotlin added where comparison or Kotlin-specific learning helps
 - paths that give you a study order instead of a pile of disconnected notes
 
 The repo is optimized for practical understanding, tradeoffs, failure modes,
 and reusable mental models, not encyclopedic coverage.
+It should not grow into a duplicate of general language courses or vendor
+certification tracks.
 
 ## Who This Is For
 
@@ -36,17 +38,15 @@ Best fit:
 Less ideal fit:
 
 - someone looking for full certification prep copied from one vendor course
+- someone looking for beginner language material reproduced from broad web courses
 - someone who wants theory completeness before practical use
 
 ## Start Here
 
-Pick the entry point that matches your goal:
+Use one main entrypoint, then branch out only if a real work need appears:
 
-- `paths/market-oriented-backend-growth.md`: main growth path for a senior backend engineer who wants one route that already includes refresh mode
-- `paths/appsec-for-software-engineers.md`: AppSec from a developer point of view
-- `paths/sre-from-backend-engineers.md`: backend to reliability ownership
-- `paths/solutions-architect-from-backend.md`: backend to end-to-end solution design
-- `paths/appsec-in-product-teams.md`: broader AppSec path inside product delivery
+- `paths/senior-java-backend-growth-plan-roadmap.md`: the canonical path for a senior Java backend engineer closing practical gaps without leaving the backend lane
+- `paths/adjacent/README.md`: optional side paths for AppSec, SRE, or wider architecture pressure
 - `topics/`: topic-by-topic entrypoints when you already know what you want to study
 - `labs/`: runnable companion material
 
@@ -54,7 +54,7 @@ Pick the entry point that matches your goal:
 
 Strong default:
 
-1. start with `paths/market-oriented-backend-growth.md` if you want one main backend path that already includes refresh mode
+1. start with `paths/senior-java-backend-growth-plan-roadmap.md` if you want the main backend path
 2. start with a topic folder if you already know the concept you want to reopen
 3. use labs when the topic benefits from code and runtime behavior
 
@@ -63,6 +63,7 @@ Practical rule:
 - use `paths/` for study order
 - use `topics/` for the durable source notes
 - use `labs/` for hands-on reinforcement
+- use `paths/adjacent/` only when a focused side lane becomes relevant
 
 ## Main Topics
 
@@ -74,7 +75,7 @@ Practical rule:
 - [Architecture](./topics/architecture/README.md)
 - [System Design](./topics/system-design/README.md)
 - [Security](./topics/security/README.md)
-- [AppSec](./topics/appsec/README.md)
+- [AppSec Foundations](./topics/appsec/README.md)
 - [SRE](./topics/sre/README.md)
 - [Solutions Architecture](./topics/solutions-architecture/README.md)
 - [Cloud](./topics/cloud/README.md)
@@ -113,5 +114,6 @@ Common note shape:
 - practical topic notes are the main source of truth
 - paths help with order, but should not become the only place where meaning lives
 - examples matter: use code when code teaches best, and word examples when code would only add noise
+- for JVM topics, prefer Java as the default example language and add Kotlin when the comparison teaches something useful
 
-See `CONTRIBUTING.md` and `LICENSE.md` for contribution and usage details.
+See `CONTRIBUTING.md` and `LICENSE` for contribution and usage details.

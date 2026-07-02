@@ -2,14 +2,22 @@
 
 > Primary fit: `Platform / Growth lane`
 
+Quick REST refresher: `@GetMapping` reads, `@PostMapping` creates,
+`@PutMapping` replaces, `@PatchMapping` partially updates, and
+`@DeleteMapping` removes.
 
-Quick REST refresher: `@GetMapping` reads, `@PostMapping` creates, `@PutMapping` replaces, `@PatchMapping` partially updates, and `@DeleteMapping` removes.
+This note stays focused on higher-value Spring MVC annotations that shape the
+HTTP boundary directly.
 
-Beyond those common REST mappings, here are the higher-value annotations that matter in real Spring APIs.
+Use the dedicated notes for adjacent concerns:
+
+- [02-exception-handling.md](./02-exception-handling.md): central error mapping with `@RestControllerAdvice` and `ProblemDetail`
+- [24-spring-security-actuator-and-testing-baseline.md](./24-spring-security-actuator-and-testing-baseline.md): route policy, actuator exposure, and service-boundary verification
+
+This note uses Java and Kotlin side by side only where controller, validation,
+and response-shape wiring are genuinely easier to compare directly.
 
 ## Controller Boundary Rule
-
-Before the annotations, keep the controller job clear.
 
 Good controller responsibilities:
 
@@ -31,58 +39,11 @@ Short rule:
 > a Spring controller is an HTTP boundary, not the place where business or
 > persistence policy should accumulate
 
-Small concrete example:
+## 1. Validation: `@Validated` and `@Valid`
 
-- weak approach: controller loads entity, mutates it, saves it, catches every exception, and decides cache behavior
-- better approach: controller validates input and delegates one use case to a service that owns the business and transaction boundary
-
-### 📍 1. Exception Handling: `@RestControllerAdvice`
-Don't use `try-catch` in controllers. Use a global handler.
-
-```kotlin
-class UserNotFoundException(message: String) : RuntimeException(message)
-
-data class ErrorDto(val message: String)
-
-@RestControllerAdvice
-class GlobalExceptionHandler {
-    @ExceptionHandler(UserNotFoundException::class)
-    fun handleNotFound(ex: UserNotFoundException): ResponseEntity<ErrorDto> {
-        return ResponseEntity.status(404).body(ErrorDto(ex.message ?: "User not found"))
-    }
-}
-
-@RestController
-@RequestMapping("/users")
-class UserController(private val userService: UserService) {
-    @GetMapping("/{id}")
-    fun getUser(@PathVariable id: Long): UserDto {
-        return userService.findById(id)
-            ?: throw UserNotFoundException("User $id not found")
-    }
-}
-```
-
-The controller does **not** call `GlobalExceptionHandler` directly. It just throws the exception. Spring sees the exception, finds the matching `@ExceptionHandler`, and builds the HTTP response for you.
-
-<details>
-<summary>Java version</summary>
-
-```java
-@RestControllerAdvice
-public class GlobalExceptionHandler {
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorDTO> handleNotFound(UserNotFoundException ex) {
-        return ResponseEntity.status(404).body(new ErrorDTO(ex.getMessage()));
-    }
-}
-```
-
-</details>
-
-### 📍 2. Validation: `@Validated` & `@Valid`
-Use `@Valid` on method arguments and `@NotBlank`, `@Size`, `@Email` in your DTOs.
-Use `@Validated` at the class level to validate `@PathVariable` or `@RequestParam`.
+Use `@Valid` on request body DTOs.
+Use `@Validated` on the controller when you also want Bean Validation on
+`@PathVariable` or `@RequestParam`.
 
 ```kotlin
 data class CreateUserRequest(
@@ -93,13 +54,14 @@ data class CreateUserRequest(
     val email: String,
 
     @field:Size(min = 8, message = "password must have at least 8 characters")
-    val password: String
+    val password: String,
 )
 
 @RestController
 @Validated
 @RequestMapping("/users")
 class UserController(private val userService: UserService) {
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createUser(@Valid @RequestBody request: CreateUserRequest): UserDto {
@@ -113,11 +75,58 @@ class UserController(private val userService: UserService) {
 }
 ```
 
-Use `@Valid` for validating a request body object. Use `@Validated` when you also want Bean Validation on simple parameters such as `@PathVariable` or `@RequestParam`.
+<details>
+<summary>Java version</summary>
 
-### 📍 3. Selective Fields: `@JsonView`
-Avoid creating multiple DTOs for the same entity (e.g., `UserSummaryDTO`, `UserFullDTO`).
-Use `@JsonView` to filter which fields are serialized depending on the controller method.
+```java
+public record CreateUserRequest(
+    @NotBlank(message = "name is required")
+    String name,
+
+    @Email(message = "email must be valid")
+    String email,
+
+    @Size(min = 8, message = "password must have at least 8 characters")
+    String password
+) {
+}
+
+@RestController
+@Validated
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto createUser(@Valid @RequestBody CreateUserRequest request) {
+        return userService.create(request);
+    }
+
+    @GetMapping("/{id}")
+    public UserDto getUser(@PathVariable @Min(1) Long id) {
+        return userService.getById(id);
+    }
+}
+```
+
+</details>
+
+Strong default:
+
+- validate request DTOs explicitly
+- validate simple route and query parameters when they carry real constraints
+- keep validation failures part of the API contract, not only an internal concern
+
+## 2. Selective Serialization: `@JsonView`
+
+`@JsonView` can help when one DTO needs a small and a detailed response shape
+without multiplying types too early.
 
 ```kotlin
 object Views {
@@ -133,12 +142,13 @@ data class UserDto(
     val name: String,
 
     @field:JsonView(Views.Details::class)
-    val email: String
+    val email: String,
 )
 
 @RestController
 @RequestMapping("/users")
 class UserController(private val userService: UserService) {
+
     @JsonView(Views.Summary::class)
     @GetMapping("/{id}/summary")
     fun getSummary(@PathVariable id: Long): UserDto = userService.getById(id)
@@ -149,10 +159,59 @@ class UserController(private val userService: UserService) {
 }
 ```
 
-The same DTO is returned in both endpoints, but the summary endpoint serializes only `id` and `name`, while the details endpoint also includes `email`.
+<details>
+<summary>Java version</summary>
 
-### 📍 4. Response Customization: `@ResponseStatus`
-Instead of manually returning `ResponseEntity`, you can annotate your custom exceptions or methods directly.
+```java
+public final class Views {
+    public interface Summary {
+    }
+
+    public interface Details extends Summary {
+    }
+}
+
+public record UserDto(
+    @JsonView(Views.Summary.class) Long id,
+    @JsonView(Views.Summary.class) String name,
+    @JsonView(Views.Details.class) String email
+) {
+}
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @JsonView(Views.Summary.class)
+    @GetMapping("/{id}/summary")
+    public UserDto getSummary(@PathVariable Long id) {
+        return userService.getById(id);
+    }
+
+    @JsonView(Views.Details.class)
+    @GetMapping("/{id}")
+    public UserDto getDetails(@PathVariable Long id) {
+        return userService.getById(id);
+    }
+}
+```
+
+</details>
+
+Use this with restraint.
+If the read shapes keep diverging, separate DTOs are often clearer.
+
+## 3. Fixed Status Mapping: `@ResponseStatus`
+
+Use `@ResponseStatus` when the status is simple and stable.
+If you need dynamic headers or dynamic status selection, use `ResponseEntity`
+instead.
 
 ```kotlin
 @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -161,6 +220,7 @@ class UserNotFoundException(message: String) : RuntimeException(message)
 @RestController
 @RequestMapping("/users")
 class UserController(private val userService: UserService) {
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createUser(@Valid @RequestBody request: CreateUserRequest): UserDto {
@@ -169,38 +229,52 @@ class UserController(private val userService: UserService) {
 }
 ```
 
-Use this when the status is fixed and simple. If you need dynamic headers, different statuses, or more control, use `ResponseEntity`.
+<details>
+<summary>Java version</summary>
 
-### 📍 5. Async Support: `@Async`
-For non-blocking tasks (like sending emails) without using a manual thread pool.
-Requires `@EnableAsync` in your configuration.
-
-```kotlin
-@Configuration
-@EnableAsync
-class AsyncConfig
-
-@Service
-class NotificationService {
-    @Async
-    fun sendWelcomeEmail(email: String) {
-        println("Sending email to $email")
+```java
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message);
     }
 }
 
 @RestController
 @RequestMapping("/users")
-class UserController(
-    private val userService: UserService,
-    private val notificationService: NotificationService
-) {
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @PostMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    fun createUser(@Valid @RequestBody request: CreateUserRequest) {
-        userService.create(request)
-        notificationService.sendWelcomeEmail(request.email)
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto createUser(@Valid @RequestBody CreateUserRequest request) {
+        return userService.create(request);
     }
 }
 ```
 
-This does **not** make the whole controller reactive. It just offloads a specific method to an async executor, which is useful for fire-and-forget work such as emails, audit logs, or background notifications.
+</details>
+
+## 4. Boundary Reminder About `@Async`
+
+`@Async` is useful, but it is not mainly a web-annotation topic.
+Treat it as a service-execution concern that a controller may trigger, not as
+part of the core HTTP boundary model.
+
+Strong default:
+
+- keep controllers synchronous in structure unless the real workflow needs more
+- use `@Async` for bounded fire-and-forget work only when the delivery
+  consequences are acceptable
+- do not confuse `@Async` with reactive end-to-end request handling
+
+## Reusable Takeaway
+
+> The useful Spring MVC annotations are the ones that keep the HTTP boundary
+> explicit: validate input clearly, control the response shape deliberately, and
+> keep business and persistence policy outside the controller.

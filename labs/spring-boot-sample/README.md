@@ -1,6 +1,6 @@
 # Spring Boot Sample
 
-This lab is a small Kotlin + Spring Boot sample used as a companion for the
+This lab is a small Kotlin-first Spring Boot sample used as a companion for the
 Spring Boot topic.
 
 Why this lab matters:
@@ -16,6 +16,7 @@ It includes examples for:
 - web and exception handling
 - JPA and repository basics
 - caching
+- security baseline and actuator exposure
 - coroutine-oriented service examples
 
 ## How To Run
@@ -40,14 +41,17 @@ The sample uses H2 for local runs and tests.
 Use it after:
 
 - [../../topics/spring-boot/README.md](../../topics/spring-boot/README.md)
-- `01-spring-boot-fundamentals.md`
+- `01-spring-boot-fast-review.md`
 - `02-exception-handling.md`
-- `03-validation.md`
+- `11-web-annotations.md`
 - `04-jpa-hibernate-performance-traps.md`
+- `24-spring-security-actuator-and-testing-baseline.md`
 - `05-ioc-deep-dive.md`
-- `15-kotlin-with-spring.md`
+- `15-kotlin-spring-idioms.md`
 
 Strong default:
 
 - use this sample to inspect request flow, bean wiring, and framework boundaries
+- inspect `SecurityConfig.kt`, `ProductControllerTest.kt`, and `ActuatorSecuritySmokeTest.kt` together as one service-boundary baseline
+- use the topic notes for Java/Kotlin comparison; keep this lab focused on one runnable Kotlin slice
 - do not treat it as a production template or as the only source of truth for the topic

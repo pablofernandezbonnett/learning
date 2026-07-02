@@ -7,6 +7,7 @@ It is the runnable companion for the Kotlin snippets that support the active
 backend learning flow.
 
 Use it after reading the main notes, not instead of them.
+This lab is intentionally Kotlin-first rather than a Java/Kotlin parity module.
 
 ## Why This Exists
 

@@ -2,6 +2,8 @@
 
 Use this note when `AI` or `ML` (`machine learning`) enters the conversation
 and you need the backend-engineer view, not the data-scientist view.
+For the current repo direction, this is a growth note, not the first thing to
+study.
 
 ---
 

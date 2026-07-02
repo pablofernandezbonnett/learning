@@ -12,6 +12,10 @@ This note keeps the topic practical:
 - how `@Transactional` behaves in Spring
 - how to explain it clearly without hand-waving
 
+This note uses Java and Kotlin side by side in the main Spring examples because
+transaction boundaries, proxies, and propagation are high-value comparison
+points for Java-first backend engineers.
+
 ---
 
 ## 1. What A Transaction Actually Gives You
@@ -63,6 +67,37 @@ class OrderService(
 }
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+@Service
+public class OrderService {
+
+    private final AccountRepository accountRepository;
+    private final OrderRepository orderRepository;
+
+    public OrderService(
+        AccountRepository accountRepository,
+        OrderRepository orderRepository
+    ) {
+        this.accountRepository = accountRepository;
+        this.orderRepository = orderRepository;
+    }
+
+    @Transactional
+    public void createOrder(long accountId, BigDecimal amount) {
+        Account account = accountRepository.findById(accountId).orElseThrow();
+        account.debit(amount);
+        accountRepository.save(account);
+
+        orderRepository.save(new Order(accountId, amount));
+    }
+}
+```
+
+</details>
+
 Why this example matters:
 
 - it shows one local unit of work
@@ -96,6 +131,24 @@ class CheckoutService {
     fun persistOrder() { }
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+public class CheckoutService {
+
+    public void runCheckout() {
+        persistOrder();
+    }
+
+    @Transactional
+    public void persistOrder() {
+    }
+}
+```
+
+</details>
 
 Why this is dangerous:
 
@@ -260,6 +313,34 @@ class CheckoutService(
     }
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@Service
+public class CheckoutService {
+
+    private final OrderRepository orderRepository;
+    private final AuditService auditService;
+
+    public CheckoutService(
+        OrderRepository orderRepository,
+        AuditService auditService
+    ) {
+        this.orderRepository = orderRepository;
+        this.auditService = auditService;
+    }
+
+    @Transactional
+    public void checkout() {
+        orderRepository.save(new Order());
+        auditService.record("checkout started");
+    }
+}
+```
+
+</details>
 
 The propagation setting on `auditService.record(...)` decides whether it joins the same
 transaction as `checkout()` or runs with different transaction behavior.

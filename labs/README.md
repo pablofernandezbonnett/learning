@@ -19,6 +19,7 @@ The preferred shape is:
 - easy to run locally without heavy setup
 - focused on one concept or one business flow at a time
 - useful as a learning aid, not just a dump of example code
+- Java-first for general JVM backend comparisons, with Kotlin added when contrast helps or when the lab is intentionally Kotlin-specific
 
 Smallest mental model:
 
@@ -31,5 +32,6 @@ Current labs include:
 - Java modern language and runtime examples
 - Kotlin basics
 - Spring Boot sample code
+- SQL query review with PostgreSQL plans and index changes
 - algorithm practice companions in Java and Kotlin
 - Kotlin backend examples for correctness, async boundaries, Kafka-style delivery, caching, and JVM behavior

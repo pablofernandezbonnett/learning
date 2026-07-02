@@ -5,6 +5,8 @@
 
 Use this after reading
 [03-serverless-for-backend-engineers.md](./03-serverless-for-backend-engineers.md).
+It is a reopen sheet, not a replacement for the fuller serverless tradeoff
+note.
 
 This is the short version to retain and reopen quickly.
 

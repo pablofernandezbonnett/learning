@@ -78,5 +78,5 @@ For any design exercise:
 Use this topic directly when you want stronger design judgment in general.
 If you want a role-transition path built on top of these ideas, start with:
 
-- [../../paths/solutions-architect-from-backend.md](../../paths/solutions-architect-from-backend.md)
-- [../../paths/sre-from-backend-engineers.md](../../paths/sre-from-backend-engineers.md)
+- [../../paths/adjacent/solutions-architect-from-backend.md](../../paths/adjacent/solutions-architect-from-backend.md)
+- [../../paths/adjacent/sre-from-backend-engineers.md](../../paths/adjacent/sre-from-backend-engineers.md)

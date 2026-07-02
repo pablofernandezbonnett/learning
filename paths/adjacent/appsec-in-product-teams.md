@@ -55,10 +55,10 @@ For each topic:
 
 ### Phase 1. Build the Core Mental Model
 
-1. [../topics/appsec/04-authentication-vs-authorization.md](../topics/appsec/04-authentication-vs-authorization.md)
-2. [../topics/security/01-auth-sessions-vs-jwt.md](../topics/security/01-auth-sessions-vs-jwt.md)
-3. [../topics/security/02-web-and-api-security.md](../topics/security/02-web-and-api-security.md)
-4. [../topics/security/08-mobile-appsec-basics.md](../topics/security/08-mobile-appsec-basics.md)
+1. [../../topics/appsec/04-authentication-vs-authorization.md](../../topics/appsec/04-authentication-vs-authorization.md)
+2. [../../topics/security/01-auth-sessions-vs-jwt.md](../../topics/security/01-auth-sessions-vs-jwt.md)
+3. [../../topics/security/02-web-and-api-security.md](../../topics/security/02-web-and-api-security.md)
+4. [../../topics/security/08-mobile-appsec-basics.md](../../topics/security/08-mobile-appsec-basics.md)
 
 Outcome:
 
@@ -67,12 +67,12 @@ Outcome:
 
 ### Phase 2. Reopen the Vulnerabilities That Matter Most
 
-5. [../topics/appsec/07-sql-injection.md](../topics/appsec/07-sql-injection.md)
-6. [../topics/appsec/08-cross-site-scripting-xss.md](../topics/appsec/08-cross-site-scripting-xss.md)
-7. [../topics/appsec/09-csrf.md](../topics/appsec/09-csrf.md)
-8. [../topics/appsec/10-access-control-and-idor.md](../topics/appsec/10-access-control-and-idor.md)
-9. [../topics/api/03-webhooks-basics.md](../topics/api/03-webhooks-basics.md)
-10. [../topics/security/05-payment-integration-patterns.md](../topics/security/05-payment-integration-patterns.md)
+5. [../../topics/appsec/07-sql-injection.md](../../topics/appsec/07-sql-injection.md)
+6. [../../topics/appsec/08-cross-site-scripting-xss.md](../../topics/appsec/08-cross-site-scripting-xss.md)
+7. [../../topics/appsec/09-csrf.md](../../topics/appsec/09-csrf.md)
+8. [../../topics/appsec/10-access-control-and-idor.md](../../topics/appsec/10-access-control-and-idor.md)
+9. [../../topics/api/03-webhooks-basics.md](../../topics/api/03-webhooks-basics.md)
+10. [../../topics/security/05-payment-integration-patterns.md](../../topics/security/05-payment-integration-patterns.md)
 
 Outcome:
 
@@ -81,9 +81,9 @@ Outcome:
 
 ### Phase 3. Learn the Standards Without Turning Into a Checklist Robot
 
-11. [../topics/security/09-appsec-standards-and-resources.md](../topics/security/09-appsec-standards-and-resources.md)
-12. [../topics/security/06-threat-modeling-and-business-abuse.md](../topics/security/06-threat-modeling-and-business-abuse.md)
-13. [../topics/spring-boot/18-threat-modeling-lab.md](../topics/spring-boot/18-threat-modeling-lab.md)
+11. [../../topics/security/09-appsec-standards-and-resources.md](../../topics/security/09-appsec-standards-and-resources.md)
+12. [../../topics/security/06-threat-modeling-and-business-abuse.md](../../topics/security/06-threat-modeling-and-business-abuse.md)
+13. [../../topics/spring-boot/18-threat-modeling-lab.md](../../topics/spring-boot/18-threat-modeling-lab.md)
 
 Outcome:
 
@@ -93,11 +93,11 @@ Outcome:
 
 ### Phase 4. Apply It in Real Engineering Work
 
-14. [../topics/security/03-spring-and-jvm-appsec.md](../topics/security/03-spring-and-jvm-appsec.md)
-15. [../topics/security/04-advanced-auth-and-sso.md](../topics/security/04-advanced-auth-and-sso.md)
-16. [../topics/security/07-secrets-logging-and-secure-sdlc.md](../topics/security/07-secrets-logging-and-secure-sdlc.md)
-17. [../topics/spring-boot/16-appsec-authz-lab.md](../topics/spring-boot/16-appsec-authz-lab.md)
-18. [../topics/spring-boot/17-webhook-idempotency-lab.md](../topics/spring-boot/17-webhook-idempotency-lab.md)
+14. [../../topics/security/03-spring-and-jvm-appsec.md](../../topics/security/03-spring-and-jvm-appsec.md)
+15. [../../topics/security/04-advanced-auth-and-sso.md](../../topics/security/04-advanced-auth-and-sso.md)
+16. [../../topics/security/07-secrets-logging-and-secure-sdlc.md](../../topics/security/07-secrets-logging-and-secure-sdlc.md)
+17. [../../topics/spring-boot/16-appsec-authz-lab.md](../../topics/spring-boot/16-appsec-authz-lab.md)
+18. [../../topics/spring-boot/17-webhook-idempotency-lab.md](../../topics/spring-boot/17-webhook-idempotency-lab.md)
 
 Outcome:
 

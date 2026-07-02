@@ -13,6 +13,12 @@ Focus:
 - networking, tracing, and event-driven flows so you can reason about where requests go and why failures become harder to debug
 - caching, concurrency, service discovery, and other mechanics that affect scale, latency, and coordination
 
+Decision boundary for workflow and integration notes:
+
+- use `03` when the problem is distributed transaction replacement, outbox, compensation, or event-driven consistency
+- use `13` when the problem is integration with enterprise or legacy systems and boundary translation matters more than pure distributed-system theory
+- use `16` when several patterns sound plausible and you need help choosing the smallest one that actually fits
+
 ## Recommended Order
 
 1. [01-monolith-vs-microservices.md](./01-monolith-vs-microservices.md): how to choose service boundaries without treating microservices as a default maturity badge
@@ -55,10 +61,6 @@ Focus:
 - [13-enterprise-integration-patterns.md](./13-enterprise-integration-patterns.md): practical message and integration patterns without turning the topic into acronym soup
 - [14-b2b-vs-b2c-commerce-systems.md](./14-b2b-vs-b2c-commerce-systems.md): how requirements change when the same platform serves `B2C` (end consumers) versus `B2B` (business accounts)
 - [15-retail-inventory-and-fulfillment-systems.md](./15-retail-inventory-and-fulfillment-systems.md): real operational tradeoffs around stock, reservation, order routing, and fulfillment
-- [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md): edge-boundary decision help for public APIs, web, mobile, and partner flows
-- [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md): practical guidance for awkward middle-stage architectures and distributed-monolith smells
-- [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md): practical guidance for replacing old relational joins once services own writes separately
-- [20-self-service-edge-platforms.md](./20-self-service-edge-platforms.md): case-study pattern for programmable edge, control planes, and self-service platform governance
 
 ## Core Rule
 

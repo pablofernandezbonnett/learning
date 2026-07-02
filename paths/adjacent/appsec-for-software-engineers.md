@@ -25,10 +25,10 @@ For each topic:
 
 ### Phase 1. Web and Session Basics
 
-1. [../topics/appsec/01-http-and-https.md](../topics/appsec/01-http-and-https.md)
-2. [../topics/appsec/02-cookies-and-sessions.md](../topics/appsec/02-cookies-and-sessions.md)
-3. [../topics/appsec/03-basic-auth-bearer-and-api-keys.md](../topics/appsec/03-basic-auth-bearer-and-api-keys.md)
-4. [../topics/appsec/04-authentication-vs-authorization.md](../topics/appsec/04-authentication-vs-authorization.md)
+1. [../../topics/appsec/01-http-and-https.md](../../topics/appsec/01-http-and-https.md)
+2. [../../topics/appsec/02-cookies-and-sessions.md](../../topics/appsec/02-cookies-and-sessions.md)
+3. [../../topics/appsec/03-basic-auth-bearer-and-api-keys.md](../../topics/appsec/03-basic-auth-bearer-and-api-keys.md)
+4. [../../topics/appsec/04-authentication-vs-authorization.md](../../topics/appsec/04-authentication-vs-authorization.md)
 
 Outcome:
 
@@ -36,8 +36,8 @@ Outcome:
 
 ### Phase 2. Tokens and Modern Login Flows
 
-5. [../topics/appsec/05-jwt.md](../topics/appsec/05-jwt.md)
-6. [../topics/appsec/06-oauth2-and-openid-connect.md](../topics/appsec/06-oauth2-and-openid-connect.md)
+5. [../../topics/appsec/05-jwt.md](../../topics/appsec/05-jwt.md)
+6. [../../topics/appsec/06-oauth2-and-openid-connect.md](../../topics/appsec/06-oauth2-and-openid-connect.md)
 
 Outcome:
 
@@ -45,10 +45,10 @@ Outcome:
 
 ### Phase 3. Core Web Vulnerabilities
 
-7. [../topics/appsec/07-sql-injection.md](../topics/appsec/07-sql-injection.md)
-8. [../topics/appsec/08-cross-site-scripting-xss.md](../topics/appsec/08-cross-site-scripting-xss.md)
-9. [../topics/appsec/09-csrf.md](../topics/appsec/09-csrf.md)
-10. [../topics/appsec/10-access-control-and-idor.md](../topics/appsec/10-access-control-and-idor.md)
+7. [../../topics/appsec/07-sql-injection.md](../../topics/appsec/07-sql-injection.md)
+8. [../../topics/appsec/08-cross-site-scripting-xss.md](../../topics/appsec/08-cross-site-scripting-xss.md)
+9. [../../topics/appsec/09-csrf.md](../../topics/appsec/09-csrf.md)
+10. [../../topics/appsec/10-access-control-and-idor.md](../../topics/appsec/10-access-control-and-idor.md)
 
 Outcome:
 

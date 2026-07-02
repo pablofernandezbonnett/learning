@@ -18,6 +18,7 @@ Working style:
 - keep mapping Kotlin features back to familiar Java and Spring use cases
 - prefer the smallest useful Kotlin feature over clever language tricks
 - treat readability and correctness as more important than idiomatic flair
+- keep Java as the reference baseline in the background, even when the runnable examples here stay Kotlin-first by design
 
 ## Stable Practical Baseline
 

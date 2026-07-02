@@ -4,6 +4,8 @@
 
 
 This document is about practical minimums.
+For the current repo direction, treat it as collaboration awareness, not as a
+main specialization target.
 
 You do not need to become a platform engineer overnight.
 

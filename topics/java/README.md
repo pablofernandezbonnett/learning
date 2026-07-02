@@ -6,6 +6,7 @@ in Java `8` or `11` and needs updating for modern backend work.
 Focus:
 
 - JVM memory and garbage collection behavior
+- profiling, `JIT`, and retention diagnostics
 - concurrency, visibility, and the Java Memory Model (`JMM`)
 - language features that matter in day-to-day backend code
 - production concurrency issues such as pool saturation and request overload
@@ -16,14 +17,16 @@ Working style:
 - keep concurrency tied to real backend failure modes instead of academic examples
 - prefer the Java `17-21` baseline that is most useful in current backend work
 - treat records, sealed types, pattern matching, and virtual threads as the modern stable baseline to reopen first
+- treat Java as the main example language for JVM refresh material, using Kotlin comparison only when it clarifies transfer or tradeoff
 
 ## Recommended Order
 
 1. [01-jvm-memory-and-gc.md](./01-jvm-memory-and-gc.md): heap, stack, metaspace, allocation, and GC behavior
-2. [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md): race conditions, visibility, `volatile`, locks, atomics, executors, and the `JMM`, meaning the rules that decide when one thread can see another thread's writes
-3. [03-modern-java-for-backend-engineers.md](./03-modern-java-for-backend-engineers.md): records, sealed types, pattern matching, and modern backend-friendly language features
-4. [04-modern-java-21-plus-notes.md](./04-modern-java-21-plus-notes.md): structured concurrency, scoped values, and newer post-21 awareness
+2. [06-jit-profiling-and-memory-leaks.md](./06-jit-profiling-and-memory-leaks.md): how `JIT`, profiling, and retention thinking help diagnose real JVM problems
+3. [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md): race conditions, visibility, `volatile`, locks, atomics, executors, and the `JMM`, meaning the rules that decide when one thread can see another thread's writes
+4. [03-modern-java-for-backend-engineers.md](./03-modern-java-for-backend-engineers.md): records, sealed types, pattern matching, and modern backend-friendly language features
 5. [05-concurrency-in-production.md](./05-concurrency-in-production.md): pool saturation, admission control, request budgets, and when local locks stop being enough
+6. [04-modern-java-21-plus-notes.md](./04-modern-java-21-plus-notes.md): structured concurrency, scoped values, and newer post-21 awareness
 
 ## Working Loop
 
@@ -38,7 +41,8 @@ If time is limited:
 2. read `02` second
 3. read `05` third
 4. read `01` fourth if JVM/runtime behavior feels rusty
-5. treat `04` as awareness material after the stable baseline is warm
+5. read `06` fifth if production diagnostics feel weak
+6. treat `04` as awareness material after the stable baseline is warm
 
 ## Companion Lab
 
@@ -96,5 +100,5 @@ That is where the Java refresh reconnects to:
 ## Core Rule
 
 - prefer depth on a few high-value topics over shallow coverage of everything
-- memory, concurrency, and modern language features give the highest return
+- memory, profiling, concurrency, and modern language features give the highest return
 - keep the baseline practical: Java `17-21`

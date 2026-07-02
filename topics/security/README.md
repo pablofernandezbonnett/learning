@@ -1,24 +1,50 @@
 # Security for Backend Engineers
 
-Use this folder for practical application security refresh in backend and
-product systems.
+Use this folder as the main security entrypoint for this repository when your
+goal is stronger backend and product security judgment.
 
-This folder overlaps with AppSec, but the emphasis here is a little more
-backend-architecture oriented.
-The main concern is trust boundaries, auth models, payment-adjacent
-correctness, and operational security habits inside product systems.
+This is the canonical security track for the senior backend route.
+The focus is not vulnerability memorization.
+The focus is trust boundaries, auth models, payment-adjacent correctness,
+secure delivery habits, and the places where backend design and security meet.
+
+Use `topics/appsec/` as a companion set when you need a more browser-first or
+vulnerability-first refresh.
 
 Focus:
 
-- authentication patterns for web, mobile, and APIs
-- web and API abuse cases
+- authentication and authorization models for web, mobile, and APIs
+- trust boundaries, workflow abuse, and backend threat thinking
 - Spring and JVM security basics
+- secrets, logging, delivery hygiene, and payment-adjacent correctness
 
 Working style:
 
 - explain security jargon before relying on it
 - keep examples close to product and backend flows
 - connect auth, trust boundaries, rate limits, and workflow abuse back to real system behavior
+
+Decision boundary for security material:
+
+- use this folder as the canonical security lane for the main senior backend path
+- use `topics/appsec/` only when you need browser, cookie, or vulnerability-class mechanics reopened explicitly
+- use `10-secure-java-companion.md` as a summary map after the core notes, not as a competing path
+- use `09-appsec-standards-and-resources.md` as a reference map when you need standards context, not as a study starting point
+
+## Role In This Repo
+
+Use this folder first when you want to improve:
+
+- backend security judgment
+- secure Spring and JVM habits
+- API and workflow safety
+- product-team security collaboration
+
+Use [../appsec/README.md](../appsec/README.md) selectively when you need:
+
+- browser and cookie basics reopened quickly
+- vulnerability-class refresh such as `XSS`, `CSRF`, `SQL injection`, or `IDOR`
+- a more classical AppSec-first study order
 
 ## Recommended Order
 
@@ -49,25 +75,27 @@ Working style:
 - [06-threat-modeling-and-business-abuse.md](./06-threat-modeling-and-business-abuse.md)
 - [07-secrets-logging-and-secure-sdlc.md](./07-secrets-logging-and-secure-sdlc.md)
 - [08-mobile-appsec-basics.md](./08-mobile-appsec-basics.md)
-- [09-appsec-standards-and-resources.md](./09-appsec-standards-and-resources.md)
+- [09-appsec-standards-and-resources.md](./09-appsec-standards-and-resources.md): reference map, not a primary study note
+- [10-secure-java-companion.md](./10-secure-java-companion.md): summary companion after the main notes above
 
 ## Related Path
 
 If you want a structured first-pass study order from browser and web basics up
 to common vulnerability classes, start with:
 
-- [../../paths/appsec-for-software-engineers.md](../../paths/appsec-for-software-engineers.md)
+- [../../paths/adjacent/appsec-for-software-engineers.md](../../paths/adjacent/appsec-for-software-engineers.md)
 
 If your goal is broader and includes APIs, mobile clients, standards, and
 secure delivery habits inside a product team, continue with:
 
-- [../../paths/appsec-in-product-teams.md](../../paths/appsec-in-product-teams.md)
+- [../../paths/adjacent/appsec-in-product-teams.md](../../paths/adjacent/appsec-in-product-teams.md)
 
 ## Core Rule
 
 - security is part of backend design, not a phase after coding
 - authorization and workflow safety matter more than fashionable auth terminology
 - correctness, limits, and trust boundaries are part of security
+- this folder is the main security route; AppSec is a companion when you need deeper vulnerability mechanics
 
 ## If You Are Studying Secure Java
 

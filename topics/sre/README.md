@@ -2,6 +2,8 @@
 
 Use this folder when you want to learn `SRE` from the point of view of someone
 who already understands backend systems.
+For the current repo direction, this is an adjacent awareness lane, not the
+main specialization target.
 
 The goal is not to turn reliability into abstract ops vocabulary.
 The goal is to understand how live systems fail, how teams detect the failure,
@@ -22,6 +24,13 @@ Working style:
 - keep examples close to APIs, queues, databases, and user-facing product flows
 - prefer "how it fails, how you detect it, and how you respond" over vendor or tool memorization
 
+Decision boundary for SRE material:
+
+- use this folder to collaborate better with `SRE` and operate services more responsibly, not to become an `SRE` by default
+- use `01` and `04` when you want the clearest bridge from backend ownership to live-incident behavior
+- use `02` and `03` when `SLI` / `SLO`, alerting, or on-call conversations become part of current work
+- use `05` and `06` as optional growth once production ownership becomes more direct or frequent
+
 ## Recommended Order
 
 1. [01-backend-engineer-vs-sre.md](./01-backend-engineer-vs-sre.md): what changes when code ownership becomes runtime ownership
@@ -40,17 +49,19 @@ Working style:
 ## Required
 
 - [04-incident-response-and-triage.md](./04-incident-response-and-triage.md)
-- [05-capacity-planning-and-load-shedding.md](./05-capacity-planning-and-load-shedding.md)
 
 ## Growth
 
+- [02-sli-slo-and-error-budgets.md](./02-sli-slo-and-error-budgets.md)
+- [03-alerting-and-on-call.md](./03-alerting-and-on-call.md)
+- [05-capacity-planning-and-load-shedding.md](./05-capacity-planning-and-load-shedding.md)
 - [06-postmortems-and-operational-review.md](./06-postmortems-and-operational-review.md)
 
 ## Related Path
 
 If your goal is the role transition from backend engineer to `SRE`, start with:
 
-- [../../paths/sre-from-backend-engineers.md](../../paths/sre-from-backend-engineers.md)
+- [../../paths/adjacent/sre-from-backend-engineers.md](../../paths/adjacent/sre-from-backend-engineers.md)
 
 ## Related Internal Topics
 
@@ -65,3 +76,4 @@ If your goal is the role transition from backend engineer to `SRE`, start with:
 - reliability is not separate from software behavior
 - a good `SRE` explanation connects symptoms, causes, blast radius, and mitigation
 - the goal is not zero failure; the goal is fast detection, controlled impact, and safer recovery
+- use this folder as adjacent reliability awareness unless current work is pulling you deeper into direct runtime ownership

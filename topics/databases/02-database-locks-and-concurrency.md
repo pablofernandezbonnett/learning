@@ -186,6 +186,29 @@ class Product(
 )
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
+
+@Entity
+public class Product {
+
+    @Id
+    private Long id;
+
+    private int stock;
+
+    @Version
+    private Long version;
+}
+```
+
+</details>
+
 Important nuance:
 
 > optimistic locking does not prevent conflicts, it detects them.
@@ -245,6 +268,25 @@ interface ProductRepository : JpaRepository<Product, Long> {
     fun findByIdForUpdate(id: Long): Product?
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select p from Product p where p.id = :id")
+    Product findByIdForUpdate(Long id);
+}
+```
+
+</details>
 
 When it fits:
 

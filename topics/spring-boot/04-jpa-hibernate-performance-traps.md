@@ -8,6 +8,10 @@ clean and performs badly.
 
 This is one of the most useful refresh topics for senior Java backend work.
 
+This note uses Java and Kotlin side by side in the main ORM examples because
+hidden SQL cost often looks innocent in both styles, and the comparison is
+useful for Java-first Spring teams working across mixed codebases.
+
 ---
 
 ## 1. The Core Rule
@@ -59,6 +63,27 @@ fun listOrders(): List<OrderSummaryResponse> {
 }
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+@GetMapping("/orders")
+public List<OrderSummaryResponse> listOrders() {
+    List<Order> orders =
+        orderRepository.findTop100ByStatusOrderByCreatedAtDesc(OrderStatus.PAID);
+
+    return orders.stream()
+        .map(order -> new OrderSummaryResponse(
+            order.getId(),
+            order.getCustomer().getName(),
+            order.getItems().size()
+        ))
+        .toList();
+}
+```
+
+</details>
+
 Why this is bad:
 
 - the first query loads the orders
@@ -90,6 +115,33 @@ interface OrderSummaryView {
 )
 fun findOrderSummaries(status: OrderStatus): List<OrderSummaryView>
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+public interface OrderSummaryView {
+    Long getOrderId();
+    String getCustomerName();
+    Long getItemCount();
+}
+
+@Query("""
+    select
+        o.id as orderId,
+        c.name as customerName,
+        count(i.id) as itemCount
+    from Order o
+    join o.customer c
+    left join o.items i
+    where o.status = :status
+    group by o.id, c.name, o.createdAt
+    order by o.createdAt desc
+    """)
+List<OrderSummaryView> findOrderSummaries(OrderStatus status);
+```
+
+</details>
 
 Why this is better:
 
@@ -131,6 +183,28 @@ class OrderController(
         orderRepository.findById(id).orElseThrow()
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@RestController
+public class OrderController {
+
+    private final OrderRepository orderRepository;
+
+    public OrderController(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
+
+    @GetMapping("/orders/{id}")
+    public Order getOrder(@PathVariable Long id) {
+        return orderRepository.findById(id).orElseThrow();
+    }
+}
+```
+
+</details>
 
 Why this is bad:
 
@@ -177,6 +251,55 @@ class OrderQueryService(
 }
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+public record OrderDetailsResponse(
+    Long id,
+    String customerName,
+    BigDecimal total
+) {
+}
+
+public interface OrderRepository extends JpaRepository<Order, Long> {
+
+    @Query("""
+        select o
+        from Order o
+        join fetch o.customer
+        where o.id = :id
+        """)
+    Order findByIdWithCustomer(Long id);
+}
+
+@Service
+public class OrderQueryService {
+
+    private final OrderRepository orderRepository;
+
+    public OrderQueryService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public OrderDetailsResponse getOrderDetails(Long id) {
+        Order order = orderRepository.findByIdWithCustomer(id);
+        if (order == null) {
+            throw new NoSuchElementException();
+        }
+
+        return new OrderDetailsResponse(
+            order.getId(),
+            order.getCustomer().getName(),
+            order.getTotal()
+        );
+    }
+}
+```
+
+</details>
+
 Why this is better:
 
 - the query method makes the fetch plan explicit instead of hoping lazy loading behaves well
@@ -218,6 +341,20 @@ fun importUsers(rows: List<UserCsvRow>) {
 }
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+@Transactional
+public void importUsers(List<UserCsvRow> rows) {
+    for (UserCsvRow row : rows) {
+        userRepository.save(User.from(row));
+    }
+}
+```
+
+</details>
+
 Why this is bad:
 
 - every entity becomes managed in one growing persistence context
@@ -242,6 +379,28 @@ fun importUsers(rows: List<UserCsvRow>) {
     entityManager.clear()
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@Transactional
+public void importUsers(List<UserCsvRow> rows) {
+    for (int i = 0; i < rows.size(); i++) {
+        entityManager.persist(User.from(rows.get(i)));
+
+        if ((i + 1) % 500 == 0) {
+            entityManager.flush();
+            entityManager.clear();
+        }
+    }
+
+    entityManager.flush();
+    entityManager.clear();
+}
+```
+
+</details>
 
 Why this is better:
 
@@ -281,6 +440,18 @@ fun listProducts(): List<Product> =
     productRepository.findAll()
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+@GetMapping("/products")
+public List<Product> listProducts() {
+    return productRepository.findAll();
+}
+```
+
+</details>
+
 Why this is bad:
 
 - a product list endpoint rarely needs the full entity
@@ -312,6 +483,32 @@ interface ProductCardView {
 )
 fun findActiveProductCards(): List<ProductCardView>
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+public interface ProductCardView {
+    Long getId();
+    String getName();
+    BigDecimal getPrice();
+    String getThumbnailUrl();
+}
+
+@Query("""
+    select
+        p.id as id,
+        p.name as name,
+        p.price as price,
+        p.thumbnailUrl as thumbnailUrl
+    from Product p
+    where p.active = true
+    order by p.updatedAt desc
+    """)
+List<ProductCardView> findActiveProductCards();
+```
+
+</details>
 
 Why this is better:
 

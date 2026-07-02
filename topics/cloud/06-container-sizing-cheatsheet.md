@@ -5,6 +5,7 @@
 
 Use this after reading
 [04-container-sizing-and-observability.md](./04-container-sizing-and-observability.md).
+It is a reopen sheet, not a replacement for the fuller sizing note.
 
 This is the short version to retain and reopen quickly.
 

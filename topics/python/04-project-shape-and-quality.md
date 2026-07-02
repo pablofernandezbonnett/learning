@@ -7,6 +7,8 @@ grows, a second engineer touches it, or the input becomes messy.
 
 You do not need to become a Python specialist for the current repo.
 You do need a small quality bar that keeps Python useful instead of fragile.
+This note intentionally skips beginner syntax and focuses on project shape that
+holds up in backend or AI-adjacent work.
 
 ---
 
@@ -95,15 +97,15 @@ name = "python-tool"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-  "fastapi>=0.122.0",
-  "pydantic>=2.0",
+  "fastapi",
+  "pydantic",
 ]
 
 [dependency-groups]
 dev = [
-  "pytest>=8.0",
-  "ruff>=0.5",
-  "pyright>=1.1",
+  "pytest",
+  "ruff",
+  "pyright",
 ]
 ```
 

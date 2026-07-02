@@ -26,6 +26,12 @@ Most topic folders follow the same shape:
 - `Required`: the material that matters often in real day-to-day backend work
 - `Growth`: deeper material worth adding once the core feels stable
 
+Some topic folders also make an explicit distinction between:
+
+- the canonical lane for the main backend roadmap
+- companion material used only for a concrete gap
+- adjacent awareness material that should not compete with the main path
+
 A good topic README should tell you three things quickly:
 
 - what problem space the folder covers
@@ -34,6 +40,11 @@ A good topic README should tell you three things quickly:
 
 When a topic has runnable companion code, the topic README should link to the
 matching lab in `labs/`.
+
+Strong default:
+
+- keep topic READMEs short enough to guide study order without replacing the topic notes
+- for JVM code examples, prefer Java first and add Kotlin when the comparison clarifies the tradeoff or idiom
 
 Current topic areas include:
 

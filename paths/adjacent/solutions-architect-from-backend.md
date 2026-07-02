@@ -56,10 +56,10 @@ For each topic:
 
 ### Phase 1. Strengthen the system-design foundation
 
-1. [../topics/system-design/backend-system-principles.md](../topics/system-design/backend-system-principles.md)
-2. [../topics/system-design/practical-checkout-design.md](../topics/system-design/practical-checkout-design.md)
-3. [../topics/system-design/system-design-guide.md](../topics/system-design/system-design-guide.md)
-4. [../topics/system-design/system-design-decision-cheatsheet.md](../topics/system-design/system-design-decision-cheatsheet.md)
+1. [../../topics/system-design/backend-system-principles.md](../../topics/system-design/backend-system-principles.md)
+2. [../../topics/system-design/practical-checkout-design.md](../../topics/system-design/practical-checkout-design.md)
+3. [../../topics/system-design/system-design-guide.md](../../topics/system-design/system-design-guide.md)
+4. [../../topics/system-design/system-design-decision-cheatsheet.md](../../topics/system-design/system-design-decision-cheatsheet.md)
 
 Outcome:
 
@@ -67,12 +67,12 @@ Outcome:
 
 ### Phase 2. Build stronger architecture judgment
 
-5. [../topics/architecture/01-monolith-vs-microservices.md](../topics/architecture/01-monolith-vs-microservices.md)
-6. [../topics/architecture/02-resiliency-patterns.md](../topics/architecture/02-resiliency-patterns.md)
-7. [../topics/architecture/03-distributed-transactions-and-events.md](../topics/architecture/03-distributed-transactions-and-events.md)
-8. [../topics/architecture/07-caching-strategies.md](../topics/architecture/07-caching-strategies.md)
-9. [../topics/architecture/09-domain-driven-design.md](../topics/architecture/09-domain-driven-design.md)
-10. [../topics/architecture/13-enterprise-integration-patterns.md](../topics/architecture/13-enterprise-integration-patterns.md)
+5. [../../topics/architecture/01-monolith-vs-microservices.md](../../topics/architecture/01-monolith-vs-microservices.md)
+6. [../../topics/architecture/02-resiliency-patterns.md](../../topics/architecture/02-resiliency-patterns.md)
+7. [../../topics/architecture/03-distributed-transactions-and-events.md](../../topics/architecture/03-distributed-transactions-and-events.md)
+8. [../../topics/architecture/07-caching-strategies.md](../../topics/architecture/07-caching-strategies.md)
+9. [../../topics/architecture/09-domain-driven-design.md](../../topics/architecture/09-domain-driven-design.md)
+10. [../../topics/architecture/13-enterprise-integration-patterns.md](../../topics/architecture/13-enterprise-integration-patterns.md)
 
 Outcome:
 
@@ -80,12 +80,12 @@ Outcome:
 
 ### Phase 3. Expand solution-level platform judgment
 
-11. [../topics/cloud/01-cloud-basics.md](../topics/cloud/01-cloud-basics.md)
-12. [../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md](../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md)
-13. [../topics/cloud/03-serverless-for-backend-engineers.md](../topics/cloud/03-serverless-for-backend-engineers.md)
-14. [../topics/devops/02-zero-downtime-deployments.md](../topics/devops/02-zero-downtime-deployments.md)
-15. [../topics/sre/02-sli-slo-and-error-budgets.md](../topics/sre/02-sli-slo-and-error-budgets.md)
-16. [../topics/sre/05-capacity-planning-and-load-shedding.md](../topics/sre/05-capacity-planning-and-load-shedding.md)
+11. [../../topics/cloud/01-cloud-basics.md](../../topics/cloud/01-cloud-basics.md)
+12. [../../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md](../../topics/cloud/02-kubernetes-and-terraform-for-backend-engineers.md)
+13. [../../topics/cloud/03-serverless-for-backend-engineers.md](../../topics/cloud/03-serverless-for-backend-engineers.md)
+14. [../../topics/devops/02-zero-downtime-deployments.md](../../topics/devops/02-zero-downtime-deployments.md)
+15. [../../topics/sre/02-sli-slo-and-error-budgets.md](../../topics/sre/02-sli-slo-and-error-budgets.md)
+16. [../../topics/sre/05-capacity-planning-and-load-shedding.md](../../topics/sre/05-capacity-planning-and-load-shedding.md)
 
 Outcome:
 
@@ -93,12 +93,12 @@ Outcome:
 
 ### Phase 4. Strengthen integration and trust-boundary thinking
 
-17. [../topics/api/01-advanced-api-design.md](../topics/api/01-advanced-api-design.md)
-18. [../topics/api/02-message-brokers-and-delivery-semantics.md](../topics/api/02-message-brokers-and-delivery-semantics.md)
-19. [../topics/api/03-webhooks-basics.md](../topics/api/03-webhooks-basics.md)
-20. [../topics/security/02-web-and-api-security.md](../topics/security/02-web-and-api-security.md)
-21. [../topics/security/06-threat-modeling-and-business-abuse.md](../topics/security/06-threat-modeling-and-business-abuse.md)
-22. [../topics/security/07-secrets-logging-and-secure-sdlc.md](../topics/security/07-secrets-logging-and-secure-sdlc.md)
+17. [../../topics/api/01-advanced-api-design.md](../../topics/api/01-advanced-api-design.md)
+18. [../../topics/api/02-message-brokers-and-delivery-semantics.md](../../topics/api/02-message-brokers-and-delivery-semantics.md)
+19. [../../topics/api/03-webhooks-basics.md](../../topics/api/03-webhooks-basics.md)
+20. [../../topics/security/02-web-and-api-security.md](../../topics/security/02-web-and-api-security.md)
+21. [../../topics/security/06-threat-modeling-and-business-abuse.md](../../topics/security/06-threat-modeling-and-business-abuse.md)
+22. [../../topics/security/07-secrets-logging-and-secure-sdlc.md](../../topics/security/07-secrets-logging-and-secure-sdlc.md)
 
 Outcome:
 
@@ -106,12 +106,12 @@ Outcome:
 
 ### Phase 5. Add the missing solutions-architecture layer
 
-23. [../topics/solutions-architecture/01-architect-vs-solutions-architect.md](../topics/solutions-architecture/01-architect-vs-solutions-architect.md)
-24. [../topics/solutions-architecture/02-requirements-and-nfrs.md](../topics/solutions-architecture/02-requirements-and-nfrs.md)
-25. [../topics/solutions-architecture/03-build-vs-buy.md](../topics/solutions-architecture/03-build-vs-buy.md)
-26. [../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md](../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md)
-27. [../topics/solutions-architecture/05-migration-and-modernization-strategy.md](../topics/solutions-architecture/05-migration-and-modernization-strategy.md)
-28. [../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md](../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md)
+23. [../../topics/solutions-architecture/01-architect-vs-solutions-architect.md](../../topics/solutions-architecture/01-architect-vs-solutions-architect.md)
+24. [../../topics/solutions-architecture/02-requirements-and-nfrs.md](../../topics/solutions-architecture/02-requirements-and-nfrs.md)
+25. [../../topics/solutions-architecture/03-build-vs-buy.md](../../topics/solutions-architecture/03-build-vs-buy.md)
+26. [../../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md](../../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md)
+27. [../../topics/solutions-architecture/05-migration-and-modernization-strategy.md](../../topics/solutions-architecture/05-migration-and-modernization-strategy.md)
+28. [../../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md](../../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md)
 
 Outcome:
 
@@ -121,12 +121,12 @@ Outcome:
 
 The repo now includes a `solutions-architecture` topic folder for the layer that sits between backend depth and wider architecture ownership:
 
-1. [../topics/solutions-architecture/01-architect-vs-solutions-architect.md](../topics/solutions-architecture/01-architect-vs-solutions-architect.md)
-2. [../topics/solutions-architecture/02-requirements-and-nfrs.md](../topics/solutions-architecture/02-requirements-and-nfrs.md)
-3. [../topics/solutions-architecture/03-build-vs-buy.md](../topics/solutions-architecture/03-build-vs-buy.md)
-4. [../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md](../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md)
-5. [../topics/solutions-architecture/05-migration-and-modernization-strategy.md](../topics/solutions-architecture/05-migration-and-modernization-strategy.md)
-6. [../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md](../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md)
+1. [../../topics/solutions-architecture/01-architect-vs-solutions-architect.md](../../topics/solutions-architecture/01-architect-vs-solutions-architect.md)
+2. [../../topics/solutions-architecture/02-requirements-and-nfrs.md](../../topics/solutions-architecture/02-requirements-and-nfrs.md)
+3. [../../topics/solutions-architecture/03-build-vs-buy.md](../../topics/solutions-architecture/03-build-vs-buy.md)
+4. [../../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md](../../topics/solutions-architecture/04-multi-tenancy-and-data-boundaries.md)
+5. [../../topics/solutions-architecture/05-migration-and-modernization-strategy.md](../../topics/solutions-architecture/05-migration-and-modernization-strategy.md)
+6. [../../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md](../../topics/solutions-architecture/06-adrs-and-stakeholder-communication.md)
 
 That fills the main conceptual gap between strong backend/system-design material and day-to-day solution-architecture judgment.
 

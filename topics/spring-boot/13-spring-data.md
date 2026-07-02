@@ -23,6 +23,10 @@ This matters because many backend teams can move fast with repositories at the
 start and then lose clarity later if they treat JPA, MongoDB, and Redis as if
 the same abstraction meant the same persistence behavior.
 
+This note uses Java and Kotlin side by side in the main Spring Data examples
+because repository and projection patterns are common comparison points in
+mixed JVM backend teams.
+
 ## Smallest Mental Model
 
 Spring Data gives you a shared repository programming style, not a shared
@@ -89,6 +93,22 @@ fun findByRole(role: UserRole): List<UserSummary>
 // Result: Spring generates a SQL that SELECTs only 'name' and 'email'.
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+public interface UserSummary {
+    String getName();
+    String getEmail();
+}
+
+// In Repository
+List<UserSummary> findByRole(UserRole role);
+// Result: Spring generates a SQL that SELECTs only 'name' and 'email'.
+```
+
+</details>
+
 Kotlin note: Spring Data's projection proxies work with Kotlin `fun` declarations
 (not properties). Use `fun getName()` not `val name: String` in projection interfaces.
 
@@ -125,6 +145,19 @@ fun auditorProvider(): AuditorAware<String> = AuditorAware {
 }
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+// In your @Configuration or @SpringBootApplication class:
+@Bean
+public AuditorAware<String> auditorProvider() {
+    return () -> Optional.of("system");
+}
+```
+
+</details>
+
 ### 4. Specifications For Dynamic Filters
 
 When a search screen has many optional filters, a single derived query method stops being practical.
@@ -149,6 +182,31 @@ object UserSpecifications {
 val spec = Specification.where(UserSpecifications.isActive())
     .and(UserSpecifications.hasRole(role))   // ignored if role is null
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+public final class UserSpecifications {
+
+    private UserSpecifications() {
+    }
+
+    public static Specification<User> isActive() {
+        return (root, query, cb) -> cb.isTrue(root.get("active"));
+    }
+
+    public static Specification<User> hasRole(UserRole role) {
+        return (root, query, cb) ->
+            role == null ? null : cb.equal(root.get("role"), role);
+    }
+}
+
+Specification<User> spec = Specification.where(UserSpecifications.isActive())
+    .and(UserSpecifications.hasRole(role));
+```
+
+</details>
 
 See `src/main/kotlin/com/learning/mastery/data/` for full examples.
 

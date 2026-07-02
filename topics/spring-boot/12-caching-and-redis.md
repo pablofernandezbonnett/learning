@@ -9,6 +9,10 @@ safe to cache.
 This note starts from the concept, then moves to the Spring and Redis shapes that matter
 in real backend work.
 
+This note uses Java and Kotlin side by side only in the main Spring cache
+configuration points. Pure cache strategy discussion stays language-neutral on
+purpose.
+
 ---
 
 ## Why This Matters
@@ -249,6 +253,18 @@ Important nuance:
 fun update(product: ProductDto): ProductDto = repository.save(product) // method always runs, then cache is refreshed
 ```
 
+<details>
+<summary>Java version</summary>
+
+```java
+@CachePut(value = "products", key = "#product.id")
+public ProductDto update(ProductDto product) {
+    return repository.save(product);
+}
+```
+
+</details>
+
 Meaning:
 
 - method always runs
@@ -262,6 +278,18 @@ fun delete(productId: String) {
     repository.deleteById(productId) // remove DB row first; Spring evicts cache entry around this call
 }
 ```
+
+<details>
+<summary>Java version</summary>
+
+```java
+@CacheEvict(value = "products", key = "#productId")
+public void delete(String productId) {
+    repository.deleteById(productId);
+}
+```
+
+</details>
 
 Meaning:
 
