@@ -398,6 +398,165 @@ class OrderApplicationService(
 }
 ```
 
+### From Requirements To Model
+
+One of the biggest DDD gaps is knowing how to get from a vague product flow to a usable model.
+
+Small checkout example:
+
+- business says: "do not charge twice"
+- business says: "do not oversell final stock"
+- business says: "once shipped, the order cannot be cancelled"
+
+Better modeling path:
+
+1. name the core business actions in business language
+2. separate the parts that clearly speak different languages
+3. choose one aggregate that protects one local rule set
+4. choose events for work that can happen later or in another context
+
+For this flow, a good early split is often:
+
+- `checkout`: confirms intent and request identity
+- `order`: owns order lifecycle and cancellation rules
+- `payment`: owns authorization, capture, retry, provider references
+- `inventory`: owns stock reservation and release
+
+Good early modeling choice:
+
+- `Order` aggregate protects order-state transitions
+- `PaymentIntent` aggregate protects payment-attempt rules
+- `InventoryReservation` or stock-allocation model protects inventory correctness
+
+Possible events:
+
+- `OrderPlaced`
+- `PaymentAuthorized`
+- `InventoryReserved`
+
+The point is not naming every class up front.
+The point is turning business risk into explicit boundaries and explicit rules.
+
+### How To Choose Aggregate Boundaries
+
+This is where many DDD explanations stay too abstract.
+
+Bad mental model:
+
+- one aggregate per table group
+- one giant aggregate so everything stays "consistent"
+- any two related entities must be updated in the same transaction
+
+Better mental model:
+
+- one aggregate protects one consistency boundary
+- keep the aggregate only as large as the rule set that truly must change together
+- if coordination can happen later, prefer events over one giant transaction
+
+Useful heuristics:
+
+- if one invariant must hold immediately after commit, keep that rule inside one aggregate
+- if two parts can tolerate short-lived delay, they probably do not belong in the same aggregate
+- if one write path keeps loading a huge object graph, the aggregate may be too large
+- if several unrelated actions keep fighting over the same root lock, the boundary may be too broad
+
+Commerce example:
+
+- `Order` should usually protect rules like "cannot cancel after shipment"
+- `Payment` should usually protect rules like "cannot capture before authorization"
+- updating both in one giant aggregate often creates coupling that is more technical than business-driven
+
+Short rule:
+
+> If the reason for one large aggregate is "the database makes it easy," the boundary is probably too broad.
+
+### Domain Service vs Application Service
+
+These two names sound similar, but they solve different problems.
+
+An **Application Service** coordinates the use case:
+
+- starts the transaction
+- loads aggregates
+- calls domain behavior
+- persists changes
+- records or publishes events
+
+A **Domain Service** holds domain logic that belongs to the business model but does
+not fit naturally on one entity or value object.
+
+Example:
+
+```kotlin
+data class CustomerTier(val name: String, val discountRate: BigDecimal)
+
+class PricingDomainService {
+    fun totalFor(items: List<OrderItem>, tier: CustomerTier): Money {
+        val subtotal = items.fold(Money(BigDecimal.ZERO, Currency.getInstance("JPY"))) { acc, item ->
+            acc + item.subtotal()
+        }
+        return Money(
+            amount = subtotal.amount.multiply(BigDecimal.ONE - tier.discountRate),
+            currency = subtotal.currency,
+        )
+    }
+}
+
+@Service
+class PlaceOrderService(
+    private val orders: OrderRepository,
+    private val pricing: PricingDomainService,
+) {
+    @Transactional
+    fun place(customerId: UUID, items: List<OrderItem>, tier: CustomerTier): UUID {
+        val total = pricing.totalFor(items, tier)
+        val order = Order.place(customerId, items, total)
+        orders.save(order)
+        return order.id
+    }
+}
+```
+
+Good practical test:
+
+- if the logic is mostly workflow and coordination, it is probably application-service logic
+- if the logic is a business rule but does not belong cleanly on one aggregate, it may be domain-service logic
+
+### How To Test A DDD Model
+
+DDD coverage is weaker if it never shows how the model should be verified.
+
+Strong default:
+
+- test aggregate rules without Spring
+- test application services with fakes or mocks for repositories and publishers
+- test persistence adapters separately from the domain model
+
+Small example:
+
+```kotlin
+class OrderTest {
+    @Test
+    fun `shipped order cannot be cancelled`() {
+        val order = Order.shipped(UUID.randomUUID())
+
+        assertThrows<IllegalStateException> {
+            order.cancel()
+        }
+    }
+}
+```
+
+Why this matters:
+
+- fast tests protect domain rules directly
+- you do not need the container just to verify one invariant
+- persistence and HTTP concerns can change without breaking domain tests unless the business rule changed
+
+Short rule:
+
+> If the business rule needs Spring to be testable, the boundary is probably blurred.
+
 ---
 
 ## 4. Strategic vs Tactical DDD

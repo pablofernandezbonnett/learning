@@ -52,6 +52,7 @@ Decision boundary for workflow and integration notes:
 - [07-caching-strategies.md](./07-caching-strategies.md): where cache helps, where stale data hurts, and how to think about invalidation
 - [09-domain-driven-design.md](./09-domain-driven-design.md): how to shape boundaries and business language without turning `DDD` (`Domain-Driven Design`) into ceremony
 - [11-service-discovery.md](./11-service-discovery.md): how services find each other in dynamic environments such as Kubernetes
+- [21-hexagonal-architecture.md](./21-hexagonal-architecture.md): how to keep use cases and domain rules independent from HTTP, JPA, and provider-specific details
 
 ## Growth
 

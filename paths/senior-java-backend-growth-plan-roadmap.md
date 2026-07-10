@@ -120,6 +120,12 @@ Focus:
 - Kafka, async boundaries, retries, outbox, and read-model judgment when the integration problem is real
 - testing by risk instead of by ideology
 
+Useful companion topics:
+
+- [../topics/architecture/09-domain-driven-design.md](../topics/architecture/09-domain-driven-design.md)
+- [../topics/architecture/21-hexagonal-architecture.md](../topics/architecture/21-hexagonal-architecture.md)
+- [../topics/spring-boot/21-practical-ddd-in-spring.md](../topics/spring-boot/21-practical-ddd-in-spring.md)
+
 Strong default:
 
 - prefer modular clarity and workflow correctness before promoting a system into more distributed patterns
