@@ -25,8 +25,10 @@ Working style:
 2. [06-jit-profiling-and-memory-leaks.md](./06-jit-profiling-and-memory-leaks.md): how `JIT`, profiling, and retention thinking help diagnose real JVM problems
 3. [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md): race conditions, visibility, `volatile`, locks, atomics, executors, and the `JMM`, meaning the rules that decide when one thread can see another thread's writes
 4. [03-modern-java-for-backend-engineers.md](./03-modern-java-for-backend-engineers.md): records, sealed types, pattern matching, and modern backend-friendly language features
-5. [05-concurrency-in-production.md](./05-concurrency-in-production.md): pool saturation, admission control, request budgets, and when local locks stop being enough
-6. [04-modern-java-21-plus-notes.md](./04-modern-java-21-plus-notes.md): structured concurrency, scoped values, and newer post-21 awareness
+5. [08-java-backend-engineering-cheatsheet.md](./08-java-backend-engineering-cheatsheet.md): practical Java backend judgment for clean code, side effects, performance, concurrency, scalability, and distributed-system hints
+6. [05-concurrency-in-production.md](./05-concurrency-in-production.md): pool saturation, admission control, request budgets, and when local locks stop being enough
+7. [07-java-collections-and-modeling-cheatsheet.md](./07-java-collections-and-modeling-cheatsheet.md): `HashMap` vs `ArrayList`, `Set`, `Queue`, `Deque`, `int` vs `Integer`, immutable boundaries, and why `BigDecimal` matters
+8. [04-modern-java-21-plus-notes.md](./04-modern-java-21-plus-notes.md): structured concurrency, scoped values, and newer post-21 awareness
 
 ## Working Loop
 
@@ -39,10 +41,12 @@ If time is limited:
 
 1. read `03` first
 2. read `02` second
-3. read `05` third
-4. read `01` fourth if JVM/runtime behavior feels rusty
-5. read `06` fifth if production diagnostics feel weak
-6. treat `04` as awareness material after the stable baseline is warm
+3. read `08` third if the gap is practical engineering judgment rather than language syntax
+4. read `05` fourth
+5. read `07` fifth if collection-choice judgment feels rusty
+6. read `01` sixth if JVM/runtime behavior feels rusty
+7. read `06` seventh if production diagnostics feel weak
+8. treat `04` as awareness material after the stable baseline is warm
 
 ## Companion Lab
 
@@ -81,6 +85,27 @@ Why:
 
 - the first group already changes day-to-day modeling and concurrency style
 - the second group is useful, but you do not need it before you can write or review modern backend code well
+
+## Judgment Companion
+
+Use [07-java-collections-and-modeling-cheatsheet.md](./07-java-collections-and-modeling-cheatsheet.md)
+when the gap is not JVM internals but day-to-day engineering judgment:
+
+- which collection shape fits the access pattern
+- why `LinkedList` is rarely the default
+- when `int` is better than `Integer`
+- why APIs should usually return `List` rather than `ArrayList`
+- why money code reaches for `BigDecimal`
+
+Use [08-java-backend-engineering-cheatsheet.md](./08-java-backend-engineering-cheatsheet.md)
+when the gap is broader and you want the typical senior-backend refresh:
+
+- how to shape service methods cleanly
+- how to make side effects explicit
+- what practical performance work usually means
+- what to remember about concurrency without becoming a JVM internals specialist
+- what actually makes a system scalable
+- which distributed-system hints matter most in day-to-day Java backend work
 
 ## If You Are A Spring Boot Engineer
 

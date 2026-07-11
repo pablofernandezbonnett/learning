@@ -495,43 +495,67 @@ enum class RefundReason(val stripeValue: RefundCreateParams.Reason) {
 
 ---
 
-## 8. PSP Comparison
+## 8. How To Compare PSPs
 
-| | Stripe | Wallet-style PSP | Adyen |
-|---|---|---|---|
-| Region focus | Global | Region-specific or local-market focus | Global / Enterprise |
-| Integration style | REST + Webhooks | REST + Webhooks | REST + Webhooks |
-| Idempotency | `Idempotency-Key` header | Same concept, different field name | `Reference` field |
-| Auth & Capture | Yes — `capture_method: manual` | Yes | Yes |
-| 3DS / SCA | Built-in via PaymentIntent | Redirect flow | Built-in |
-| Webhook delivery | At-least-once (handle duplicates) | At-least-once | At-least-once |
+Do not choose a PSP from a generic feature table. Provider behavior, market
+coverage, and compliance responsibilities change, so use the provider's current
+documentation and your commercial constraints as the source of truth.
+
+Compare these concrete questions instead:
+
+- Which markets, currencies, and payment methods does the product actually need?
+- Is the business flow authorize-then-capture, immediate capture, recurring payment, or marketplace payout?
+- How do idempotency, retries, and reconciliation work for this provider?
+- How are webhooks signed, retried, and replayed?
+- Which provider identifiers must be stored to reconcile payment, refund, dispute, and payout state?
+- What integration shape changes the card-data and PCI DSS boundary?
+
+Strong default:
+
+> Keep provider identifiers and provider-specific requests behind an adapter, but
+> keep your own payment-attempt state and business transitions as the local
+> source of truth.
 
 ---
 
-## 9. PCI DSS Basics (What a Backend Engineer Needs to Know)
+## 9. Payment Data and PCI DSS: Practical Boundary
 
-You do not need to be a PCI auditor. You need to know enough to not create
-compliance problems for your company.
+You do not need to be a PCI auditor. You do need to avoid expanding the
+card-data boundary accidentally and avoid claiming a compliance outcome that
+the integration has not earned.
 
-**Level 1 (avoid this):** Your server touches raw card data (PAN, CVV).
-You are now in full PCI scope — quarterly audits, penetration tests, dedicated
-cardholder data environment.
+Smallest useful mental model:
 
-**Level 4 (target this):** Card data goes directly to the PSP via their JS library
-or hosted fields integration. Your server only sees tokens and payment
-intent IDs. You are in the minimal PCI scope (SAQ A).
+- a PSP-hosted checkout or processor-controlled payment frame can keep raw card data out of the backend
+- that usually reduces the card-data surface, but it does not remove all security or PCI DSS responsibilities
+- the applicable self-assessment questionnaire (`SAQ`) depends on the full integration and every eligibility criterion, not on one library choice
 
-**Backend rules:**
-- Never log the full card number, CVV, or expiry date. Ever.
-- Never store CVV — not even temporarily.
-- Tokens (`tok_xxx`) from the PSP are single-use and safe to log.
-- Use HTTPS everywhere (TLS 1.2+ only). No HTTP in payment flows.
-- Your webhook endpoint must verify the HMAC signature before processing.
+Bad mental model:
 
-**Practical summary:**
-"By using Stripe Elements or a hosted fields integration, the card data never
-touches our servers. We receive a token. Our PCI scope is SAQ A — the lightest
-possible. This is a deliberate architectural decision, not just a convenience."
+> Hosted fields mean we are automatically `SAQ A` and can stop worrying about payment-page security.
+
+Better mental model:
+
+> Keep raw card data out of the service where possible, then confirm the actual
+> PCI DSS scope and `SAQ` eligibility with the current PCI guidance, acquirer,
+> and compliance owner.
+
+For example, a merchant-controlled page can still affect the payment flow even
+when the processor collects the card data. The integration shape matters.
+
+Backend rules:
+
+- never log or store PAN, CVV, expiry date, API secrets, or full authorization headers
+- treat provider tokens and payment references as sensitive operational identifiers: retain only what the business needs and mask or redact them in ordinary logs
+- use HTTPS for every payment-facing and webhook endpoint; follow the provider's current transport requirements
+- verify the provider's webhook signature before trusting the payload, using that provider's documented scheme rather than assuming every provider uses the same HMAC flow
+- keep payment state, idempotency keys, and reconciliation references durable on your side
+
+Strong default:
+
+> Tokenization reduces sensitive-data handling. It does not turn a payment
+> integration into a compliance-free feature or make provider identifiers safe
+> to spread through logs.
 
 ---
 
@@ -566,4 +590,5 @@ possible. This is a deliberate architectural decision, not just a convenience."
 - Stripe Webhooks: https://docs.stripe.com/webhooks
 - Stripe Signature Verification: https://docs.stripe.com/webhooks/signature
 - PCI DSS Overview: https://www.pcisecuritystandards.org/standards/pci-dss
+- PCI SSC on SAQ A eligibility: https://www.pcisecuritystandards.org/faqs/if-a-merchant-s-e-commerce-implementation-meets-the-criteria-that-all-elements-of-payment-pages-originate-from-a-pci-dss-compliant-service-provider-is-the-merchant-eligible-to-complete-saq-a-or-saq-a-ep/
 - OWASP Transaction Authorization Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Transaction_Authorization_Cheat_Sheet.html

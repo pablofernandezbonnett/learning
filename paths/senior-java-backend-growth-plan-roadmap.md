@@ -75,6 +75,25 @@ Short rule:
 
 ## Recommended Order
 
+### Foundation. Ship changes safely
+
+Start here when Git workflow, review discipline, or production delivery feels
+rusty:
+
+- [../topics/git/README.md](../topics/git/README.md)
+- [safe-production-change-loop.md](./safe-production-change-loop.md)
+
+Focus:
+
+- keeping local and shared Git history safe
+- making changes small enough to review, test, roll out, and roll back
+- treating schema/API compatibility and production observation as part of the change
+
+Outcome:
+
+- you can connect a code change to its delivery and recovery path before moving
+  into deeper Java or architecture refresh
+
 ### Phase 1. Refresh the Java backend core
 
 Start here:
@@ -87,6 +106,7 @@ Start here:
 Focus:
 
 - modern Java baseline: records, sealed types, pattern matching, virtual threads
+- Java backend engineering judgment: method shape, explicit side effects, collection and type choice, practical performance, and concurrency basics without overfocusing on JVM internals
 - concurrency, request budgets, and runtime behavior
 - SQL judgment: indexes, joins, `EXPLAIN`, transactions, locking, isolation
 - Spring Boot production basics: transactions, JPA, security, validation, config, testing, actuator

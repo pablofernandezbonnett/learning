@@ -48,6 +48,7 @@ Strong default:
 
 Current topic areas include:
 
+- `git`
 - `java`, `kotlin`, `spring-boot`, `databases`, `api`, `architecture`
 - `system-design`, `security`, `appsec`, `sre`, `solutions-architecture`
 - `cloud`, `devops`, `testing`, `algorithms`

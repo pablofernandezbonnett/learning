@@ -46,6 +46,7 @@ Less ideal fit:
 Use one main entrypoint, then branch out only if a real work need appears:
 
 - `paths/senior-java-backend-growth-plan-roadmap.md`: the canonical path for a senior Java backend engineer closing practical gaps without leaving the backend lane
+- `paths/safe-production-change-loop.md`: one practical loop that connects a code change to review, rollout, monitoring, rollback, and follow-up
 - `paths/adjacent/README.md`: optional side paths for AppSec, SRE, or wider architecture pressure
 - `topics/`: topic-by-topic entrypoints when you already know what you want to study
 - `labs/`: runnable companion material
@@ -67,6 +68,7 @@ Practical rule:
 
 ## Main Topics
 
+- [Git](./topics/git/README.md)
 - [Java](./topics/java/README.md)
 - [Kotlin](./topics/kotlin/README.md)
 - [Spring Boot](./topics/spring-boot/README.md)
@@ -86,6 +88,7 @@ Practical rule:
 - [Go](./topics/go/README.md)
 - [Python](./topics/python/README.md)
 - [Dart](./topics/dart/README.md)
+- [Flutter](./topics/flutter/README.md)
 - [Lua](./topics/lua/README.md)
 
 ## How The Repo Is Shaped

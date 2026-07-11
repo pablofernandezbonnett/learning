@@ -29,3 +29,15 @@ See `LICENSE` for the repository licensing split between documentation and code.
 ## Practical Note
 
 This file describes the intended usage and contribution policy.
+
+## Documentation Verification
+
+Before proposing documentation changes, run:
+
+```bash
+node scripts/verify-markdown.mjs
+```
+
+It checks repository-local Markdown links and heading anchors. It deliberately
+does not request external URLs, because external documentation can be
+temporarily unavailable even when the repository link is correct.

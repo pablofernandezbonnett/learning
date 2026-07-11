@@ -1,0 +1,23 @@
+name: Verify documentation
+
+on:
+  push:
+    paths:
+      - "**.md"
+      - "scripts/verify-markdown.mjs"
+      - ".github/workflows/docs-verify.yml"
+  pull_request:
+    paths:
+      - "**.md"
+      - "scripts/verify-markdown.mjs"
+      - ".github/workflows/docs-verify.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: node scripts/verify-markdown.mjs
