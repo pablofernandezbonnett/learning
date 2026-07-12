@@ -37,6 +37,12 @@ la pregunta. Aprender una frase aislada no prepara para una conversación.
    localizarte y moverte.
 8. [08 Kanji para reconocer](./08-kanji-para-reconocer.md): señales y palabras
    cotidianas, sin obligación de escribirlos.
+9. [Engineering Japanese](./engineering/README.md): vocabulario, reuniones y
+   estados de trabajo para entender y participar de forma básica.
+10. [Saludos, respuestas y escucha](./09-saludos-respuestas-y-aizuchi.md):
+    intercambios cotidianos y señales breves de “te sigo”.
+11. [Verbos básicos y forma `-masu`](./10-verbos-basicos-y-masu.md): acciones
+    cotidianas en presente/futuro, pasado y negativo.
 
 ## Conexión con el curso actual
 
@@ -49,10 +55,12 @@ clase, busca solo las frases que podrías usar esa semana.
 Ampliaremos cada tema como una nota breve y validable:
 
 - familia, casa y describir dónde vives;
-- rutina diaria y verbos en forma `-masu`;
+- señalar cosas y lugares con `これ / それ / あれ` (*kore / sore / are*) y usar
+  las partículas básicas;
 - comida, alergias y restricciones alimentarias;
 - médico, farmacia y urgencias no críticas;
-- trabajo, colegio y conversaciones de cortesía;
+- chat, correo y conversaciones de cortesía en el trabajo;
+- entrevistas o conversaciones con recruiters cuando exista una necesidad real;
 - compras: tallas, colores y devoluciones;
 - mensajes cortos y llamadas;
 - japonés escuchado: contracciones y respuestas habituales;

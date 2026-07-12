@@ -42,8 +42,11 @@ hablas de ti. Al principio, usarlo te ayuda a formar la frase.
 | どこ | doko | dónde | あそこです (*asoko desu*, allí) |
 | いつ | itsu | cuándo | あしたです (*ashita desu*, mañana) |
 | なんじ | nanji | a qué hora | ごじです (*goji desu*, a las cinco) |
+| いくら | ikura | cuánto cuesta | ごひゃく えんです (*gohyaku en desu*, 500 yenes) |
+| いくつ | ikutsu | cuántos / cuántas | ふたつです (*futatsu desu*, dos) |
 | どれ / どっち | dore / docchi | cuál | これです (*kore desu*, este) |
 | どの | dono | cuál + nombre | この メニューです (*kono menyuu desu*) |
+| どんな | donna | qué tipo de | アイス コーヒーです (*aisu koohii desu*, café frío) |
 | どう | dou | cómo | だいじょうぶです (*daijoubu desu*, bien) |
 | どうして | doushite | por qué | しごとです (*shigoto desu*, por trabajo) |
 

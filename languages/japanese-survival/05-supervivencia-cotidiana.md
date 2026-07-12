@@ -54,6 +54,33 @@ amables, pero no excesivamente formales; sirven bien como primer registro.
 > *nihongo wa mada jouzu ja arimasen.*  
 > Aún no hablo japonés bien.
 
+## Pedir una acción sencilla
+
+`Vてください` (*V-te kudasai*) significa “por favor, haz V”. No memorices una
+conjugación entera todavía: aprende estas frases como bloques útiles.
+
+| Japonés | Romaji | Español |
+|---|---|---|
+| かいてください | kaite kudasai | escríbelo, por favor |
+| みせてください | misete kudasai | muéstramelo, por favor |
+| もう いちど いってください | mou ichido itte kudasai | dilo otra vez, por favor |
+| ゆっくり はなしてください | yukkuri hanashite kudasai | habla despacio, por favor |
+| みてください | mite kudasai | mira, por favor |
+| きいてください | kiite kudasai | escucha, por favor |
+
+No confundas `みてください` (*mite kudasai*, “mira”) con `みせてください`
+(*misete kudasai*, “muéstrame”). Si quieres saber si alguien puede hablar un
+idioma, pregunta `えいごを はなせますか` (*eigo o hanasemasu ka*, “¿puedes hablar
+inglés?”), no `はなせました` (*hanasemashita*), que tiene otro tiempo.
+
+> **ローマじで かいてください。**<br>
+> *roomaji de kaite kudasai.*<br>
+> Escríbelo en romaji, por favor.
+
+> **はい、わかりました。**<br>
+> *hai, wakarimashita.*<br>
+> Sí, entendido.
+
 ## Necesidades simples
 
 > **トイレは どこですか。**  

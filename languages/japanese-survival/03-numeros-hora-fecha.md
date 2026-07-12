@@ -199,6 +199,18 @@ ser dos, pero `にかい` (*nikai*) es planta 2, `にまい` (*nimai*) son dos h
 
 `から` (*kara*) significa “desde / a partir de”.
 
+Para la hora en que haces una acción, usa `なんじに` (*nanji ni*, “¿a qué
+hora?”). `から` (*kara*) sirve para el inicio de un periodo; `に` (*ni*) marca
+el momento de la acción.
+
+> **あした なんじに しゅっぱつしますか。**<br>
+> *ashita nanji ni shuppatsu shimasu ka?*<br>
+> ¿A qué hora sales mañana?
+
+> **はちじに しゅっぱつします。**<br>
+> *hachiji ni shuppatsu shimasu.*<br>
+> Salgo a las ocho.
+
 | Hora | Lectura |
 |---:|---|
 | 1:00 | いちじ - ichiji |
@@ -254,10 +266,26 @@ minutos), `にじゅっぷん` (*nijuppun*, veinte minutos).
 | por la tarde | ひる | hiru |
 | por la noche | ばん | ban |
 
-Los meses se forman con número + `がつ` (*gatsu*): `いちがつ` (*ichigatsu*,
-enero), `しちがつ` (*shichigatsu*, julio), `じゅうにがつ` (*juunigatsu*,
-diciembre). Algunas fechas son especiales: día 1 `ついたち` (*tsuitachi*), día
-2 `ふつか` (*futsuka*), día 3 `みっか` (*mikka*), día 4 `よっか` (*yokka*), día
+Los meses se forman con número + `がつ` (*gatsu*). Memoriza la tabla como una
+serie; julio usa `しちがつ` (*shichigatsu*), no una lectura con `nana`.
+
+| Mes | Japonés | Romaji |
+|---|---|---|
+| enero | いちがつ | ichigatsu |
+| febrero | にがつ | nigatsu |
+| marzo | さんがつ | sangatsu |
+| abril | しがつ | shigatsu |
+| mayo | ごがつ | gogatsu |
+| junio | ろくがつ | rokugatsu |
+| julio | しちがつ | shichigatsu |
+| agosto | はちがつ | hachigatsu |
+| septiembre | くがつ | kugatsu |
+| octubre | じゅうがつ | juugatsu |
+| noviembre | じゅういちがつ | juuichigatsu |
+| diciembre | じゅうにがつ | juunigatsu |
+
+Algunas fechas son especiales: día 1 `ついたち` (*tsuitachi*), día 2
+`ふつか` (*futsuka*), día 3 `みっか` (*mikka*), día 4 `よっか` (*yokka*), día
 20 `はつか` (*hatsuka*).
 
 Regla práctica: para una cita importante, escribe la cifra en el teléfono y
