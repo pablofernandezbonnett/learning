@@ -24,8 +24,9 @@ What you will find here:
 
 The repo is optimized for practical understanding, tradeoffs, failure modes,
 and reusable mental models, not encyclopedic coverage.
-It should not grow into a duplicate of general language courses or vendor
-certification tracks.
+It should not grow into a duplicate of broad courses or vendor certification
+tracks. Small, clearly separated personal-learning companions are acceptable
+when they remain practical and deliberately scoped.
 
 ## Who This Is For
 
@@ -90,6 +91,10 @@ Practical rule:
 - [Dart](./topics/dart/README.md)
 - [Flutter](./topics/flutter/README.md)
 - [Lua](./topics/lua/README.md)
+
+## Personal Learning
+
+- [Japonés de supervivencia para hispanohablantes](./languages/japanese-survival/README.md): notas breves para acompañar un curso A1 y manejar situaciones cotidianas.
 
 ## How The Repo Is Shaped
 
