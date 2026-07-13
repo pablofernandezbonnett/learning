@@ -92,6 +92,76 @@ persona habla. No interrumpen: indican atención. Si no has entendido, no uses
 おねがいします` (*sumimasen. mou ichido onegaishimasu*, “perdón, otra vez por
 favor”).
 
+## Reaccionar a buenas y malas noticias
+
+No hace falta construir una frase larga. Estas reacciones breves te permiten
+mostrar alegría, sorpresa o empatía sin comprometerte a nada. Aprende cada una
+como un bloque.
+
+| Japonés | Romaji | Significado y cuándo usarlo |
+|---|---|---|
+| よかったです | yokatta desu | qué bien / me alegro / menos mal; tras un buen resultado |
+| よかったですね | yokatta desu ne | qué bien, me alegro por ti; reacción amable a una buena noticia |
+| ほんとうですか | hontou desu ka | ¿de verdad?; sorpresa interesada, con tono amable |
+| すごいですね | sugoi desu ne | qué increíble / impresionante; elogio o sorpresa positiva |
+| たいへんですね | taihen desu ne | vaya, qué duro; empatía ante una dificultad |
+| ざんねんですね | zannen desu ne | qué pena; reacción a un plan o resultado malo |
+| おめでとうございます | omedetou gozaimasu | felicidades; cumpleaños, logro o buena noticia clara |
+
+`よかった` (*yokatta*, qué bien / me alegro / menos mal) es una forma muy
+frecuente y casual. Con desconocidos, profesorado o trabajo, usa
+`よかったです` (*yokatta desu*, qué bien / me alegro) o `よかったですね` (*yokatta
+desu ne*, qué bien, me alegro por ti). Memorízalo como bloque: procede de
+`いい` (*ii*, bueno), pero no necesitas estudiar ahora esa conjugación.
+
+`たいへんですね` (*taihen desu ne*, vaya, qué duro) muestra que reconoces una
+dificultad; no significa que hayas entendido todos los detalles ni que vayas a
+resolverla. `ざんねんですね` (*zannen desu ne*, qué pena) es empatía, no una
+disculpa: si la culpa es tuya, añade `すみません` (*sumimasen*, lo siento /
+perdón) cuando corresponda.
+
+## Mini conversaciones para responder, no solo reconocer
+
+> **でんしゃが きました。**<br>
+> *densha ga kimashita.*<br>
+> Ha llegado el tren.
+
+> **あ、よかったです。**<br>
+> *a, yokatta desu.*<br>
+> Ah, qué bien / menos mal.
+
+> **テストに ごうかくしました。**<br>
+> *tesuto ni goukaku shimashita.*<br>
+> He aprobado el examen.
+
+> **おめでとうございます。すごいですね。**<br>
+> *omedetou gozaimasu. sugoi desu ne.*<br>
+> Felicidades. Qué bien / impresionante.
+
+> **きょうは しごとが たくさん あります。**<br>
+> *kyou wa shigoto ga takusan arimasu.*<br>
+> Hoy tengo mucho trabajo.
+
+> **たいへんですね。**<br>
+> *taihen desu ne.*<br>
+> Vaya, qué duro.
+
+> **あしたの よていは なくなりました。**<br>
+> *ashita no yotei wa nakunarimashita.*<br>
+> El plan de mañana se ha cancelado.
+
+> **ざんねんですね。**<br>
+> *zannen desu ne.*<br>
+> Qué pena.
+
+> **らいしゅうは やすみです。**<br>
+> *raishuu wa yasumi desu.*<br>
+> La semana que viene es festivo / tengo vacaciones.
+
+> **ほんとうですか。よかったですね。**<br>
+> *hontou desu ka. yokatta desu ne.*<br>
+> ¿De verdad? Qué bien, me alegro.
+
 ## Pregunta y respuesta con contexto
 
 > **あしたは かいぎです。**<br>
