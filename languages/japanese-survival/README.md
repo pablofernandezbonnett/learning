@@ -43,6 +43,10 @@ la pregunta. Aprender una frase aislada no prepara para una conversación.
     intercambios cotidianos y señales breves de “te sigo”.
 11. [Verbos básicos y forma `-masu`](./10-verbos-basicos-y-masu.md): acciones
     cotidianas en presente/futuro, pasado y negativo.
+12. [Posición, direcciones y adjetivos](./11-posicion-direcciones-y-adjetivos.md):
+    orientarte, entender indicaciones y describir lo básico.
+13. [Señalar cosas y lugares](./12-senalar-cosas-y-lugares.md): esto, eso,
+    aquello, aquí y allí; útil para pedir sin conocer aún todo el vocabulario.
 
 ## Conexión con el curso actual
 
@@ -55,8 +59,8 @@ clase, busca solo las frases que podrías usar esa semana.
 Ampliaremos cada tema como una nota breve y validable:
 
 - familia, casa y describir dónde vives;
-- señalar cosas y lugares con `これ / それ / あれ` (*kore / sore / are*) y usar
-  las partículas básicas;
+- partículas básicas `は / を / に / で` (*wa / o / ni / de*) con ejemplos
+  de supervivencia;
 - comida, alergias y restricciones alimentarias;
 - médico, farmacia y urgencias no críticas;
 - chat, correo y conversaciones de cortesía en el trabajo;

@@ -34,7 +34,7 @@ medias. Por eso 21 es “dos-diez-uno”.
 | 41 | よんじゅういち | yonjuuichi |
 | 99 | きゅうじゅうきゅう | kyuujuukyuu |
 
-Ejemplo de precio: `21円` se lee `にじゅういち えん` (*nijuuichi en*).
+Ejemplo de precio: `21円（にじゅういち えん）` (*nijuuichi en*, 21 yenes).
 
 > **いくらですか。**  
 > *ikura desu ka?*  
@@ -127,9 +127,9 @@ Por tanto, `いちまい` (*ichimai*) significa **una hoja / una entrada**, no
 
 ### Pisos: `-kai` / `-gai`
 
-Para plantas de un edificio se usa `階` (*kai/gai*). Aquí hay tres cambios que
-merece la pena memorizar: planta 1 `いっかい` (*ikkai*), planta 3 `さんがい`
-(*sangai*) y planta 6 `ろっかい` (*rokkai*).
+Para plantas de un edificio se usa `階（かい / がい）` (*kai / gai*, planta).
+Aquí hay tres cambios que merece la pena memorizar: planta 1 `いっかい`
+(*ikkai*), planta 3 `さんがい` (*sangai*) y planta 6 `ろっかい` (*rokkai*).
 
 > **ホテルの フロントは なんがいですか。**  
 > *hoteru no furonto wa nangai desu ka?*  

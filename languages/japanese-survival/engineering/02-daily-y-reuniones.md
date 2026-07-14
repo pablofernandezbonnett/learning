@@ -68,9 +68,10 @@ verificado.
 
 ## Respuestas de estado que debes usar con cuidado
 
-`わかりました` (*wakarimashita*) significa “entendido”; úsalo cuando realmente
-has entendido la petición. `問題ありません` (*mondai arimasen*) significa “no
-hay problema”; no lo uses si todavía estás investigando. En ese caso,
+`わかりました` (*wakarimashita*, entendido) significa “entendido”; úsalo cuando
+realmente has entendido la petición. `問題ありません（もんだい ありません）`
+(*mondai arimasen*, no hay problema) significa “no hay problema”; no lo uses
+si todavía estás investigando. En ese caso,
 `かくにんします` (*kakunin shimasu*, “lo comprobaré”) es la respuesta segura.
 
 Regla práctica: en el trabajo, decir el siguiente paso real es mejor que

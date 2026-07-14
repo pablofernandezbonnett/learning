@@ -95,9 +95,10 @@ alguien puede hablar ahora, usa `はなせますか` (*hanasemasu ka*).
 ## Qué falta, pero puede esperar
 
 Con esta nota ya tienes un núcleo de supervivencia sólido: kana, preguntas,
-números, hora, peticiones, saludos, pedidos, verbos básicos y trabajo. Lo
-siguiente con buen retorno es señalar personas, objetos y lugares con
-`これ / それ / あれ` (*kore / sore / are*) y afianzar las partículas `は / を /
-に / で` (*wa / o / ni / de*). Después, adjetivos simples y la forma `-te`
-completa te harán sonar más natural, pero no son un requisito para empezar a
-resolver situaciones reales.
+números, hora, peticiones, saludos, pedidos, verbos básicos, trabajo y
+[direcciones y adjetivos](./11-posicion-direcciones-y-adjetivos.md). Lo
+siguiente con buen retorno es [señalar personas, objetos y lugares](./12-senalar-cosas-y-lugares.md)
+con `これ / それ / あれ` (*kore / sore / are*) y afianzar las partículas `は / を /
+に / で` (*wa / o / ni / de*). Después, la forma `-te` completa te hará sonar
+más natural, pero no es un requisito para empezar a resolver situaciones
+reales.

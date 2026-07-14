@@ -56,10 +56,12 @@ empieza por reconocer el tema de la conversación.
 
 ## Tres palabras que no conviene sobreinterpretar
 
-`確認` (*kakunin*) significa comprobar o confirmar; no siempre quiere decir que
-algo ya está aprobado. `対応` (*taiou*, gestionar / atender) suele expresar que
-se tomará o tomó una acción, no que el problema esté completamente resuelto.
-`障害` (*shougai*) suele hablar de una incidencia operativa; no lo uses como
+`確認（かくにん）` (*kakunin*, comprobación / confirmación) significa comprobar o
+confirmar; no siempre quiere decir que algo ya está aprobado.
+`対応（たいおう）` (*taiou*, gestionar / atender) suele expresar que se tomará o
+tomó una acción, no que el problema esté completamente resuelto.
+`障害（しょうがい）` (*shougai*, incidencia operativa) suele hablar de una
+incidencia operativa; no lo uses como
 sinónimo automático de cualquier bug pequeño.
 
 ## Pregunta y respuesta

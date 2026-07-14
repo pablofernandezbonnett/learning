@@ -23,12 +23,13 @@ destino, pregunta dónde está y confirma andén, salida u hora.
 
 Palabras de señal: `みぎ` (*migi*, derecha), `ひだり` (*hidari*, izquierda),
 `まっすぐ` (*massugu*, recto), `ちかい` (*chikai*, cerca), `とおい` (*tooi*,
-lejos).
+lejos). Para posiciones, cruces y frases completas de indicación, sigue con
+[Posición, direcciones y adjetivos](./11-posicion-direcciones-y-adjetivos.md).
 
 ## Tren, autobús y salida
 
-> **とうきょう えきに いきますか。**  
-> *Toukyou eki ni ikimasu ka?*  
+> **この でんしゃは とうきょう えきに いきますか。**<br>
+> *kono densha wa toukyou eki ni ikimasu ka?*<br>
 > ¿Va a la estación de Tokio?
 
 > **はい、いきます。**  
@@ -50,6 +51,32 @@ lejos).
 > **はちじ じゅっぷんです。**  
 > *hachiji juppun desu.*  
 > Sale a las 8:10.
+
+### Palabras de estación que merece la pena reconocer
+
+| Japonés | Romaji | Español |
+|---|---|---|
+| 改札（かいさつ） | kaisatsu | torno / puerta de acceso de la estación |
+| 出口（でぐち） | deguchi | salida |
+| 乗り場（のりば） | noriba | lugar de embarque / andén |
+| 乗り換え（のりかえ） | norikae | transbordo / cambio de línea |
+| ホーム | hoomu | andén |
+
+> **かいさつは どこですか。**<br>
+> *kaisatsu wa doko desu ka?*<br>
+> ¿Dónde están los tornos de la estación?
+
+> **あそこです。**<br>
+> *asoko desu.*<br>
+> Están allí.
+
+> **のりかえは なんばんせんですか。**<br>
+> *norikae wa nanbansen desu ka?*<br>
+> ¿En qué vía tengo que hacer el transbordo?
+
+> **さんばんせんです。**<br>
+> *sanbansen desu.*<br>
+> Es la vía 3.
 
 ## Taxi y hotel
 
