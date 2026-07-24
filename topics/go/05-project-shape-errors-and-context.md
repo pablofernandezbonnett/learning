@@ -247,7 +247,61 @@ Why:
 
 ---
 
-## 9. Takeaway
+## 9. Concurrency Needs Ownership, Not Just Goroutines
+
+A goroutine is cheap to start, but it is still work that needs an owner.
+
+For request-scoped concurrent work, make these questions answerable:
+
+- which context cancels it
+- who waits for its result or error
+- what bounds the amount of parallel work
+- what happens if the caller leaves early
+
+One small pattern matters when a caller can time out before a goroutine sends
+its result:
+
+```go
+type StockResult struct {
+	Units int
+	Err   error
+}
+
+result := make(chan StockResult, 1)
+go func() {
+	units, err := client.Available(ctx, sku)
+	result <- StockResult{Units: units, Err: err}
+}()
+
+select {
+case stock := <-result:
+	return stock.Units, stock.Err
+case <-ctx.Done():
+	return 0, ctx.Err()
+}
+```
+
+The buffered channel prevents the sender from getting stuck if cancellation
+wins the `select`. It is not a substitute for passing `ctx` to `Available`:
+the downstream client must also observe cancellation and stop its own work.
+
+For fan-out where the first failure should cancel sibling work, `errgroup` is
+often clearer than manually combining `WaitGroup`, an error channel, and
+cancellation. Keep parallelism bounded by the downstream limit rather than
+launching one goroutine per input without a cap.
+
+Finally, run concurrent code under the race detector:
+
+```bash
+go test -race ./...
+```
+
+It finds data races exercised by the test; it does not prove that untested
+interleavings are safe.
+
+---
+
+## 10. Takeaway
 
 The first useful Go design rule is not "use patterns."
 
@@ -257,6 +311,9 @@ It is:
 > explicit control flow instead of hidden exceptional flow.
 
 ## Further Reading
+
+- [Go race detector](https://go.dev/doc/articles/race_detector)
+- [`errgroup` package](https://pkg.go.dev/golang.org/x/sync/errgroup)
 
 - [Go: Errors are values](https://go.dev/blog/errors-are-values)
 - [Go blog: Working with errors in Go 1.13](https://go.dev/blog/go1.13-errors)

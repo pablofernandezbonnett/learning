@@ -165,7 +165,50 @@ This is where backend and UI design meet:
 
 ---
 
-## 6. Concrete Example
+## 6. Lifecycle Is Part Of Async UI
+
+`build` can run many times. Do not start one-time work from it, and do not
+assume a screen still exists after an `await` completes.
+
+Own resources explicitly:
+
+- dispose controllers such as `TextEditingController`, `FocusNode`, and
+  `AnimationController`
+- cancel subscriptions, timers, or state holders that outlive the screen
+- check that the widget is still mounted before navigating or updating UI after
+  asynchronous work
+
+```dart
+class CheckoutPageState extends State<CheckoutPage> {
+  final _quantityController = TextEditingController();
+  bool _submitFailed = false;
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    super.dispose();
+  }
+
+  Future<void> submit() async {
+    final accepted = await widget.checkout.placeOrder();
+    if (!context.mounted) return;
+
+    if (accepted) {
+      Navigator.of(context).pushReplacementNamed('/confirmation');
+    } else {
+      setState(() => _submitFailed = true);
+    }
+  }
+}
+```
+
+The point is lifecycle ownership, not this exact state shape. A completed
+request may be harmless; a completed request that updates a disposed screen is
+not.
+
+---
+
+## 7. Concrete Example
 
 Imagine an order history screen.
 
@@ -182,7 +225,7 @@ That is stronger than:
 
 ---
 
-## 7. Strong Default
+## 8. Strong Default
 
 For most product screens:
 
@@ -190,10 +233,11 @@ For most product screens:
 - let navigation follow feature flows
 - model more than one async failure shape
 - preserve useful data on partial failure when you can
+- dispose screen-owned resources and check `context.mounted` after `await`
 
 ---
 
-## 8. Big Traps
+## 9. Big Traps
 
 1. **Layout tested only with one payload**
    Example: long merchant names or translated text breaks the screen.
@@ -210,9 +254,13 @@ For most product screens:
 5. **Destroying usable stale data too quickly**
    Example: one background failure wipes the whole screen.
 
+6. **Updating a screen after it has gone away**
+   Example: an async callback navigates or calls `setState` after the user
+   already left the page.
+
 ---
 
-## 9. Practical Summary
+## 10. Practical Summary
 
 Practical summary:
 

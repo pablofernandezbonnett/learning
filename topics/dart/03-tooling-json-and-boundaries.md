@@ -49,6 +49,7 @@ For a plain Dart package or module, these commands matter most:
 
 ```bash
 dart pub get
+dart format .
 dart analyze
 dart test
 ```
@@ -65,6 +66,7 @@ dart test
 
 Why this matters:
 
+- formatting removes review noise before the analyzer runs
 - the analyzer catches type and style issues fast
 - tests stay cheap to run
 - the package shape stays predictable
@@ -88,6 +90,35 @@ Strong default:
 - export the public API from `lib/...`
 - keep implementation details in `lib/src/...`
 - keep tests close to behavior, not only happy-path demos
+
+### Give The Analyzer A Useful Baseline
+
+The analyzer is more valuable when it is allowed to reject a few weak
+shortcuts. Add the `lints` package as a development dependency, then start with
+this small `analysis_options.yaml`:
+
+```yaml
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-raw-types: true
+```
+
+`strict-casts` makes implicit downcasts visible. `strict-raw-types` catches
+generic types written without their type arguments. Both help a Java developer
+avoid accidentally reintroducing `dynamic` at a boundary.
+
+Before applying automatic fixes, inspect what they propose:
+
+```bash
+dart fix --dry-run
+dart fix --apply
+```
+
+Use `dart fix --apply` for mechanical cleanup, then review and test the result
+like any other change. It does not replace design judgment.
 
 ---
 
@@ -261,6 +292,7 @@ Why this matters:
 If you want the shortest modern Dart tool-and-boundary reset, use this:
 
 - `dart pub get`
+- `dart format .`
 - `dart analyze`
 - `dart test`
 - convert JSON maps into typed objects quickly
@@ -280,6 +312,8 @@ The most useful Dart productivity loop is this:
 
 - [Packages](https://dart.dev/tools/pub/packages)
 - [dart analyze](https://dart.dev/tools/dart-analyze)
+- [dart format](https://dart.dev/tools/dart-format)
+- [dart fix](https://dart.dev/tools/dart-fix)
 - [dart test](https://dart.dev/tools/dart-test)
 - [Serialization](https://dart.dev/libraries/serialization/json)
 - [Extension types](https://dart.dev/language/extension-types)

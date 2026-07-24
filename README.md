@@ -88,6 +88,7 @@ Practical rule:
 - [Algorithms](./topics/algorithms/README.md)
 - [Go](./topics/go/README.md)
 - [Python](./topics/python/README.md)
+- [TypeScript](./topics/typescript/README.md)
 - [Dart](./topics/dart/README.md)
 - [Flutter](./topics/flutter/README.md)
 - [Lua](./topics/lua/README.md)

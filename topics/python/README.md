@@ -28,9 +28,13 @@ Python is faster to type.
 2. [04-project-shape-and-quality.md](./04-project-shape-and-quality.md): typing, testing, tooling, and the point where a script needs stronger boundaries
 3. [examples/02-data-scripts.py](./examples/02-data-scripts.py): data and ETL-shaped work
 4. [examples/fastapi_app.py](./examples/fastapi_app.py): a lightweight API mental bridge from Spring Boot
+5. [06-integration-boundaries.md](./06-integration-boundaries.md): protocols, HTTP clients, config, errors, logging, and Python container shape
+6. [07-llm-application-boundaries.md](./07-llm-application-boundaries.md): use an LLM as a bounded dependency, not as business logic
 
 If your likely work is data or automation, run the script example next. If it is
 a bounded internal API, read the project-shape note before the FastAPI example.
+Read `06` when the code calls another service or starts living in production.
+Read `07` only when the Python service really owns an AI-facing integration.
 
 ## JVM Mental Map
 

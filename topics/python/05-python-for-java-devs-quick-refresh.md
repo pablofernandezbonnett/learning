@@ -155,6 +155,52 @@ Why this matters:
 - very common in scripts, ETL, and API shaping
 - easier to read once you accept the style
 
+### Small Python edges that surprise Java developers
+
+Python passes object references around. Assigning a list does not copy it, and a
+mutable default value is created once when the function is defined, not once per
+call.
+
+Weak:
+
+```python
+def add_sku(sku: str, skus: list[str] = []) -> list[str]:
+    skus.append(sku)
+    return skus
+```
+
+The second caller receives the first caller's list. Use `None` to mean "no list
+was supplied", then create a new list inside the function.
+
+```python
+def add_sku(sku: str, skus: list[str] | None = None) -> list[str]:
+    target = [] if skus is None else skus
+    target.append(sku)
+    return target
+```
+
+Use `is None`, not `== None`: this is an identity check for Python's one
+`None` object. Also be deliberate about copies. `next_items = items` gives two
+names to the same list; `next_items = list(items)` makes a shallow copy.
+
+For files, connections, and similar resources, prefer `with`. It makes the
+ownership and cleanup rule visible even if the code inside fails.
+
+```python
+from pathlib import Path
+
+
+def read_report(path: Path) -> str:
+    try:
+        with path.open(encoding="utf-8") as report_file:
+            return report_file.read()
+    except OSError as error:
+        raise RuntimeError("could not read report") from error
+```
+
+`raise ... from error` preserves the original cause, which is much more useful
+than replacing an I/O failure with an unexplained generic exception.
+
 ---
 
 ## 5. What Modern Python Usually Looks Like
@@ -267,6 +313,33 @@ Short rule:
 
 > use `async` when the stack is actually async, not as a badge that the code is modern
 
+### Parallel I/O, cancellation, and limits
+
+When two independent I/O calls are both needed for a checkout screen, start
+them together rather than waiting for one before starting the other.
+
+```python
+import asyncio
+
+
+async def checkout_context(gateway: "CheckoutGateway", order_id: str) -> tuple[object, object]:
+    async with asyncio.TaskGroup() as tasks:
+        order = tasks.create_task(gateway.fetch_order(order_id))
+        stock = tasks.create_task(gateway.fetch_stock(order_id))
+    return order.result(), stock.result()
+```
+
+`TaskGroup` waits for the work when the block ends. If one task fails, Python
+cancels its unfinished sibling and reports the error (or an `ExceptionGroup`
+when several tasks fail) instead of leaving work running in the background. Use
+it for a small, independent set of calls that are safe to cancel; do not create
+one task per unbounded item in a large input.
+
+The same rule applies to blocking code: calling a blocking database driver,
+file operation, or HTTP client inside `async def` still blocks that worker.
+Choose a consistently async stack for concurrent I/O, or keep the boundary
+synchronous.
+
 ---
 
 ## 7. Project And Tooling Defaults
@@ -359,3 +432,4 @@ The most useful Python reset from a Java starting point is this:
 - [What’s New In Python 3.7](https://docs.python.org/3/whatsnew/3.7.html)
 - [The Python Tutorial](https://docs.python.org/3/tutorial/)
 - [venv — Create virtual environments](https://docs.python.org/3/library/venv.html)
+- [asyncio task groups](https://docs.python.org/3/library/asyncio-task.html#task-groups)

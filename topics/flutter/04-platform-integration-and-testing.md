@@ -113,6 +113,17 @@ Short rule:
 
 > Do not expect one widget test layer to prove the whole product flow.
 
+### Native Platform UI Is A Separate Test Boundary
+
+Flutter integration tests can prove the Flutter-side handoff, but they cannot
+drive every operating-system permission dialog or platform view. Test the
+decision and callback in Flutter; use suitable native-aware tooling or a device
+check for the OS-owned interaction itself.
+
+For example, a widget test can prove that a camera permission request is
+triggered and its result changes app state. It does not prove that the Android
+or iOS dialog is rendered or accepted correctly.
+
 ---
 
 ## 3. Strong Default

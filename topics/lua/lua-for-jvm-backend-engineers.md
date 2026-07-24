@@ -195,6 +195,23 @@ Security and permission rule:
 - the runtime identity that fetches scripts should be read-only
 - the people or systems that publish scripts should be a smaller, more controlled set than the systems that merely execute them
 
+### `Globals` Have A Lifetime
+
+In LuaJ, a `Globals` environment holds script-visible state. If unrelated
+requests share one mutable environment, a script can leave global state behind
+for a later evaluation to observe.
+
+Strong default:
+
+- create a fresh, restricted environment for each evaluation or isolate state
+  per request and script version
+- pass all needed values through `ctx` and return the decision explicitly
+- if you pool environments for performance, reset or recreate them and prove
+  isolation with tests before trusting the pool
+
+This is why `local` is more than style in a rule script: it reduces accidental
+state that can survive beyond the decision you intended to make.
+
 ---
 
 ## 7. What Hot Updates Actually Mean
@@ -353,3 +370,4 @@ It is:
 
 - [Lua official overview](https://www.lua.org/work/doc/)
 - [LuaJ project](https://github.com/luaj/luaj)
+- [LuaJ `Globals` API](https://luaj.org/luaj/3.0/api/org/luaj/vm2/Globals.html)

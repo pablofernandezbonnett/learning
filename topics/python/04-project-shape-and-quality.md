@@ -81,7 +81,7 @@ Good default:
 
 ```bash
 uv init
-uv add fastapi pydantic
+uv add fastapi pydantic pydantic-settings httpx
 uv add --dev pytest ruff pyright
 ruff check .
 ruff format .
@@ -99,6 +99,8 @@ requires-python = ">=3.12"
 dependencies = [
   "fastapi",
   "pydantic",
+  "pydantic-settings",
+  "httpx",
 ]
 
 [dependency-groups]

@@ -52,5 +52,5 @@ Current topic areas include:
 - `java`, `kotlin`, `spring-boot`, `databases`, `api`, `architecture`
 - `system-design`, `security`, `appsec`, `sre`, `solutions-architecture`
 - `cloud`, `devops`, `testing`, `algorithms`
-- `python`, `go`, `dart`, `flutter`, `lua`
+- `python`, `typescript`, `go`, `dart`, `flutter`, `lua`
 - `ai`
