@@ -39,6 +39,7 @@ Decision boundary for AI material:
 - use `06` when the goal is a local or private AI server for daily engineering work
 - use `07` when that setup becomes a shared or reachable internal service
 - use `08` when the goal is practical productivity in code, docs, review, or incident work
+- use `09` when an AI-assisted feature needs explicit intent, acceptance criteria, and a reviewable implementation plan
 - use `02` when output quality, structure, and repeatability matter
 - use `05` once the AI service becomes team-shared, product-facing, or operationally important
 - use `03` as optional awareness once the prompt, eval, and trust boundaries are already clear
@@ -50,22 +51,25 @@ Decision boundary for AI material:
 2. [06-local-ai-server-for-backend-engineers.md](./06-local-ai-server-for-backend-engineers.md): when a local or private model service is useful and how to keep the first setup practical
 3. [07-securing-private-ai-services.md](./07-securing-private-ai-services.md): how to treat a private AI runtime like a real internal service boundary
 4. [08-ai-assisted-development-for-backend-engineers.md](./08-ai-assisted-development-for-backend-engineers.md): where AI helps most in daily backend work and where verification must stay human-driven
-5. [02-prompting-and-evals.md](./02-prompting-and-evals.md): how to prompt more reliably and how to test whether the prompt actually works
-6. [05-ai-serving-observability-and-rollout.md](./05-ai-serving-observability-and-rollout.md): what you need to observe, gate, and roll out safely so an AI feature behaves like a production system
-7. [03-tools-agents-and-guardrails.md](./03-tools-agents-and-guardrails.md): how agentic systems use tools, why guardrails matter, and what a good skill or agent definition looks like
-8. [04-ml-and-ai-pipelines-for-jvm-backend.md](./04-ml-and-ai-pipelines-for-jvm-backend.md): where offline pipelines, online inference, Java serving, Ollama, ONNX, and workflow orchestration actually fit once the service boundary is already clear
+5. [09-spec-driven-development-for-ai-assisted-work.md](./09-spec-driven-development-for-ai-assisted-work.md): how to turn a meaningful AI-assisted change into explicit intent, a plan, small tasks, and verifiable results
+6. [02-prompting-and-evals.md](./02-prompting-and-evals.md): how to prompt more reliably and how to test whether the prompt actually works
+7. [05-ai-serving-observability-and-rollout.md](./05-ai-serving-observability-and-rollout.md): what you need to observe, gate, and roll out safely so an AI feature behaves like a production system
+8. [03-tools-agents-and-guardrails.md](./03-tools-agents-and-guardrails.md): how agentic systems use tools, why guardrails matter, and what a good skill or agent definition looks like
+9. [04-ml-and-ai-pipelines-for-jvm-backend.md](./04-ml-and-ai-pipelines-for-jvm-backend.md): where offline pipelines, online inference, Java serving, Ollama, ONNX, and workflow orchestration actually fit once the service boundary is already clear
 
 ## Refresh
 
 - [01-ai-fluency-for-backend-engineers.md](./01-ai-fluency-for-backend-engineers.md)
 - [06-local-ai-server-for-backend-engineers.md](./06-local-ai-server-for-backend-engineers.md)
 - [08-ai-assisted-development-for-backend-engineers.md](./08-ai-assisted-development-for-backend-engineers.md)
+- [09-spec-driven-development-for-ai-assisted-work.md](./09-spec-driven-development-for-ai-assisted-work.md)
 
 ## Required
 
 - [06-local-ai-server-for-backend-engineers.md](./06-local-ai-server-for-backend-engineers.md)
 - [07-securing-private-ai-services.md](./07-securing-private-ai-services.md)
 - [08-ai-assisted-development-for-backend-engineers.md](./08-ai-assisted-development-for-backend-engineers.md)
+- [09-spec-driven-development-for-ai-assisted-work.md](./09-spec-driven-development-for-ai-assisted-work.md)
 - [02-prompting-and-evals.md](./02-prompting-and-evals.md)
 
 ## Growth
