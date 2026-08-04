@@ -9,14 +9,17 @@ para empezar.
 > **なにに しますか。**  
 > *nani ni shimasu ka?*  
 > ¿Qué vas a tomar / elegir?
+> English: What would you like?
 
 > **これを ください。**  
 > *kore o kudasai.*  
 > Esto, por favor.
+> English: This, please.
 
 > **コーヒーを おねがいします。**  
 > *koohii o onegaishimasu.*  
 > Un café, por favor.
+> English: A coffee, please.
 
 `ください` (*kudasai*) y `おねがいします` (*onegaishimasu*) son opciones amables.
 Para empezar, usa una de las dos; no hace falta combinarlas en cada frase.
@@ -29,14 +32,17 @@ las cadenas no siempre usan los mismos tamaños.
 > **アイス カフェオレを おねがいします。**<br>
 > *aisu kafe ore o onegaishimasu.*<br>
 > Un café con leche frío, por favor.
+> English: An iced café au lait, please.
 
 > **サイズは どうしますか。**<br>
 > *saizu wa dou shimasu ka?*<br>
 > ¿Qué tamaño quieres?
+> English: What size would you like?
 
 > **Mサイズで おねがいします。**<br>
 > *emu saizu de onegaishimasu.*<br>
 > Tamaño M, por favor.
+> English: Medium size, please.
 
 `R` se lee `アール` (*aaru*), `M` se lee `エム` (*emu*) y `L` se lee `エル`
 (*eru*). Por ejemplo, `Rサイズで おねがいします` (*aaru saizu de
@@ -46,14 +52,17 @@ algunas cafeterías usan `S`, `M`, `L` y otras `R`, `L`.
 > **てんないですか。おもちかえりですか。**<br>
 > *tennai desu ka? omochikaeri desu ka?*<br>
 > ¿Para tomar aquí o para llevar?
+> English: For here or to go?
 
 > **ここで おねがいします。**<br>
 > *koko de onegaishimasu.*<br>
 > Para tomar aquí, por favor.
+> English: For here, please.
 
 > **おもちかえりで おねがいします。**<br>
 > *omochikaeri de onegaishimasu.*<br>
 > Para llevar, por favor.
+> English: To go, please.
 
 `店内（てんない）` (*tennai*) significa dentro del local y `お持ち帰り
 （おもちかえり）` (*omochikaeri*) significa para llevar. En algunos sitios
@@ -67,52 +76,64 @@ En cafeterías, supermercados y tiendas oirás estas preguntas. Responder con
 > **ふくろは いりますか。**<br>
 > *fukuro wa irimasu ka?*<br>
 > ¿Necesitas bolsa?
+> English: Do you need a bag?
 
 > **はい、おねがいします。**<br>
 > *hai, onegaishimasu.*<br>
 > Sí, por favor.
+> English: Yes, please.
 
 > **レシートは いりますか。**<br>
 > *reshiito wa irimasu ka?*<br>
 > ¿Necesitas recibo?
+> English: Do you need a receipt?
 
 > **いいえ、だいじょうぶです。**<br>
 > *iie, daijoubu desu.*<br>
 > No, no hace falta.
+> English: No, I am okay.
 
 > **ポイントカードは おもちですか。**<br>
 > *pointo kaado wa omochi desu ka?*<br>
 > ¿Tienes tarjeta de puntos?
+> English: Do you have a point card?
 
 > **いいえ、ありません。**<br>
 > *iie, arimasen.*<br>
 > No, no tengo.
+> English: No, I do not.
 
 ## Cantidad, precio y pago
 
 > **いくつ ですか。**  
 > *ikutsu desu ka?*  
 > ¿Cuántos son? / ¿Cuántos quieres?
+> English: How many would you like?
 
 > **ふたつ おねがいします。**  
 > *futatsu onegaishimasu.*  
 > Dos, por favor.
+> English: Two, please.
 
 > **いくらですか。**  
 > *ikura desu ka?*  
 > ¿Cuánto cuesta?
+> English: How much is it?
 
 > **ごひゃく えんです。**  
 > *gohyaku en desu.*  
 > Son 500 yenes.
+> English: It is 500 yen.
 
 > **カードで はらえますか。**  
 > *kaado de haraemasu ka?*  
 > ¿Se puede pagar con tarjeta?
+> English: Can I pay by card?
 
 > **はい、つかえます。**  
 > *hai, tsukaemasu.*  
 > Sí, se puede usar.
+> English: Yes, you can.
 
 Para contar, el número cambia según el tipo de cosa. La guía de `-tsu`,
 entradas (`-mai`), personas y pisos está en
@@ -125,22 +146,27 @@ el mejor punto de partida.
 > **みずを ください。**  
 > *mizu o kudasai.*  
 > Agua, por favor.
+> English: Water, please.
 
 > **おすすめは なんですか。**  
 > *osusume wa nan desu ka?*  
 > ¿Qué recomienda?
+> English: What do you recommend?
 
 > **これは からいですか。**  
 > *kore wa karai desu ka?*  
 > ¿Esto pica?
+> English: Is this spicy?
 
 > **はい、からいです。**  
 > *hai, karai desu.*  
 > Sí, pica.
+> English: Yes, it is spicy.
 
 > **おかいけい おねがいします。**  
 > *okaikei onegaishimasu.*  
 > La cuenta, por favor.
+> English: The bill, please.
 
 ## Alergias y límites
 
@@ -150,13 +176,16 @@ una tarjeta escrita y confirma ingredientes.
 > **X アレルギーが あります。**  
 > *X arerugii ga arimasu.*  
 > Tengo alergia a X.
+> English: I have an allergy to X.
 
 > **たまご アレルギーが あります。**  
 > *tamago arerugii ga arimasu.*  
 > Tengo alergia al huevo.
+> English: I have an egg allergy.
 
 > **これに X は ありますか。**  
 > *kore ni X wa arimasu ka?*  
 > ¿Esto contiene X?
+> English: Does this contain X?
 
 Regla práctica: señala, usa el nombre del ingrediente y pide confirmación.
