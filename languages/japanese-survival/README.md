@@ -47,6 +47,8 @@ la pregunta. Aprender una frase aislada no prepara para una conversación.
     orientarte, entender indicaciones y describir lo básico.
 13. [Señalar cosas y lugares](./12-senalar-cosas-y-lugares.md): esto, eso,
     aquello, aquí y allí; útil para pedir sin conocer aún todo el vocabulario.
+14. [Partículas de supervivencia](./13-particulas-de-supervivencia.md):
+    conectar frases cortas sobre acciones, destino, tiempo, compañía y límites.
 
 ## Conexión con el curso actual
 
@@ -59,8 +61,6 @@ clase, busca solo las frases que podrías usar esa semana.
 Ampliaremos cada tema como una nota breve y validable:
 
 - familia, casa y describir dónde vives;
-- partículas básicas `は / を / に / で` (*wa / o / ni / de*) con ejemplos
-  de supervivencia;
 - comida, alergias y restricciones alimentarias;
 - médico, farmacia y urgencias no críticas;
 - chat, correo y conversaciones de cortesía en el trabajo;

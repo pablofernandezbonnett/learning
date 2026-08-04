@@ -98,7 +98,7 @@ Con esta nota ya tienes un núcleo de supervivencia sólido: kana, preguntas,
 números, hora, peticiones, saludos, pedidos, verbos básicos, trabajo y
 [direcciones y adjetivos](./11-posicion-direcciones-y-adjetivos.md). Lo
 siguiente con buen retorno es [señalar personas, objetos y lugares](./12-senalar-cosas-y-lugares.md)
-con `これ / それ / あれ` (*kore / sore / are*) y afianzar las partículas `は / を /
-に / で` (*wa / o / ni / de*). Después, la forma `-te` completa te hará sonar
-más natural, pero no es un requisito para empezar a resolver situaciones
-reales.
+con `これ / それ / あれ` (*kore / sore / are*) y
+[partículas de supervivencia](./13-particulas-de-supervivencia.md). Después,
+la forma `-te` completa te hará sonar más natural, pero no es un requisito
+para empezar a resolver situaciones reales.
