@@ -7,16 +7,19 @@ correcta y amable.
 
 ## Regla de lectura
 
-Cada ejemplo muestra tres capas:
+Cada ejemplo muestra cuatro capas:
 
 > **おなまえは なんですか。**  
 > *onamae wa nan desu ka?*  
 > ¿Cómo te llamas?
+> English: What is your name?
 
 - El japonés aparece en **hiragana**, **katakana** y, más adelante, kanji.
 - El *romaji* es apoyo de pronunciación. Léelo, pero mira también el kana.
 - Las traducciones buscan que puedas usar la frase; no siempre son literales.
-- En estas notas no se usan macrones: `とうきょう` (*toukyou*) se escribe
+- El español es el apoyo principal; la línea o columna **English** permite
+  comparar la frase con tus materiales en inglés.
+- En estas notas no se usan macrones: `とうきょう` (*toukyou*, Tokio) se escribe
   `toukyou` en romaji.
 
 ## Ruta inicial
@@ -37,18 +40,19 @@ la pregunta. Aprender una frase aislada no prepara para una conversación.
    localizarte y moverte.
 8. [08 Kanji para reconocer](./08-kanji-para-reconocer.md): señales y palabras
    cotidianas, sin obligación de escribirlos.
-9. [Engineering Japanese](./engineering/README.md): vocabulario, reuniones y
-   estados de trabajo para entender y participar de forma básica.
-10. [Saludos, respuestas y escucha](./09-saludos-respuestas-y-aizuchi.md):
+9. [Saludos, respuestas y escucha](./09-saludos-respuestas-y-aizuchi.md):
     intercambios cotidianos y señales breves de “te sigo”.
-11. [Verbos básicos y forma `-masu`](./10-verbos-basicos-y-masu.md): acciones
+10. [Verbos básicos y forma `-masu`](./10-verbos-basicos-y-masu.md): acciones
     cotidianas en presente/futuro, pasado y negativo.
-12. [Posición, direcciones y adjetivos](./11-posicion-direcciones-y-adjetivos.md):
+11. [Posición, direcciones y adjetivos](./11-posicion-direcciones-y-adjetivos.md):
     orientarte, entender indicaciones y describir lo básico.
-13. [Señalar cosas y lugares](./12-senalar-cosas-y-lugares.md): esto, eso,
+12. [Señalar cosas y lugares](./12-senalar-cosas-y-lugares.md): esto, eso,
     aquello, aquí y allí; útil para pedir sin conocer aún todo el vocabulario.
-14. [Partículas de supervivencia](./13-particulas-de-supervivencia.md):
+13. [Partículas de supervivencia](./13-particulas-de-supervivencia.md):
     conectar frases cortas sobre acciones, destino, tiempo, compañía y límites.
+14. [Engineering Japanese](./engineering/README.md) (opcional, en paralelo):
+    vocabulario, reuniones y estados de trabajo para entender y participar de
+    forma básica.
 
 ## Conexión con el curso actual
 

@@ -45,13 +45,13 @@ Para pedir señalando, usa el bloque que ya aparece en
 | あれ | あの | are / ano | aquello / aquel, aquella |
 | どれ | どの | dore / dono | cuál / cuál + nombre |
 
-> **どの メニューですか。**<br>
-> *dono menyuu desu ka?*<br>
-> ¿Cuál menú es?
+> **どの メニューが いいですか。**<br>
+> *dono menyuu ga ii desu ka?*<br>
+> ¿Qué menú prefieres / cuál te parece bien?
 
-> **この メニューです。**<br>
-> *kono menyuu desu.*<br>
-> Es este menú.
+> **この メニューが いいです。**<br>
+> *kono menyuu ga ii desu.*<br>
+> Prefiero este menú / este menú está bien.
 
 No digas `これ メニュー` (*kore menyuu*): `これ` (*kore*, esto) ya ocupa el
 lugar del nombre. Di `この メニュー` (*kono menyuu*, este menú).

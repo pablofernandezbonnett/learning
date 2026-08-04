@@ -114,6 +114,12 @@ parejas como vocabulario.
 | あつい / つめたい | atsui / tsumetai | caliente / frío, para comida o bebida |
 | かんたん / むずかしい | kantan / muzukashii | fácil / difícil |
 
+`おおい` (*ooi*, muchos / mucha cantidad) y `すくない` (*sukunai*, pocos /
+poca cantidad) son una excepción útil: normalmente hablan de cantidad, no
+describen directamente un nombre como “grande” o “pequeño”. Aprende bloques
+seguros como `ひとが おおいです` (*hito ga ooi desu*, hay mucha gente) y
+`じかんが すくないです` (*jikan ga sukunai desu*, hay poco tiempo).
+
 `たかい` (*takai*) cambia según el contexto. `たかい ビル` (*takai biru*,
 edificio alto), `せが たかい` (*se ga takai*, ser alto de estatura) y `ねだんが
 たかい` (*nedan ga takai*, ser caro) usan la misma palabra. Para “bajo” de

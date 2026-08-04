@@ -31,38 +31,43 @@ También existen los cambios de sonido: `ガ ga`, `ザ za`, `ダ da`, `バ ba`,
 
 ## Palabras que probablemente verás
 
-| Japonés | Romaji | Significado |
-|---|---|---|
-| コーヒー | koohii | café |
-| レストラン | resutoran | restaurante |
-| ホテル | hoteru | hotel |
-| タクシー | takushii | taxi |
-| バス | basu | autobús |
-| スーパー | suupaa | supermercado |
-| トイレ | toire | baño / aseo |
-| メニュー | menyuu | menú |
-| ビール | biiru | cerveza |
+| Japonés | Romaji | Español | English |
+|---|---|---|---|
+| コーヒー | koohii | café | coffee |
+| レストラン | resutoran | restaurante | restaurant |
+| ホテル | hoteru | hotel | hotel |
+| タクシー | takushii | taxi | taxi |
+| バス | basu | autobús | bus |
+| スーパー | suupaa | supermercado | supermarket |
+| トイレ | toire | baño / aseo | toilet / restroom |
+| メニュー | menyuu | menú | menu |
+| ビール | biiru | cerveza | beer |
 
 ## Pregunta y respuesta
 
 > **これは なんですか。**  
 > *kore wa nan desu ka?*  
 > ¿Qué es esto?
+> English: What is this?
 
 > **コーヒーです。**  
 > *koohii desu.*  
 > Es café.
+> English: It is coffee.
 
 > **トイレは どこですか。**  
 > *toire wa doko desu ka?*  
 > ¿Dónde está el baño?
+> English: Where is the restroom?
 
 > **あそこです。**  
 > *asoko desu.*  
 > Está allí.
+> English: It is over there.
 
 ## Cuidado útil
 
 No todo katakana es idéntico a la palabra original. Por ejemplo, `マンション`
-(*manshon*) suele significar apartamento o edificio de apartamentos, no una
-mansión. Aprende el significado japonés de la palabra que ves.
+(*manshon*, apartamento o edificio de apartamentos; **English:** apartment
+building) suele significar eso, no una mansión. Aprende el significado japonés
+de la palabra que ves.

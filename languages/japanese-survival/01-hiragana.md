@@ -26,7 +26,8 @@ Notas rápidas:
   `r` fuerte.
 - `し` es `shi`, `ち` es `chi`, `つ` es `tsu` y `ふ` es `fu` suave.
 - `を` suele sonar `o` y aparece sobre todo como partícula de objeto.
-- `は` se pronuncia `wa` cuando marca el tema: `わたしは` (*watashi wa*).
+- `は` se pronuncia `wa` cuando marca el tema: `わたしは` (*watashi wa*,
+  yo / en cuanto a mí).
 
 ## Sonidos que cambian una palabra
 
@@ -54,10 +55,12 @@ Combinaciones frecuentes: `きゃ kya`, `きゅ kyu`, `きょ kyo`; `しゃ sha`
 > **おなまえは なんですか。**  
 > *onamae wa nan desu ka?*  
 > ¿Cómo te llamas?
+> English: What is your name?
 
 > **わたしは パブロ です。**  
 > *watashi wa paburo desu.*  
 > Soy Pablo.
+> English: I am Pablo.
 
 La pregunta contiene `は`, escrito *ha* en la tabla pero pronunciado `wa` aquí.
 
@@ -65,7 +68,8 @@ La pregunta contiene `は`, escrito *ha* en la tabla pero pronunciado `wa` aquí
 
 Lee sin romaji, luego comprueba:
 
-- `こんにちは` - *konnichiwa* - hola / buenas tardes.
-- `ありがとう` - *arigatou* - gracias.
-- `すみません` - *sumimasen* - disculpa / para llamar la atención.
-- `にほんご` - *nihongo* - japonés.
+- `こんにちは` - *konnichiwa* - hola / buenas tardes - **English:** hello.
+- `ありがとう` - *arigatou* - gracias - **English:** thank you.
+- `すみません` - *sumimasen* - disculpa / para llamar la atención -
+  **English:** excuse me / sorry.
+- `にほんご` - *nihongo* - japonés - **English:** Japanese.
