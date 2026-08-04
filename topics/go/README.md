@@ -21,11 +21,14 @@ Keep this baseline warm:
 
 ## Recommended Order
 
-1. [01-basics/main.go](./01-basics/main.go): syntax, structs, methods, and explicit errors
-2. [03-http-json/main.go](./03-http-json/main.go): JSON handler and validation flow
-3. [05-project-shape-errors-and-context.md](./05-project-shape-errors-and-context.md): project shape, errors, interfaces, and `context`
-4. [04-gin-service/README.md](./04-gin-service/README.md): one realistic service slice with Gin
-5. [02-concurrency/main.go](./02-concurrency/main.go): goroutines, channels, `select`, and wait groups
+1. [00-go-for-java-developers.md](./00-go-for-java-developers.md): the Java-to-Go mental map that matters in backend work
+2. [01-basics/main.go](./01-basics/main.go): syntax, structs, methods, and explicit errors
+3. [03-http-json/main.go](./03-http-json/main.go): JSON handler and validation flow
+4. [05-project-shape-errors-and-context.md](./05-project-shape-errors-and-context.md): project shape, errors, interfaces, and `context`
+5. [06-http-https-and-api-clients.md](./06-http-https-and-api-clients.md): server lifecycle, HTTPS, and outbound API calls
+6. [04-gin-service/README.md](./04-gin-service/README.md): one realistic service slice with Gin
+7. [07-testing-tooling-and-quality.md](./07-testing-tooling-and-quality.md): tests, race detection, formatting, and dependency hygiene
+8. [02-concurrency/main.go](./02-concurrency/main.go): goroutines, channels, `select`, and wait groups
 
 Run the examples from this folder:
 
@@ -43,3 +46,11 @@ cd 04-gin-service && go run .
 
 Treat Go as a focused growth lane when current work or a target role needs it,
 not as a replacement for the main Java backend roadmap.
+
+## Further Reading
+
+- [A Tour of Go](https://go.dev/tour/): interactive syntax and concurrency introduction; use it after the Java-to-Go map, not instead of it.
+- [Official Go tutorials](https://go.dev/doc/tutorial/): modules, tests, databases, fuzzing, and an official Gin API tutorial.
+- [Effective Go](https://go.dev/doc/effective_go): idioms worth returning to once basic syntax is familiar.
+- [Gin Quickstart](https://gin-gonic.com/en/docs/quickstart/): create and run a minimal Gin API.
+- [Gin middleware](https://gin-gonic.com/en/docs/middleware/) and [testing](https://gin-gonic.com/en/docs/testing/): the two Gin concepts most useful after the quickstart.
