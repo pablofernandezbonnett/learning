@@ -40,6 +40,51 @@ una frase amable en pregunta.
 contexto deja claro que hablas de ti. Al principio, usarlo te ayuda a formar
 la frase.
 
+## Presentación corta de Pablo
+
+Esta es una presentación natural para clase, conocer a alguien o una
+conversación tranquila. No hace falta decirla entera: empieza por nombre,
+origen y dónde vives; añade trabajo, aficiones o familia solo si apetece.
+
+> **はじめまして。パブロです。スペインじんです。**<br>
+> *hajimemashite. Paburo desu. Supeinjin desu.*<br>
+> Mucho gusto. Soy Pablo. Soy español.
+> English: Nice to meet you. I am Pablo. I am Spanish.
+
+> **がまごおりに すんでいます。IT エンジニアです。**<br>
+> *Gamagoori ni sunde imasu. ai tii enjinia desu.*<br>
+> Vivo en Gamagori. Soy ingeniero de IT.
+> English: I live in Gamagori. I am an IT engineer.
+
+> **おんがくと ウォーゲームと やまのぼりが すきです。**<br>
+> *ongaku to woogeemu to yamanobori ga suki desu.*<br>
+> Me gustan la música, los wargames y la montaña / el montañismo.
+> English: I like music, wargames, and mountain climbing.
+
+> **つまは にほんじんです。むすめが うまれた ばかりです。**<br>
+> *tsuma wa nihonjin desu. musume ga umareta bakari desu.*<br>
+> Mi mujer es japonesa. Mi hija acaba de nacer.
+> English: My wife is Japanese. My daughter was just born.
+
+`はじめまして` (*hajimemashite*, mucho gusto / encantado) abre un primer
+encuentro. `うまれた ばかり` (*umareta bakari*, acaba de nacer) se aprende aquí
+como bloque: no necesitas estudiar todavía su gramática. `つま` (*tsuma*, mi
+mujer / esposa) es una forma habitual para hablar de tu propia esposa; para
+hablar de la esposa de otra persona se usa otra palabra.
+
+### Preguntas que probablemente escucharás
+
+| Pregunta | Romaji | Español | English | Respuesta de Pablo |
+|---|---|---|---|---|
+| どこに すんでいますか。 | doko ni sunde imasu ka? | ¿Dónde vives? | Where do you live? | がまごおりに すんでいます。 (*Gamagoori ni sunde imasu.*, Vivo en Gamagori. **English:** I live in Gamagori.) |
+| おしごとは なんですか。 | oshigoto wa nan desu ka? | ¿En qué trabajas? | What is your job? | IT エンジニアです。 (*ai tii enjinia desu.*, Soy ingeniero de IT. **English:** I am an IT engineer.) |
+| しゅみは なんですか。 | shumi wa nan desu ka? | ¿Cuáles son tus aficiones? | What are your hobbies? | おんがくと ウォーゲームと やまのぼりが すきです。 (*ongaku to woogeemu to yamanobori ga suki desu.*, Me gustan la música, los wargames y el montañismo. **English:** I like music, wargames, and mountain climbing.) |
+| ごかぞくは？ | gokazoku wa? | ¿Y tu familia? | What about your family? | つまは にほんじんです。むすめが うまれた ばかりです。 (*tsuma wa nihonjin desu. musume ga umareta bakari desu.*, Mi mujer es japonesa y mi hija acaba de nacer. **English:** My wife is Japanese, and my daughter was just born.) |
+
+`ごかぞく` (*gokazoku*, familia) usa `ご` como forma respetuosa al preguntar
+por la familia de otra persona. La pregunta se oye mucho en formato corto:
+`ごかぞくは？` (*gokazoku wa?*, ¿y tu familia?).
+
 ## Palabras de pregunta
 
 | Pregunta | Romaji | Español | English | Respuesta corta posible |
