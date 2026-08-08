@@ -20,6 +20,8 @@ Focus:
 - platform wiring, configuration, and Spring cloud-facing concerns
 - runtime readiness, health, and observability basics for real services
 - service baseline discipline around security, actuator exposure, and testing
+- batch execution, restart, reconciliation, and failure handling when the
+  product has imports, settlement, reporting, or scheduled processing
 
 Working style:
 
@@ -104,6 +106,9 @@ is merely running or actually trustworthy:
 - [21-practical-ddd-in-spring.md](./21-practical-ddd-in-spring.md)
 - [22-practical-cqrs-and-read-models.md](./22-practical-cqrs-and-read-models.md)
 - [23-practical-modular-monolith-in-spring.md](./23-practical-modular-monolith-in-spring.md)
+- [25-spring-batch-production-jobs.md](./25-spring-batch-production-jobs.md):
+  bounded imports, settlement, restart, idempotency, observability, and safe
+  failure handling for production jobs
 
 ## Companion Lab
 
