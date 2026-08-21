@@ -85,6 +85,74 @@ hablar de la esposa de otra persona se usa otra palabra.
 por la familia de otra persona. La pregunta se oye mucho en formato corto:
 `ごかぞくは？` (*gokazoku wa?*, ¿y tu familia?).
 
+## Pronombres personales: reconocerlos y usarlos con cuidado
+
+El japonés omite el sujeto cuando ya se entiende por el contexto. Por eso no
+necesitas repetir “yo”, “tú”, “él” o “ella” como en español. Aprende estas
+palabras sobre todo para reconocerlas; usa el nombre de la persona cuando
+puedas.
+
+| Persona | Japonés | Romaji | Español | English | Uso seguro |
+|---|---|---|---|---|---|
+| yo | わたし | watashi | yo | I | opción amable y segura para hablar de ti |
+| nosotros/as | わたしたち | watashitachi | nosotros/as | we | grupo que te incluye |
+| tú / usted | あなた | anata | tú / usted | you | reconócelo; con una persona, suele sonar mejor `nombre + さん` (*namae + san*, nombre + trato respetuoso) |
+| vosotros/as / ustedes | あなたたち | anatatachi | vosotros/as / ustedes | you (plural) | correcto, pero muy directo; para dirigirte a un grupo, `みなさん` (*minasan*, todos/as) suele ser más natural |
+| él | かれ | kare | él | he | también puede significar “novio”, según el contexto |
+| ella | かのじょ | kanojo | ella | she | también puede significar “novia”, según el contexto |
+| ellos/as; grupo mixto | かれら | karera | ellos/as | they | grupo de hombres o mixto; úsalo sobre todo para reconocerlo |
+| ellas | かのじょたち | kanojotachi | ellas | they | grupo solo de mujeres; menos frecuente en conversación básica |
+
+El sustituto más natural de “tú” es el nombre: `さとうさんは どうですか`
+(*Satou-san wa dou desu ka*, ¿y usted, señor/a Satou?) en vez de `あなたは
+どうですか` (*anata wa dou desu ka*, ¿y tú / usted?). Si el contexto ya está
+claro, puedes simplemente decir `どうですか` (*dou desu ka*, ¿qué tal? / ¿cómo
+es?).
+
+### Pregunta y respuesta con personas
+
+> **あの ひとは だれですか。**<br>
+> *ano hito wa dare desu ka?*<br>
+> ¿Quién es esa persona?
+> English: Who is that person?
+
+> **かれは ともだちです。**<br>
+> *kare wa tomodachi desu.*<br>
+> Él es un amigo.
+> English: He is a friend.
+
+> **パブロさんと わたしは IT エンジニアです。**<br>
+> *Paburo-san to watashi wa ai tii enjinia desu.*<br>
+> Pablo y yo somos ingenieros de IT.
+> English: Pablo and I are IT engineers.
+
+### Hablar de tu hija sin repetir `むすめ`
+
+Después de mencionar a tu hija, `かのじょ` (*kanojo*, ella) es correcto y el
+contexto deja claro que no significa “novia”. Aun así, la forma más natural
+en japonés suele ser omitir “ella” en la segunda frase si no hay duda sobre
+quién hablas.
+
+> **むすめは うまれた ばかりです。かのじょは げんきです。**<br>
+> *musume wa umareta bakari desu. kanojo wa genki desu.*<br>
+> Mi hija acaba de nacer. Ella está bien.
+> English: My daughter was just born. She is doing well.
+
+> **むすめは うまれた ばかりですが、げんきです。**<br>
+> *musume wa umareta bakari desu ga, genki desu.*<br>
+> Mi hija acaba de nacer, pero está bien.
+> English: My daughter was just born, but she is doing well.
+
+La segunda versión es la que más probablemente oirás: la hija ya es el tema,
+así que `かのじょ` (*kanojo*, ella) no hace falta. Úsalo cuando quieras
+contrastar a dos mujeres o cuando, sin el pronombre, no esté claro quién hace
+la acción.
+
+En una conversación real, `かれは ともだちです` (*kare wa tomodachi desu*, él
+es un amigo) puede sonar menos natural que nombrar a la persona: `たなかさんは
+ともだちです` (*Tanaka-san wa tomodachi desu*, el señor / la señora Tanaka es
+amigo/a). Ese es el patrón que conviene copiar primero.
+
 ## Palabras de pregunta
 
 | Pregunta | Romaji | Español | English | Respuesta corta posible |
