@@ -36,6 +36,9 @@ la pregunta. Aprender una frase aislada no prepara para una conversación.
    - [Presentación personal de Pablo (20–30 segundos)](./04-preguntas-y-frases-base.md#presentación-corta-de-pablo):
      nombre, origen, Gamagori, trabajo, aficiones y familia; con las preguntas
      que probablemente escucharás.
+   - [Pronombres personales](./04-preguntas-y-frases-base.md#pronombres-personales-reconocerlos-y-usarlos-con-cuidado):
+     yo, tú, él, ella y plurales, con el uso natural de nombres en lugar de
+     pronombres cuando corresponda.
 5. [05 Supervivencia cotidiana](./05-supervivencia-cotidiana.md): clase,
    ayuda y comprensión.
 6. [06 Pedir, comprar y comer](./06-pedir-comprar-comer.md): pedir y pagar.
