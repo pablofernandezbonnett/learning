@@ -95,7 +95,7 @@ Practical rule:
 
 ## Personal Learning
 
-- [Japonés de supervivencia para hispanohablantes](./languages/japanese-survival/README.md): notas breves para acompañar un curso A1 y manejar situaciones cotidianas.
+- [Japanese Survival for Spanish Speakers](./languages/japanese-survival/README.md) *(Japonés de supervivencia para hispanohablantes)*: practical Spanish-first notes for accompanying an A1 course and handling everyday situations.
 
 ## How The Repo Is Shaped
 

@@ -33,6 +33,9 @@ la pregunta. Aprender una frase aislada no prepara para una conversación.
    calendario y rutina.
 4. [04 Preguntas y frases base](./04-preguntas-y-frases-base.md):
    presentarte, preguntar y contestar.
+   - [Presentación personal de Pablo (20–30 segundos)](./04-preguntas-y-frases-base.md#presentación-corta-de-pablo):
+     nombre, origen, Gamagori, trabajo, aficiones y familia; con las preguntas
+     que probablemente escucharás.
 5. [05 Supervivencia cotidiana](./05-supervivencia-cotidiana.md): clase,
    ayuda y comprensión.
 6. [06 Pedir, comprar y comer](./06-pedir-comprar-comer.md): pedir y pagar.
