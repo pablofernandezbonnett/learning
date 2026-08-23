@@ -93,10 +93,6 @@ Practical rule:
 - [Flutter](./topics/flutter/README.md)
 - [Lua](./topics/lua/README.md)
 
-## Personal Learning
-
-- [Japanese Survival for Spanish Speakers](./languages/japanese-survival/README.md) *(Japonés de supervivencia para hispanohablantes)*: practical Spanish-first notes for accompanying an A1 course and handling everyday situations.
-
 ## How The Repo Is Shaped
 
 Most topic folders use the same order:
