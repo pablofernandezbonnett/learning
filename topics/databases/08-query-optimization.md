@@ -332,6 +332,32 @@ Short rule:
 
 > read models and write models do not always need the same object structure
 
+### 6.1 When The Query Is Inherently The Wrong Read Model
+
+Some search questions are expensive because the application repeatedly asks a
+transactional table to answer a different question. For example, finding which
+resources have capacity throughout a date range can become costly if every
+search scans historical reservations and tests overlaps.
+
+Do not jump straight to an index. First clarify:
+
+- how current the search result must be
+- which filters and ordering are actually hot
+- whether the booking or write transaction, rather than search, owns final
+  availability truth
+
+If the read is dominant and brief staleness is acceptable, an indexed
+availability-by-date record or a derived search projection may be a better read
+model. The transactional booking path still rechecks and changes authoritative
+availability atomically before it confirms. This makes search cheap without
+turning a cache or projection into booking truth.
+
+Tradeoff:
+
+- a separate read model adds synchronization, replay, and freshness work
+- keeping one transactional table is simpler, but may make high-volume search
+  unnecessarily expensive
+
 ---
 
 ## 7. Connection Pooling Is Part Of Query Performance

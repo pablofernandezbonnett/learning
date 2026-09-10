@@ -151,6 +151,44 @@ Bad vs better:
 - bad: one unbounded list endpoint because "clients can filter on their side"
 - better: explicit page limits and a pagination model that fits the real dataset and ordering needs
 
+### 2.3 A Search Endpoint Is Also A Cost Contract
+
+Before choosing an endpoint, clarify what is being searched. A list of records
+already owned by the caller and a live availability search may both look like
+`GET`, but they have different freshness, authorization, and cost rules.
+
+For a live search, a bounded shape might be:
+
+```http
+GET /v1/hotel-offers?destinationId=TYO&checkIn=2026-10-12&checkOut=2026-10-15&adults=2&pageSize=25&cursor=opaque-value
+```
+
+Strong defaults:
+
+- derive the agency or tenant from authentication, not a caller-controlled
+  query parameter
+- validate dates, occupancy, filters, sort values, and a small maximum page
+  size before starting expensive work
+- make a cursor opaque and bind it to the filters and ordering that produced it;
+  reject a cursor reused with different search criteria
+- return `nextCursor` rather than an exact `total` unless the product really
+  needs that count and can afford it
+- return only the fields needed for the result list, not every detail of every
+  result
+
+If the filter object is too large or structured for a query string, a
+side-effect-free `POST /v1/.../searches` can be a clearer input contract. The
+HTTP method does not remove the need to bound the query.
+
+For volatile search data, state the freshness rule explicitly. A displayed
+price or availability result is not a hold. The later booking or commit path
+must revalidate against the authoritative source before confirming.
+
+Practical rule:
+
+> Pagination protects response size. Validation, authorization, and request
+> cost limits protect the work required to produce that page.
+
 ---
 
 ## 3. Error Shape: Make Failures Actionable

@@ -86,6 +86,25 @@ Strong default:
 - do not let cache become the final authority for money, final order state, or
   high-contention write decisions unless that is a deliberate system design
 
+### Search Result Cache Boundaries
+
+Search results often mix data with different freshness needs. For example,
+hotel descriptions can be cached longer than price or availability. Keep those
+decisions separate instead of caching the complete response blindly.
+
+For a short-lived search-result cache:
+
+- build the key from normalized filters, ordering, and the authorized tenant or
+  agency scope; never let one caller receive another caller's contracted result
+- use it only when the product accepts the resulting staleness
+- coalesce identical in-flight misses when a burst would otherwise make every
+  request recompute the same result
+- revalidate final price, capacity, or other correctness-critical state on the
+  later commit path
+
+This reduces repeated read work. It does not replace rate limiting, request
+deadlines, or a correct database query.
+
 Reusable takeaway:
 
 > I treat caching as a latency optimization over a clear source of truth. The

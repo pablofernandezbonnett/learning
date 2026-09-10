@@ -293,6 +293,37 @@ Good vs bad pattern:
 
 Earlier controlled rejection is often kinder than slower hidden failure.
 
+### API Admission Control: Rate, Concurrency, And Cost
+
+An API response that has already completed cannot be taken back. Protection
+happens when each new request tries to start expensive work.
+
+Three controls address different failure shapes:
+
+- a rate limit controls how many requests a caller starts over time; a token
+  bucket permits a steady rate plus a small burst
+- a concurrency limit controls how many expensive requests that caller has in
+  flight; this protects pools when each request becomes slow
+- a cost limit gives expensive request shapes a larger budget cost, such as a
+  broad date-range search or large fan-out, instead of treating every request
+  as equally cheap
+
+For a shared API, apply these limits by authenticated client or tenant. Use a
+shared counter when requests can land on different instances; per-instance
+limits do not protect the shared database or downstream dependency completely.
+
+On rejection, return `429 Too Many Requests` and, when useful, `Retry-After`.
+This tells a well-behaved caller to back off rather than retry immediately.
+The permitted values are capacity and product-tier decisions, so choose them
+from load tests and observed dependency limits rather than quoting a universal
+number.
+
+Strong default:
+
+> Rate limits stop a caller starting too much work; concurrency limits stop a
+> slow request from occupying too much capacity; cost limits stop one valid but
+> broad request shape from being treated as cheap.
+
 ---
 
 ## 11. Retry Storms
