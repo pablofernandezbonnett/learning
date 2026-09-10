@@ -86,7 +86,9 @@ Start with this:
 
 Short rule:
 
-> Postgres is usually the source of truth, document stores fit access-pattern-heavy reads, and Redis is usually a support layer, not the final truth
+> A relational SQL database such as MySQL or Postgres is usually the source of
+> truth, document stores fit access-pattern-heavy reads, and Redis is usually a
+> support layer, not the final truth
 
 ---
 
@@ -193,6 +195,48 @@ Tradeoffs:
 Practical line:
 
 > I default to SQL for the commit path when the business rule is more important than raw write scale.
+
+### 3.1 Why A Relational Database Is A Reasonable Choice Here
+
+For hotel booking truth, a relational database is a good fit when the system
+needs to change related facts together: claim room capacity, create a
+reservation, and prevent the counter from becoming negative. It gives the
+application transactions, constraints, indexes, and concurrency controls in one
+source of truth.
+
+Small concrete shape:
+
+```text
+relational-database transaction
+  -> conditionally claim room-night inventory
+  -> insert reservation or temporary hold
+  -> commit both, or roll back both
+```
+
+Why not make Redis or a document database the final reservation truth?
+
+- a cache can return an old availability value
+- a distributed lock can expire or be unavailable; it is not the durable proof
+  that a room was claimed
+- a document model can work, but the main problem here is a multi-row,
+  competing-write transaction rather than flexible document shape
+
+MySQL/InnoDB and PostgreSQL are two concrete relational choices. For this
+problem, the generic decision comes first: choose a transactional relational
+store. The engine decision comes second.
+
+Choose between them using concrete requirements such as existing operational
+skill, supported SQL features, extension needs, hosting constraints, and
+measured performance. Do not choose by the slogan "Postgres is better" or
+"MySQL is simpler." Both can protect this reservation invariant when used with
+the right transaction and conditional claim.
+
+Strong default:
+
+> Keep a transactional relational database as the booking source of truth. If
+> MySQL/InnoDB already fits the team's operational skills, it is a reasonable
+> choice. Add a cache or read projection only for search scale, never as the
+> final booking decision.
 
 ---
 

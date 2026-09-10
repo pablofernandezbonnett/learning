@@ -46,6 +46,33 @@ What a transaction does **not** automatically give you:
 
 That distinction is one of the main senior-level signals.
 
+### What `@Transactional` Means Across Databases
+
+`@Transactional` tells Spring to group the database work in the method into one
+local transaction. It does not make the database itself optional: the database
+engine decides how commits, locks, and isolation work.
+
+A correctly configured Spring transaction manager starts and ends that local,
+multi-statement transaction around the annotated service method. The generic
+rule is the same with MySQL, PostgreSQL, or another transactional database.
+
+Plain-English version:
+
+- without the transaction, decrementing a room counter and inserting a
+  reservation can become two separate commits
+- with one short transaction, either both changes become permanent or both are
+  rolled back
+- this is still not enough if the decrement itself is an unsafe
+  read-modify-write; use a conditional update or lock for the competing writers
+
+MySQL/InnoDB is one concrete mapping: connections use `autocommit` by default,
+so the transaction manager must make the decrement and reservation insert one
+explicit transaction. Other engines expose the same all-or-nothing idea with
+their own default settings and SQL syntax.
+
+See [`../../topics/databases/02-database-locks-and-concurrency.md`](../../topics/databases/02-database-locks-and-concurrency.md)
+for the portable reservation strategy and engine-specific mappings.
+
 ---
 
 ## 2. The Smallest Useful Example
@@ -178,9 +205,15 @@ or force one another to retry.
 
 The main levels worth remembering:
 
-- `READ_COMMITTED`: common default, prevents dirty reads
+- `READ_COMMITTED`: a common baseline, prevents dirty reads
 - `REPEATABLE_READ`: row reads stay stable inside the transaction
 - `SERIALIZABLE`: strongest guarantee, highest contention cost
+
+Database-specific caution:
+
+- Spring does not make all databases use the same default isolation level
+- MySQL/InnoDB defaults to `REPEATABLE READ`; if you do not set an isolation
+  level in `@Transactional`, verify the actual database and connection settings
 
 What that means in practice:
 

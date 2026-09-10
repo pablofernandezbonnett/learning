@@ -67,14 +67,17 @@ Small concrete example:
 
 Strong default:
 
-- start by naming the business invariant, then choose optimistic or pessimistic
-  control based on contention and conflict cost
+- start by naming the business invariant, then choose an atomic conditional
+  write, optimistic locking, or pessimistic control based on the data shape,
+  contention, and conflict cost
 
 Reusable takeaway:
 
 > I frame database concurrency around protecting one business invariant under
-> competing writers, then choose optimistic locking for rarer collisions or
-> pessimistic locking when contention is high and retries are too expensive.
+> competing writers. For a simple inventory counter, I use an atomic
+> conditional update; for richer state, I choose optimistic locking for rarer
+> collisions or pessimistic locking when contention is high and retries are too
+> expensive.
 
 ---
 
@@ -303,19 +306,118 @@ Tradeoff:
 `Serialization` here means you are deliberately forcing one writer to finish
 before another writer can continue on the same protected row or range.
 
+### 3.3 Atomic conditional update for limited inventory
+
+For a numeric availability counter, the simplest strong default is often not
+"read, then lock, then write." It is one database statement that claims stock
+only if enough remains.
+
+The portable idea is simple. Model remaining capacity separately from the
+reservation record: one capacity entry represents one resource and one time
+slot, such as a hotel room type on one night. A reservation may only be created
+after it claims every required capacity entry.
+
+For one room on one night, the conditional claim looks like this in SQL-like
+pseudocode:
+
+```text
+decrease available rooms by 1
+only where this hotel, room type, and night still have at least 1 room
+```
+
+Every relational database has an equivalent of this operation. The application
+must learn whether the claim succeeded from the statement result:
+
+- success: this request claimed the room
+- no matching change: availability is gone, so return a conflict
+
+Two callers can issue this at the same time. The database coordinates the
+conflicting write: one claim succeeds, and the other finds that the condition
+is no longer true. The important property is not the syntax. It is that the
+database evaluates "is there capacity?" and decrements it as one protected
+change, rather than the application making those two steps separately.
+
+There is no unsafe application-side `SELECT available_rooms` followed later by
+an unconditional update.
+
+For a stay across several nights, make the whole claim and reservation one short
+local transaction:
+
+```text
+begin transaction
+  claim every requested night, only if each still has enough capacity
+  if every night was claimed:
+    create reservation or temporary hold
+    commit
+  otherwise:
+    roll back
+```
+
+If one night is unavailable, rollback means any earlier decrement in this
+attempt disappears too. The client receives a conflict such as `409` with an
+actionable "availability changed" response; it should choose another option
+rather than blindly retrying the same request.
+
+The invariant is:
+
+> confirmed reservations must never make `available_rooms` negative, and every
+> confirmed reservation must have claimed all of its nights atomically.
+
+Important boundaries:
+
+- this protects two different customers competing for the same inventory
+- an `Idempotency-Key` separately protects one customer retrying the same
+  reservation request after a timeout; see
+  [`01-idempotency-and-transaction-safety.md`](./01-idempotency-and-transaction-safety.md)
+- do not keep row locks open while calling a payment provider; create a
+  durable, expiring hold in the local transaction when payment confirmation is
+  later, then confirm or release that hold through explicit state transitions
+- handle a database deadlock or serialization failure with a small bounded
+  retry of the whole transaction, not a retry loop that runs forever
+
+Do not use a cache or a distributed lock as the final authority here. They can
+reduce load or coordinate best effort, but the transaction that changes durable
+inventory must enforce the no-oversell rule.
+
+### Engine-Specific Mappings
+
+The strategy above is database-agnostic. These are implementation differences,
+not different correctness rules:
+
+- PostgreSQL can return claimed rows directly with `UPDATE ... RETURNING`
+- MySQL uses the conditional `UPDATE` and the affected-row count to tell the
+  application whether capacity was claimed
+- all engines have their own lock, deadlock, and isolation behavior; use their
+  documentation when writing the production query
+
+MySQL/InnoDB companion notes:
+
+- use `InnoDB`; a transaction annotation cannot give transactional semantics to
+  a non-transactional table engine
+- keep the transaction short: do not call payment, email, or another HTTP API
+  before `COMMIT` or `ROLLBACK`
+- MySQL/InnoDB defaults to `REPEATABLE READ`, but the safe result above comes
+  from the conditional write and transaction, not from changing isolation level
+  and hoping
+
 ---
 
-## 4. How To Choose Between Optimistic And Pessimistic
+## 4. How To Choose A Concurrency Strategy
 
 The clean rule is:
 
+- prefer an **atomic conditional update** when one counter or state transition
+  can express the business rule directly
 - prefer **optimistic** when collisions are uncommon and scale matters
 - choose **pessimistic** when contention is high and the cost of a conflict is high
 
 Good examples:
 
 - profile updates: optimistic is usually fine
-- inventory decrement for hot SKUs: pessimistic may be justified
+- inventory decrement represented by a counter: atomic conditional update is
+  often the simplest fit
+- inventory with a complex decision or consistently hot rows: pessimistic may
+  be justified
 - payment or ledger-like flows: often combine strict transaction rules with very small
   transaction scopes
 
@@ -333,8 +435,10 @@ and deadlocks without asking whether the business case needs it.
 Isolation levels define what concurrent transactions are allowed to observe.
 This is the database rulebook for overlapping work.
 
-- `READ_COMMITTED`: prevents dirty reads; common default
-- `REPEATABLE_READ`: stable row reads inside the transaction
+- `READ_COMMITTED`: prevents dirty reads; common default in some relational
+  databases
+- `REPEATABLE_READ`: stable row reads inside the transaction; the default for
+  MySQL/InnoDB unless the server or session changes it
 - `SERIALIZABLE`: strongest guarantee, highest contention cost
 
 Practical rule:
@@ -355,37 +459,34 @@ Typical failure cases to connect back to business behavior:
 
 ---
 
-## 6. MVCC In One Minute
+## 6. MVCC In One Minute: Postgres And InnoDB
 
 Practical question:
 
-> If one transaction is writing a row in Postgres, can another transaction still read it?
+> If one transaction is writing a row, can another transaction still read it?
 
 Short answer:
 
-> Usually yes, because Postgres uses MVCC.
+> Often yes. Both Postgres and MySQL/InnoDB use MVCC, but the exact result also
+> depends on the isolation level and whether the read asks for a lock.
 
 What that means in practice:
 
-- Postgres keeps row versions
+- the database retains enough information about older row versions to give a
+  consistent read
 - readers can often see the previous committed version
 - reads do not always block writes, and writes do not always block reads
 
 Why it matters:
 
-`MVCC` means `Multi-Version Concurrency Control`: the database keeps several row
-versions around so readers can often continue without waiting for a writer to finish.
+`MVCC` means `Multi-Version Concurrency Control`: the database keeps enough
+row-version information for many readers to continue without waiting for every
+writer to finish.
 
 - better read concurrency
 - less blocking than old lock-heavy mental models
-- but old row versions still need cleanup, which is why autovacuum matters
-
-`MVCC` means `Multi-Version Concurrency Control`.
-
-That name sounds intimidating, but the basic idea is simple:
-
-- instead of one row having only one visible version, the database can keep older committed versions around briefly
-- that lets many reads continue without waiting behind every write
+- but old versions still need cleanup; Postgres and InnoDB manage that work
+  differently
 
 MVCC is not a magic shield:
 
@@ -400,17 +501,16 @@ If you want the Spring version, keep the answer simple:
 
 1. identify the shared state
 2. identify the invariant you must protect
-3. choose optimistic or pessimistic control
+3. choose an atomic conditional write, optimistic, or pessimistic control
 4. keep the transaction short
 5. define the retry or conflict behavior explicitly
 
 Clean example:
 
-> For inventory I would first ask whether hot contention is common. If not, I would
-> start with optimistic locking using a version field and explicit retry or conflict
-> handling. If contention is frequent and overselling risk is high, I would move to a
-> tighter transaction with `SELECT ... FOR UPDATE` or a pessimistic lock, but I would
-> keep that transaction very short to avoid killing throughput.
+> For a simple inventory counter, I prefer an atomic conditional decrement because
+> the database either claims the stock or returns zero rows. If the decision spans
+> richer state, I use optimistic locking for uncommon collisions, or a short
+> `SELECT ... FOR UPDATE` transaction when hot contention makes conflicts too costly.
 
 ---
 
@@ -418,32 +518,40 @@ Clean example:
 
 > The main concurrency bug I think about first is the lost update problem: two requests
 > read the same value, both write back a derived value, and one write silently overwrites
-> the other. My default choice is optimistic locking when conflicts are rare, because it
-> scales better. If contention is high or the business boundary is especially strict, I
-> use pessimistic locking or `SELECT FOR UPDATE`, but only inside a short transaction.
+> the other. For a simple stock or room counter, I prefer an atomic conditional update:
+> it decrements only when availability remains, so one caller wins and the other gets a
+> conflict. For richer state, I choose optimistic locking for rare collisions or a short
+> pessimistic transaction when contention is high.
 
 ---
 
 ## 9. 1-Minute Answer
 
-> I frame database concurrency around the business invariant, not around locks first. A
-> classic problem is lost update: two requests read the same stock value and overwrite each
-> other. Optimistic locking detects that race with a version field and is usually my default
-> when collisions are uncommon because it avoids blocking. Pessimistic locking is more
-> appropriate when contention is frequent and the cost of a conflict is high, but it reduces
-> throughput and increases deadlock risk, so I keep the transaction short. I also separate
-> locking from isolation level: `READ_COMMITTED`, `REPEATABLE_READ`, and `SERIALIZABLE`
-> change what transactions can observe, but they do not remove the need for good write-path
-> design. In Postgres I also rely on MVCC knowledge to explain why readers often do not block
-> writers.
+> I frame database concurrency around the business invariant, not around locks first. For
+> a hotel room or simple stock counter, the invariant is that confirmed reservations cannot
+> make availability negative. I enforce it with a short transaction containing an atomic
+> conditional update and the reservation insert: one request claims the inventory, while a
+> competing one updates zero rows and receives a conflict. An idempotency key handles a retry
+> of that same request; it is different from competition between two customers. For richer
+> state I use optimistic locking for rare collisions, or a short pessimistic transaction when
+> contention is high. I keep transactions short, especially around external payment calls,
+> because locks reduce throughput and can deadlock.
 
 ---
 
 ## 10. What To Internalize
 
 - the lost update problem is the first concurrency bug to explain
+- an atomic conditional update is often the simplest safe claim for a limited
+  numeric inventory counter
 - optimistic locking detects conflicts; it does not prevent them up front
 - pessimistic locking serializes access by blocking
 - stronger locking and stronger isolation both cost throughput
 - short transactions matter as much as lock choice
 - MVCC improves read concurrency but does not remove write contention
+
+## Further Reading
+
+- [MySQL `UPDATE` statement](https://dev.mysql.com/doc/refman/8.4/en/update.html): syntax and affected-row behaviour used by the conditional claim
+- [MySQL/InnoDB autocommit, commit, and rollback](https://dev.mysql.com/doc/refman/8.4/en/innodb-autocommit-commit-rollback.html): why a multi-statement reservation needs an explicit transaction
+- [MySQL/InnoDB transaction isolation levels](https://dev.mysql.com/doc/refman/8.4/en/innodb-transaction-isolation-levels.html): the `REPEATABLE READ` default and locking implications
