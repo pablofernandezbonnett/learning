@@ -59,8 +59,8 @@ A common failure pattern is:
 
 1. traffic rises
 2. one dependency slows down
-3. requests stay in flight longer
-4. thread pools, DB pools, or queues fill up
+3. requests that already started take longer to finish
+4. the limited application workers, database connections, or waiting lines fill up
 5. latency rises more
 6. failures spread into parts of the system that were healthy at first
 
@@ -73,7 +73,8 @@ Bad mental model:
 
 Better mental model:
 
-- if queues, pools, or in-flight requests keep growing, the system may already be on the way to visible failure
+- if the waiting lines, used database connections, or unfinished requests keep
+  growing, the system may already be on the way to visible failure
 
 Saturation is often an early warning that raw availability misses.
 
@@ -293,24 +294,25 @@ Good vs bad pattern:
 
 Earlier controlled rejection is often kinder than slower hidden failure.
 
-### API Admission Control: Rate, Concurrency, And Cost
+### How An API Refuses Work Before It Overloads
 
 An API response that has already completed cannot be taken back. Protection
 happens when each new request tries to start expensive work.
 
 Three controls address different failure shapes:
 
-- a rate limit controls how many requests a caller starts over time; a token
-  bucket permits a steady rate plus a small burst
-- a concurrency limit controls how many expensive requests that caller has in
-  flight; this protects pools when each request becomes slow
-- a cost limit gives expensive request shapes a larger budget cost, such as a
-  broad date-range search or large fan-out, instead of treating every request
-  as equally cheap
+- a rate limit is a maximum number of requests a caller may start in a time
+  window; it can allow a small short burst without accepting unlimited traffic
+- a simultaneous-work limit is a maximum number of expensive requests from a
+  caller that may be running right now; this matters when each one becomes slow
+- a cost limit treats a broad date-range search or a request that calls many
+  suppliers as more expensive than a narrow search, instead of pretending both
+  cost the same
 
-For a shared API, apply these limits by authenticated client or tenant. Use a
-shared counter when requests can land on different instances; per-instance
-limits do not protect the shared database or downstream dependency completely.
+For a shared API, apply these limits by authenticated client or tenant. If the
+application runs in several copies, they need one shared count; otherwise each
+copy lets the caller consume its own separate allowance while all of them still
+hit the same database or supplier.
 
 On rejection, return `429 Too Many Requests` and, when useful, `Retry-After`.
 This tells a well-behaved caller to back off rather than retry immediately.
@@ -320,9 +322,9 @@ number.
 
 Strong default:
 
-> Rate limits stop a caller starting too much work; concurrency limits stop a
-> slow request from occupying too much capacity; cost limits stop one valid but
-> broad request shape from being treated as cheap.
+> A rate limit controls requests over time. A simultaneous-work limit controls
+> how many slow operations can occupy the system now. A cost limit stops one
+> broad request from being treated as cheap.
 
 ### Cheap Protection For A Direct API
 
@@ -334,19 +336,21 @@ Before adding complex infrastructure, a useful server-side order is:
 
 1. authenticate the calling agency or client, then reject invalid or oversized
    request shapes before database or supplier work starts
-2. use a short end-to-end deadline and stop work on client disconnect when the
-   runtime and dependency support cancellation
-3. cap expensive requests in flight with a small semaphore or bounded
-   admission gate; fail fast when it is full instead of building an unbounded
-   request queue
-4. coalesce identical in-flight reads or reuse a short-lived, safely scoped
-   result when recomputing the same search would be wasteful
+2. set a maximum time for the whole request; if the caller disconnects, stop
+   work when the application and database can do so
+3. allow only a small fixed number of expensive searches to run at once; when
+   all places are occupied, reject the next search immediately instead of
+   letting an ever-growing waiting line form
+4. when several callers ask exactly the same search at once, run it once and
+   share that answer with the others instead of querying the database several
+   times; this is called request coalescing
 
 These measures are low-cost and work for direct API callers. They have narrow
-limits: coalescing only helps identical requests, and a concurrency cap can be
-kept full by many different requests. Neither is a defence against a deliberate
-flood of valid, distinct calls. That case still needs caller quotas or rate
-limits, and often upstream network or application-layer DDoS protection.
+limits: sharing work only helps identical requests, and a fixed number of
+places can be kept full by many different requests. Neither stops a deliberate
+flood of valid, different calls. That case still needs caller quotas or rate
+limits, and often a protection service placed before the application that drops
+attack traffic before it reaches the API.
 
 ---
 

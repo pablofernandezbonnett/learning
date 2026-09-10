@@ -94,11 +94,12 @@ decisions separate instead of caching the complete response blindly.
 
 For a short-lived search-result cache:
 
-- build the key from normalized filters, ordering, and the authorized tenant or
-  agency scope; never let one caller receive another caller's contracted result
+- build the cache key from the same filters, ordering, and authorized tenant or
+  agency; this prevents one caller receiving another caller's contracted result
 - use it only when the product accepts the resulting staleness
-- coalesce identical in-flight misses when a burst would otherwise make every
-  request recompute the same result
+- when the cache is empty and many identical searches arrive together, run one
+  database query and let the others reuse its result instead of running many;
+  this is called request coalescing
 - revalidate final price, capacity, or other correctness-critical state on the
   later commit path
 
@@ -107,9 +108,10 @@ deadlines, or a correct database query.
 
 Important limit:
 
-> Caching and request coalescing help only when requests reuse the same safe
-> result. They do not stop a direct API client from sending many distinct,
-> uncached requests, so they are optimizations rather than admission control.
+> Caching and sharing one identical query help only when callers ask for the
+> same safe result. They do not stop a direct API client from sending many
+> different queries, so they make repeated work cheaper but do not control who
+> may start work.
 
 Reusable takeaway:
 

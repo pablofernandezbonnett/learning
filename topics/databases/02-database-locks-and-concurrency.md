@@ -21,6 +21,10 @@ Quick terms used here:
 - `stale state` = the request is making a decision from data that was true a moment ago but is no longer current
 - `contention` = several requests want the same row or business key at the same time
 - `isolation level` = the database rulebook for what concurrent transactions may observe
+- `invariant` = the business rule that must never be broken, such as "do not
+  sell the last room twice"
+- `atomic conditional update` = one database change that happens only if its
+  condition is true; here, decrease availability only if some remains
 
 ---
 
@@ -370,10 +374,11 @@ Important boundaries:
   reservation request after a timeout; see
   [`01-idempotency-and-transaction-safety.md`](./01-idempotency-and-transaction-safety.md)
 - do not keep row locks open while calling a payment provider; create a
-  durable, expiring hold in the local transaction when payment confirmation is
-  later, then confirm or release that hold through explicit state transitions
-- handle a database deadlock or serialization failure with a small bounded
-  retry of the whole transaction, not a retry loop that runs forever
+  saved temporary reservation with an expiry time when payment confirmation is
+  later, then either confirm it or release its rooms
+- if two transactions wait on each other in a circle, the database can abort one
+  to break that deadlock; retry the whole transaction only a small number of
+  times, not forever
 
 Do not use a cache or a distributed lock as the final authority here. They can
 reduce load or coordinate best effort, but the transaction that changes durable

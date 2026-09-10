@@ -169,8 +169,9 @@ Strong defaults:
   query parameter
 - validate dates, occupancy, filters, sort values, and a small maximum page
   size before starting expensive work
-- make a cursor opaque and bind it to the filters and ordering that produced it;
-  reject a cursor reused with different search criteria
+- make a cursor a server-controlled marker for the last item in the page; the
+  client should pass it back unchanged, and the server rejects it if filters or
+  ordering differ from the original search
 - return `nextCursor` rather than an exact `total` unless the product really
   needs that count and can afford it
 - return only the fields needed for the result list, not every detail of every
@@ -180,9 +181,9 @@ If the filter object is too large or structured for a query string, a
 side-effect-free `POST /v1/.../searches` can be a clearer input contract. The
 HTTP method does not remove the need to bound the query.
 
-For volatile search data, state the freshness rule explicitly. A displayed
-price or availability result is not a hold. The later booking or commit path
-must revalidate against the authoritative source before confirming.
+For search data that can change quickly, state the freshness rule explicitly. A
+displayed price or availability result is not a hold. The later booking path
+must check the current database value again before confirming.
 
 Practical rule:
 
@@ -192,15 +193,16 @@ Practical rule:
 ### 2.4 Simple Default Before Extra Components
 
 For a modest, stable reservation-history list, start with an authenticated
-`GET`, validated filters, a narrow response projection, and a capped page size.
+`GET`, validated filters, a response containing only the fields needed in the
+list, and a capped page size.
 Offset pagination is still the simpler fit when the data set and page depth are
 bounded. Do not add a search service, cache, or asynchronous workflow merely
 because the endpoint is named "search".
 
 Move to cursor pagination when deep pages, a large changing result set, or a
 user-facing feed make offset's work and shifting windows a real problem. Move
-to a more complex read model only when measurement shows that the simple query
-cannot meet the required latency or load.
+to a separate data copy designed for fast reads only when measurement shows
+that the simple query cannot meet the required response time or load.
 
 ---
 

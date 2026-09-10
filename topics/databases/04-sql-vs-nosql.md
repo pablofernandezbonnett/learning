@@ -202,7 +202,7 @@ For hotel booking truth, a relational database is a good fit when the system
 needs to change related facts together: claim room capacity, create a
 reservation, and prevent the counter from becoming negative. It gives the
 application transactions, constraints, indexes, and concurrency controls in one
-source of truth.
+place whose confirmed data the application trusts.
 
 Small concrete shape:
 
@@ -216,10 +216,10 @@ relational-database transaction
 Why not make Redis or a document database the final reservation truth?
 
 - a cache can return an old availability value
-- a distributed lock can expire or be unavailable; it is not the durable proof
-  that a room was claimed
-- a document model can work, but the main problem here is a multi-row,
-  competing-write transaction rather than flexible document shape
+- a separate locking service can expire or be unavailable; it is not durable
+  proof that a room was claimed
+- a document model can work, but the main problem here is changing several
+  related entries safely while customers compete, not flexible document shape
 
 MySQL/InnoDB and PostgreSQL are two concrete relational choices. For this
 problem, the generic decision comes first: choose a transactional relational
@@ -235,8 +235,8 @@ Strong default:
 
 > Keep a transactional relational database as the booking source of truth. If
 > MySQL/InnoDB already fits the team's operational skills, it is a reasonable
-> choice. Add a cache or read projection only for search scale, never as the
-> final booking decision.
+> choice. Add a cache or a separate copy designed for fast searches only when
+> search traffic needs it, never as the final booking decision.
 
 ---
 
