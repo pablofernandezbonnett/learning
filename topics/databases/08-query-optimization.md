@@ -358,6 +358,23 @@ Tradeoff:
 - keeping one transactional table is simpler, but may make high-volume search
   unnecessarily expensive
 
+### 6.2 Simple Fix Order Before A New Read Model
+
+Start with the least invasive change that the evidence supports:
+
+1. return only the list fields needed and enforce a small page limit
+2. inspect the generated SQL for N+1 queries or avoidable joins
+3. run the execution plan and add one index that matches the real filter and
+   sort pattern, if the plan shows that it helps
+4. replace deep offset pagination with keyset pagination when page depth is the
+   cost
+5. consider a cache, read projection, replica, partitioning, or search engine
+   only when the simple query path is still the measured bottleneck
+
+This order matters because a new read model solves some expensive query shapes,
+but it also creates data propagation and recovery work. It is not the default
+answer to a query that has not yet been measured.
+
 ---
 
 ## 7. Connection Pooling Is Part Of Query Performance

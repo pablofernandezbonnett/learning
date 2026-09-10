@@ -189,6 +189,19 @@ Practical rule:
 > Pagination protects response size. Validation, authorization, and request
 > cost limits protect the work required to produce that page.
 
+### 2.4 Simple Default Before Extra Components
+
+For a modest, stable reservation-history list, start with an authenticated
+`GET`, validated filters, a narrow response projection, and a capped page size.
+Offset pagination is still the simpler fit when the data set and page depth are
+bounded. Do not add a search service, cache, or asynchronous workflow merely
+because the endpoint is named "search".
+
+Move to cursor pagination when deep pages, a large changing result set, or a
+user-facing feed make offset's work and shifting windows a real problem. Move
+to a more complex read model only when measurement shows that the simple query
+cannot meet the required latency or load.
+
 ---
 
 ## 3. Error Shape: Make Failures Actionable

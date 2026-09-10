@@ -324,6 +324,30 @@ Strong default:
 > slow request from occupying too much capacity; cost limits stop one valid but
 > broad request shape from being treated as cheap.
 
+### Cheap Protection For A Direct API
+
+Browser controls such as debounce, disabling a button, or cancelling an old
+search improve the browser experience. They do not protect an API: another
+client can call the endpoint directly.
+
+Before adding complex infrastructure, a useful server-side order is:
+
+1. authenticate the calling agency or client, then reject invalid or oversized
+   request shapes before database or supplier work starts
+2. use a short end-to-end deadline and stop work on client disconnect when the
+   runtime and dependency support cancellation
+3. cap expensive requests in flight with a small semaphore or bounded
+   admission gate; fail fast when it is full instead of building an unbounded
+   request queue
+4. coalesce identical in-flight reads or reuse a short-lived, safely scoped
+   result when recomputing the same search would be wasteful
+
+These measures are low-cost and work for direct API callers. They have narrow
+limits: coalescing only helps identical requests, and a concurrency cap can be
+kept full by many different requests. Neither is a defence against a deliberate
+flood of valid, distinct calls. That case still needs caller quotas or rate
+limits, and often upstream network or application-layer DDoS protection.
+
 ---
 
 ## 11. Retry Storms

@@ -105,6 +105,12 @@ For a short-lived search-result cache:
 This reduces repeated read work. It does not replace rate limiting, request
 deadlines, or a correct database query.
 
+Important limit:
+
+> Caching and request coalescing help only when requests reuse the same safe
+> result. They do not stop a direct API client from sending many distinct,
+> uncached requests, so they are optimizations rather than admission control.
+
 Reusable takeaway:
 
 > I treat caching as a latency optimization over a clear source of truth. The
