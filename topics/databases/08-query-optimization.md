@@ -39,6 +39,33 @@ Short rule:
 
 > measure first, then fix
 
+### If The Interviewer Says The SQL Query Is Slow
+
+Take that premise literally. Do not start by investigating HTTP calls, JSON,
+or a connection pool: those matter for a **slow request**, but this question is
+about one SQL statement.
+
+A solid first answer is:
+
+1. get the exact SQL, its real parameter values, and the table sizes
+2. run the database's execution plan tool (`EXPLAIN`, plus actual timing when
+   the database provides it)
+3. find where it reads far more rows than it returns, performs an expensive
+   sort, or repeats a costly join
+4. change the SQL or add the one index that matches its real `WHERE`, `JOIN`,
+   and `ORDER BY` pattern
+5. run the same plan again and compare time and rows read
+
+For example, a hotel search commonly filters by location and date, then sorts
+by price. An index on only `location` may still leave a large sort. A composite
+index that matches the actual filter and order can be better, but only the plan
+can prove it for the real data.
+
+Bad mental model: “the query is slow, so add indexes everywhere.”
+
+Better mental model: “the plan shows the database's chosen path; change the
+query or index that makes that path expensive, then verify the improvement.”
+
 ## 1.1 A Slow Request Is Not Always A Slow Query
 
 This matters because teams often jump straight to the database when a request
@@ -461,24 +488,24 @@ Good practical summary:
 
 ## 10. 20-Second Answer
 
-> My first query optimization step is always measurement, not guessing. In Spring apps I
-> first look for N+1 and the actual generated SQL. In Postgres I use `EXPLAIN ANALYZE` to
-> inspect scan type, row counts, and timing. Then I decide whether the problem is an index,
-> the actual SQL pattern, deep offset pagination, or connection pool contention.
+> If the SQL query itself is slow, I take the exact statement and parameters
+> and inspect its execution plan. I look for reading too many rows, an expensive
+> sort or join, and an index that does not match the real filters and order.
+> Then I make one query or index change and run the plan again to prove it helped.
 
 ---
 
 ## 11. 1-Minute Answer
 
-> I approach query optimization as an evidence problem. The most common application-layer
-> issue is N+1, so in JPA-based services I inspect the generated SQL early instead of
-> trusting repository code. In Postgres I use `EXPLAIN ANALYZE` and look for sequential
-> scans on large tables, high rows-examined versus rows-returned, and expensive sort or
-> join behavior. I choose indexes based on the actual filter and sort pattern rather than
-> adding them blindly, and I remember that indexes improve reads but cost writes. I also
-> look at pagination strategy because deep `OFFSET` queries degrade badly and keyset is often
-> a better fit for user-facing feeds. Finally, I check the connection pool and transaction
-> scope because some "slow queries" are actually fast queries waiting for a JDBC connection.
+> I treat a slow SQL statement as an evidence problem. First I capture the
+> exact SQL and parameters and inspect the execution plan. I check whether it
+> scans far more rows than it returns, sorts a large result, or makes an
+> expensive join. Then I simplify the query if it returns unnecessary data and
+> add or adjust an index to match the real filters, joins, and order. I do not
+> add indexes blindly, because they also slow writes. Finally I run the same
+> plan again and compare time and rows read. If the interview instead says the
+> *endpoint* is slow, only then I widen the investigation to N+1 queries,
+> connection waits, remote calls, and payload size.
 
 ---
 

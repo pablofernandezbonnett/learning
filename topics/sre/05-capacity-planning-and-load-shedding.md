@@ -326,31 +326,105 @@ Strong default:
 > how many slow operations can occupy the system now. A cost limit stops one
 > broad request from being treated as cheap.
 
-### Cheap Protection For A Direct API
+### Many Identical Requests: Run The Work Once
 
 Browser controls such as debounce, disabling a button, or cancelling an old
 search improve the browser experience. They do not protect an API: another
 client can call the endpoint directly.
 
-Before adding complex infrastructure, a useful server-side order is:
+Suppose one authenticated client sends the *same* expensive read 10,000 times
+at once: a hotel search, streaming catalogue query, product search, or account
+history. The important distinction is:
+
+- the 10,000 HTTP requests still reached the API, so they still use network,
+  connection, and some application memory
+- but the expensive SQL search does **not** need to run 10,000 times
+
+The simple server-side fix is to make a safe key from the caller's access scope
+and normalized read fields (for example query, filters, sort, and page). The
+first request starts the expensive work. Requests with the same key wait for,
+or reuse, that one result. People sometimes call this *request coalescing*; it
+just means “do the identical work once.”
+
+Do not make the key from only the visible search text. Tenant permissions,
+subscription rights, region, or contracted prices can differ, so two callers
+must not share a result unless they are allowed to see exactly the same data.
+
+After that result is ready, keep it briefly in a cache when a slightly old
+answer is acceptable. Then a repeat request can return the saved answer without
+waiting for the database at all.
+
+The interviewer may be pointing to one of these simpler controls:
+
+| Control | What it does in the 10,000-identical-request case | What it does **not** solve |
+| --- | --- | --- |
+| Short cache | A repeat arriving after the first result is ready gets the saved result. | It cannot help the first 10,000 requests if they all arrive before the result exists. |
+| Run identical work once | While the first read is running, later matching requests share that one expensive operation. | Each HTTP request can still occupy a connection while waiting. |
+| Per-client simultaneous-request limit | Allows, for example, only a small number of one client's requests to be active now; rejects the rest. | It does not reuse a result and does not limit how many requests the client can make over an hour. |
+| Request and connection limits at the API entry point | Stops huge bodies, too many connections, or requests that wait too long from reaching workers. | It cannot tell whether two valid searches mean the same business work. |
+| Rate limit | Limits how many requests a client starts during a period such as a minute. | It is broader than needed when the only problem is repeated identical work. |
+
+So a good low-cost order for this exact case is: short cache first, share the
+unfinished identical search on a cache miss, then cap waiting and simultaneous
+requests. Use a rate limit as an additional control when the client may also
+send many *different* searches.
+
+### Repeated Work Is Not The Same As A Denial-of-Service Attack
+
+There are two real cases, and a good answer names both:
+
+1. **Repeated identical reads.** A legitimate or buggy client repeats the same
+   request. A cache and one shared expensive operation make this cheap.
+2. **Denial-of-service attack.** Someone tries to exhaust network connections,
+   CPU, memory, or database capacity. A cache helps only one small part of that
+   problem: it cannot make 10,000 incoming connections harmless.
+
+For the second case, protect the API before normal application work starts:
+
+- put a reverse proxy, load balancer, or API gateway in front of the service;
+  it is the public front door and can reject traffic without consuming an
+  application worker
+- set maximum connection counts, request/header/body sizes, and short idle and
+  request timeouts there
+- authenticate agencies early; apply quotas or rate limits by agency identity,
+  with an IP-based fallback for unauthenticated traffic
+- keep an application-level simultaneous-work limit as a second line of
+  defence, so a valid but expensive request cannot fill all database workers
+
+For a large network-level flood, the public front door needs provider or
+network-level denial-of-service protection; an application process sees the
+attack too late. A `429` with `Retry-After` is useful for a known client that
+exceeds its allowance. A `503` with `Retry-After` is appropriate when the
+service has no capacity, regardless of which client caused it.
+
+This is useful, but it is not a complete denial-of-service defence. Ten
+thousand waiting requests can still exhaust connections or memory. Bound that
+too:
 
 1. authenticate the calling agency or client, then reject invalid or oversized
    request shapes before database or supplier work starts
 2. set a maximum time for the whole request; if the caller disconnects, stop
    work when the application and database can do so
-3. allow only a small fixed number of expensive searches to run at once; when
-   all places are occupied, reject the next search immediately instead of
-   letting an ever-growing waiting line form
-4. when several callers ask exactly the same search at once, run it once and
-   share that answer with the others instead of querying the database several
-   times; this is called request coalescing
+3. put a small maximum on simultaneous requests and on how many may wait for
+   the same unfinished result; reject the excess quickly with `429` or `503`
+   and, if useful, `Retry-After`
+4. enforce request-body, header, and connection limits at the API entry point,
+   before requests reach application workers
 
-These measures are low-cost and work for direct API callers. They have narrow
-limits: sharing work only helps identical requests, and a fixed number of
-places can be kept full by many different requests. Neither stops a deliberate
-flood of valid, different calls. That case still needs caller quotas or rate
-limits, and often a protection service placed before the application that drops
-attack traffic before it reaches the API.
+This works for direct API callers, not only a UI. It has a narrow purpose:
+sharing work makes repeated *identical* reads cheap. A caller can still send
+many distinct valid requests. For that wider abuse case, a caller quota or rate
+limit is still needed; there is no server-side trick that makes unlimited
+different work free.
+
+Strong interview answer:
+
+> If one client sends 10,000 identical expensive reads, I build a key from its
+> access scope and normalized input. One request does the expensive work and
+> the rest reuse its result or a very short cache. This is different from rate
+> limiting: I am not counting requests per minute; I am avoiding the same work
+> many times. I also cap concurrent requests and waiting callers, because
+> deduplicating work does not make 10,000 open connections harmless.
 
 ---
 

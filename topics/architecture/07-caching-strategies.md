@@ -99,7 +99,7 @@ For a short-lived search-result cache:
 - use it only when the product accepts the resulting staleness
 - when the cache is empty and many identical searches arrive together, run one
   database query and let the others reuse its result instead of running many;
-  this is called request coalescing
+  this is called request coalescing, meaning “do identical work once”
 - revalidate final price, capacity, or other correctness-critical state on the
   later commit path
 
@@ -109,9 +109,10 @@ deadlines, or a correct database query.
 Important limit:
 
 > Caching and sharing one identical query help only when callers ask for the
-> same safe result. They do not stop a direct API client from sending many
-> different queries, so they make repeated work cheaper but do not control who
-> may start work.
+> same safe result. They do not make 10,000 open HTTP requests free: cap how
+> many callers may wait for one unfinished result. They also do not stop a
+> direct API client from sending many different queries, so they make repeated
+> work cheaper but do not control who may start work.
 
 Reusable takeaway:
 
@@ -141,12 +142,15 @@ intermediary between the cache and the primary database.
 
 **Pros:**
 - Redis only holds data that is actually being used (memory savings).
-- If Redis goes down, the application keeps working (falling back to the database, though slower).
+- If Redis goes down, the application can fall back to the database when that
+  database has enough spare capacity; otherwise use a bounded stale fallback or
+  controlled rejection rather than sending every caller to the database at once.
 
 **Cons:**
 - The first user to request an uncached item takes the "Miss" and experiences latency.
-- Mitigation (Cache Stampede): Pre-warm the cache — if a product launch is scheduled at noon,
-  a script fills Redis at 11:59 before traffic arrives.
+- For an expected spike, pre-warm important keys gradually and with a limit on
+  refresh work. A sudden bulk warm-up can overload the same database the cache
+  was meant to protect.
 
 ---
 
@@ -194,26 +198,59 @@ cache, and the cache is responsible for going to Postgres if it does not have th
 
 ---
 
-## The Big Cache Problem: Cache Stampede (The Thundering Herd)
+## Refreshing Cache Without Causing A Cascade
 
-**Interview Scenario:**
+A cache can fail safely only if its refresh path is bounded. The dangerous case
+is a **cache stampede**: a popular key expires, many callers all miss at once,
+and they flood the database or a slow dependency. That new overload can make
+the whole application fail, even though the original problem was one empty
+cache entry.
 
-You have a product that expires from cache every 10 minutes. It is the main product on your
-homepage. It happens to expire. In that millisecond, the cache is empty. At that exact moment,
-5,000 users hit the homepage.
+The default refresh rule for cache-aside is simple:
 
-Your application (Cache-Aside) says: "It's not in Redis. I'll ask Postgres." **All 5,000 threads
-hit Postgres simultaneously requesting the same product.** Postgres is overwhelmed, connections
-collapse, and your site goes down.
+1. write the source of truth first
+2. after that write succeeds, remove the affected cache key
+3. the next read loads the new value and puts it back into cache
 
-**How do you solve it?**
+Removing a key is usually safer than trying to update several cache entries in
+the write request. For complex or cross-service writes, publish a durable
+post-commit event and let a consumer remove or refresh affected keys. A `TTL`
+(the maximum age of a cached value) is still useful as a safety net if an
+invalidation message is delayed or missed.
 
-Mention **Distributed Locks (Mutex) in Redis**:
+For a very hot key, add these protections:
 
-*"If a cache miss occurs on something critical and high-demand, my thread would attempt to acquire
-a lock in Redis. Only 1 of the 5,000 threads would succeed in going to Postgres, running the
-SELECT, and refilling Redis. The other 4,999 threads would wait briefly polling Redis until the
-first thread filled the cache, protecting the relational database from the destructive spike."*
+- **one refresh per key:** when a value is missing, one caller refreshes it;
+  matching callers share that work or wait only for a short, bounded time
+- **serve slightly old data while refreshing:** keep a last known good value
+  for a short extra window. One caller refreshes in the background while other
+  callers receive that older value. This works only when the business accepts
+  the temporary staleness.
+- **vary expiry times:** add small random variation to `TTL`s so many keys do
+  not expire in the same second after a deployment or bulk warm-up
+- **bound refresh work:** use short deadlines and a small limit on concurrent
+  cache refreshes, so a dependency outage cannot consume every app worker or
+  database connection
+
+If the refresh fails, do not retry endlessly. Serve the last known good value
+only until its agreed maximum age. After that, return a clear temporary failure
+or a reduced response rather than turning every caller into another database
+retry. For data where old values are unsafe, do not serve stale data: fail fast
+or use the authoritative path with strict capacity limits.
+
+Bad mental model: “when the cache expires, every request can just reload it.”
+
+Better mental model: “one controlled refresh is allowed; other requests get a
+bounded wait, an acceptable older value, or an explicit failure.”
+
+Strong interview answer:
+
+> I use cache-aside by default: write the database first and invalidate the
+> cached key after success. For hot keys, only one request refreshes a missing
+> key, expiry times are staggered, and callers can receive a briefly stale last
+> known good value while refresh happens if the product allows it. Refresh work
+> has timeouts and concurrency limits, so a cache miss cannot cascade into a
+> database outage.
 
 ---
 

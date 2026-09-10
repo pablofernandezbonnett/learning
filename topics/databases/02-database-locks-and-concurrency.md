@@ -310,18 +310,28 @@ Tradeoff:
 `Serialization` here means you are deliberately forcing one writer to finish
 before another writer can continue on the same protected row or range.
 
-### 3.3 Atomic conditional update for limited inventory
+### 3.3 Atomic conditional update for a limited shared resource
 
-For a numeric availability counter, the simplest strong default is often not
-"read, then lock, then write." It is one database statement that claims stock
-only if enough remains.
+For a numeric counter or a resource with limited slots, the simplest strong
+default is often not "read, then lock, then write." It is one protected change
+that claims a unit only if enough remains.
+
+The same rule appears in different products:
+
+- hotel rooms: do not sell the last room twice
+- concert seats: do not sell the same seat twice
+- a subscription plan: do not allow more active streams than the plan permits
+- a download licence: do not let two devices claim the final licence slot
+
+The product changes; the question does not: what durable system makes the final
+yes-or-no decision when two requests arrive together?
 
 The portable idea is simple. Model remaining capacity separately from the
 reservation record: one capacity entry represents one resource and one time
 slot, such as a hotel room type on one night. A reservation may only be created
 after it claims every required capacity entry.
 
-For one room on one night, the conditional claim looks like this in SQL-like
+For one unit of capacity, the conditional claim looks like this in SQL-like
 pseudocode:
 
 ```text
@@ -344,8 +354,8 @@ change, rather than the application making those two steps separately.
 There is no unsafe application-side `SELECT available_rooms` followed later by
 an unconditional update.
 
-For a stay across several nights, make the whole claim and reservation one short
-local transaction:
+For a booking across several nights, make the whole claim and reservation one
+short local transaction:
 
 ```text
 begin transaction
@@ -367,6 +377,70 @@ The invariant is:
 > confirmed reservations must never make `available_rooms` negative, and every
 > confirmed reservation must have claimed all of its nights atomically.
 
+### 3.4 The Last Room: Two Clients, Step By Step
+
+Assume the web page showed one remaining standard room for 12 October. Agency A
+and Agency B both press “reserve” at nearly the same time. What the page showed
+is only a past observation; it is **not** the decision that reserves the room.
+
+The reservation endpoint must ask the database again. A portable version of the
+critical part looks like this:
+
+```text
+begin transaction
+  for each requested night, always in date order:
+    decrease that night's remaining rooms by 1
+    only if at least 1 room remains
+
+    if the database says no row changed:
+      roll back
+      return 409: availability changed; choose another room or date
+
+  create the reservation as HELD or CONFIRMED
+commit
+return success
+```
+
+For one night, the essential SQL shape is:
+
+```sql
+UPDATE room_type_availability
+SET remaining_rooms = remaining_rooms - 1
+WHERE hotel_id = :hotel_id
+  AND room_type_id = :room_type_id
+  AND stay_date = :stay_date
+  AND remaining_rooms >= 1;
+```
+
+If the statement changes one row, that reservation won the last room. If it
+changes zero rows, the other reservation got there first, or the room was
+already unavailable. The database makes that decision while changing the row,
+so there is no gap where both applications can separately decide that one room
+is still available.
+
+For several nights, execute the conditional changes in the same date order and
+roll back all of them if any night fails. Keeping every request in the same
+order reduces the chance that two transactions wait for each other's rows.
+
+If the product reserves a specific physical room, such as room 301, another
+valid model is one row per room and night, protected by a unique database
+constraint. The first reservation creates that row; a second reservation for
+the same room and night fails the uniqueness rule. The common principle is the
+same: let the durable database reject the second claim.
+
+Do not confuse two different failures:
+
+- two agencies compete for the last room: one gets success and the other gets
+  `409 Conflict`
+- the *same* agency retries the same reservation after a timeout: accept an
+  `Idempotency-Key` and return the original outcome instead of creating a
+  second reservation
+
+External payment is a later step. Do not hold database locks open while waiting
+for a payment provider. First save a short-lived `HELD` reservation in the
+transaction. Then call payment. A later short transaction either confirms that
+hold or releases its claimed rooms when payment fails or the hold expires.
+
 Important boundaries:
 
 - this protects two different customers competing for the same inventory
@@ -383,6 +457,15 @@ Important boundaries:
 Do not use a cache or a distributed lock as the final authority here. They can
 reduce load or coordinate best effort, but the transaction that changes durable
 inventory must enforce the no-oversell rule.
+
+One variation needs an explicit expiry rule: an active streaming slot or a
+download session can disappear when a device loses network. That claim is a
+*lease*: a temporary claim with an expiry time. The system renews it while the
+session is alive and releases or expires it otherwise. For short-lived session
+limits, a deliberately chosen store with atomic changes and expiry may be the
+final authority for that session rule; in that case it is not merely a cache in
+front of another store. For reservations, money, or other durable business
+records, a transactional database is the safer final authority.
 
 ### Engine-Specific Mappings
 

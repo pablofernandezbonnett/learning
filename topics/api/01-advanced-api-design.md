@@ -190,7 +190,145 @@ Practical rule:
 > Pagination protects response size. Validation, authorization, and request
 > cost limits protect the work required to produce that page.
 
-### 2.4 Simple Default Before Extra Components
+### 2.4 A Generic Way To Design A Costly Read Operation
+
+This works for hotel offers, a streaming catalogue, product search, account
+history, or any API operation that returns a potentially large or expensive
+list. Start with the contract, not a technology.
+
+1. **Name the result.** What is the caller trying to see or decide? Is it a
+   catalogue, live availability, history, recommendation list, or status?
+2. **Name the caller and scope.** Who is allowed to see it, and which tenant,
+   subscription, region, or permissions change the result?
+3. **Define small valid input.** Required filters, allowed optional filters,
+   allowed sort orders, and validation rules. Reject a vague or unlimited query
+   before it starts expensive work.
+4. **Choose the data freshness rule.** Is a slightly old answer acceptable, or
+   must it reflect the latest state? This decides whether caching is safe and
+   whether a displayed result can be trusted for a later write.
+5. **Bound the response and work.** Return only needed fields, cap page size,
+   use a stable order and suitable pagination, and set a deadline for slow
+   dependencies.
+6. **State failure behaviour.** Say which input errors are `400`, which access
+   failures are `401` or `403`, when a caller should back off, and whether a
+   partial answer is useful when a data source fails.
+7. **Protect and observe it.** Reuse identical safe reads where possible, but
+   protect the public entry point from abusive traffic separately. Measure
+   latency, errors, dependency time, and rejected work.
+
+For example, a streaming catalogue search and hotel-offer search differ in
+their fields, but both need caller scope, bounded filters, a freshness rule,
+pagination, cost limits, failure behaviour, and observability.
+
+Generic interview opening:
+
+> I first define what the caller is allowed to see, the smallest valid input,
+> how fresh the answer must be, and how much work one request may cause. Then
+> I choose the endpoint shape, pagination, error contract, and protection
+> limits. I keep a displayed read separate from a later correctness-critical
+> write unless the product explicitly creates a hold.
+
+### 2.5 How To Start The Hotel Search Design
+
+Do not begin by naming a framework, database, cache, or endpoint. Here the
+business task is: an agency searches live hotel offers for the traveller it
+represents, then may reserve one. First make that contract concrete. A useful
+interview order is:
+
+1. **Where does availability come from?** Is room stock owned in our database,
+   supplied live by partners, or both? This decides how fresh the answer can be
+   and how we handle a partner timing out.
+2. **Who is acting and for whom?** The authenticated agency determines
+   permissions, contracted prices, and supplier access. The traveller's search
+   needs may affect occupancy, country, or room rules, but the agency identity
+   comes from authentication, never a normal `agencyId` query parameter.
+3. **What is the smallest valid search?** Destination or hotel, check-in and
+   check-out dates, rooms and guests per room, and possibly currency or
+   traveller country. Decide which filters and sort values are allowed; do not
+   accept arbitrary fields or unlimited date ranges.
+4. **What must one offer contain?** Return a hotel and room type, rate plan,
+   price and currency, cancellation conditions, and an `offerId` the agency can
+   later select. An `offerId` identifies what was shown; it is not a promise
+   that the room is held.
+5. **How does the list stay bounded?** Pick a small maximum page size and a
+   stable order. Use a server-made cursor for a large or changing result set;
+   omit an expensive exact total unless it is truly needed.
+6. **What can change after search?** Prices and availability can change. State
+   the freshness rule or an offer expiry time, then check and claim inventory
+   again when the agency creates a reservation.
+7. **What happens under load or failure?** Validate before costly work, use a
+   brief safe cache for repeated searches, set timeouts, and protect the public
+   API separately against excessive traffic. If hotel partners are queried,
+   give each partner a short deadline and a bounded number of parallel calls;
+   decide explicitly whether a partial answer is useful or whether failure of a
+   required partner fails the search.
+
+Only after these answers, choose a boring first contract such as:
+
+```http
+GET /v1/hotel-offers?destinationId=TYO&checkIn=2026-10-12&checkOut=2026-10-15&adults=2&pageSize=25&cursor=next-page-marker
+Authorization: Bearer <agency-token>
+```
+
+```json
+{
+  "items": [
+    {
+      "offerId": "offer_abc",
+      "hotelId": "h_123",
+      "roomTypeId": "standard",
+      "name": "Example Hotel",
+      "ratePlan": "refundable",
+      "price": { "amount": "180.00", "currency": "EUR" },
+      "cancellation": "Free cancellation until 2026-10-10",
+      "expiresAt": "2026-10-01T10:05:00Z"
+    }
+  ],
+  "nextCursor": "next-page-marker"
+}
+```
+
+The search endpoint is a read: it returns `200` or a clear input or permission
+error. It does not create a hold. A separate `POST /v1/reservations` accepts the
+selected `offerId`, traveller details, and agency reference. That write uses an
+`Idempotency-Key` for retry safety, rechecks price and availability, and returns
+`201` or `409` when another client took the last room first.
+
+Good interview opening:
+
+> First I clarify whether availability comes from our inventory, hotel partners,
+> or both; then I identify the authenticated agency and the traveller search
+> data it needs. I design an authenticated, validated, paginated endpoint that
+> returns available offers, not reservations. A later booking endpoint receives
+> the selected offer and traveller details, then rechecks and claims
+> availability in a database transaction.
+
+### 2.6 Decide What “Next Page” Means When Offers Change
+
+Hotel availability is live data. An offer can disappear or change price between
+page 1 and page 2, even with correct cursor pagination. Decide the product rule
+instead of promising accidental consistency.
+
+Two reasonable choices are:
+
+- **Live pages:** each request returns the best offers available at that moment.
+  This is simpler and needs no saved search state, but page 2 may differ from
+  what page 1 implied.
+- **Short-lived search session:** the first request saves the ordered set of
+  offers or IDs and returns a search marker. Later pages use that saved set
+  until it expires. Pages are more stable, but the service must store and
+  expire that state. Prices and availability still need checking at booking.
+
+Strong default: start with live pages and tell clients that offers can change.
+Add a short-lived search session only when stable pagination is a real product
+requirement, not merely because cursor pagination exists.
+
+Before calling the design complete, measure search latency, database time,
+partner timeouts, cache-hit rate, rejected requests, and `409` reservation
+conflicts. These numbers show whether the search is slow, being abused, or
+losing availability too often; they prevent tuning from becoming guesswork.
+
+### 2.7 Simple Default Before Extra Components
 
 For a modest, stable reservation-history list, start with an authenticated
 `GET`, validated filters, a response containing only the fields needed in the

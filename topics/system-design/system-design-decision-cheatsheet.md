@@ -1046,6 +1046,68 @@ This order prevents a common mistake:
 
 ---
 
+### 15.1 Scaling A Busy Read API Without Moving The Failure
+
+When a search, catalogue, feed, or history endpoint becomes slow under load,
+do not jump straight to a bigger cluster. First locate the limit: application
+CPU, database query time, database connection wait, a hot cache key, or a slow
+external dependency. Then use this progression:
+
+1. **Make one request cheaper.** Validate and bound filters, page size, and
+   payload. Inspect the real database plan, fix the query or index, and remove
+   repeated queries.
+2. **Reuse safe repeated reads.** Add a cache only when the same answer is
+   requested often and a short period of staleness is acceptable. Make refresh
+   bounded so an expiry does not flood the source of truth.
+3. **Scale stateless application copies.** Put more API instances behind a load
+   balancer when application CPU or request concurrency is the limit.
+   `Stateless` means an instance does not keep important client state only in
+   its own memory, so another instance can serve the next request. Do not
+   blindly multiply each instance's database connection pool: many new API
+   copies can exhaust the same database.
+4. **Add read replicas for broad read pressure.** A read replica is a database
+   copy that serves reads. Use replicas when many normal queries, not just a
+   few hot keys, overload the primary database and the product can tolerate a
+   short delay before a write appears in that copy.
+5. **Precompute a specialised read copy only when needed.** A saved table or
+   search index shaped for one hard query can make that query cheap, but it
+   introduces delayed updates and recovery work.
+6. **Scale or split the primary database last.** A larger primary is often the
+   simplest next step. Partitioning or sharding is for data or write volume
+   that one primary genuinely cannot carry; it makes joins, transactions, and
+   operations harder.
+
+Keep correctness-critical writes on their authoritative write path. A cache,
+replica, or search index can answer a fast read, but it must not be the final
+decision for a payment, reservation, stock claim, or another competing write.
+
+Useful distinction:
+
+- a **cache** avoids repeating a small number of hot answers
+- a **read replica** is a database copy that spreads many ordinary reads away
+  from the primary
+- more **API instances** add request-handling capacity but do not add database
+  capacity
+- a **read-specific copy** stores data in a shape that makes one hard query
+  cheap, and adds a delay between a write and that copy becoming current
+
+Reusable answer:
+
+> I scale from the measured bottleneck outward. I first reduce request and
+> query cost, then cache repeated safe reads, then add stateless API capacity or
+> replicas according to where pressure remains. I protect connection pools and
+> refresh paths so scaling the API does not simply overload the database. I
+> consider a separate copy designed for reads or sharding only after the
+> simpler path is still proven insufficient.
+
+Related reading:
+
+- [../architecture/07-caching-strategies.md](../architecture/07-caching-strategies.md)
+- [../databases/05-database-scaling.md](../databases/05-database-scaling.md)
+- [../sre/05-capacity-planning-and-load-shedding.md](../sre/05-capacity-planning-and-load-shedding.md)
+
+---
+
 ## 16. Shortest Practical Summary
 
 If you need the shortest useful reset:
