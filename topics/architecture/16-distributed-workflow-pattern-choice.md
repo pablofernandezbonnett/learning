@@ -82,6 +82,37 @@ Each one points to a different default.
 
 ---
 
+## Quick Visual Decision Map
+
+Use this map to narrow the first plausible choice. It is not a rule that one
+workflow may use only one pattern: an order flow can use an outbox to publish
+an event and a saga to recover a separate cross-service step. The point is to
+name the gap before adding machinery.
+
+```mermaid
+flowchart TD
+    START[What coordination gap must close?]
+    START --> A[Non-critical work can happen after the write]
+    START --> B[Several systems need the same durable business fact]
+    START --> C[One service must save state and publish reliably]
+    START --> D[One business workflow crosses services and can fail halfway]
+    START --> E[Reads and writes need different models]
+    START --> F[The complete event history is business value]
+
+    A --> QUEUE[Queue<br/>one owned background path]
+    B --> STREAM[Event stream<br/>fan-out and replay]
+    C --> OUTBOX[Outbox<br/>avoid a DB-plus-broker dual write]
+    D --> SAGA[Saga<br/>local steps plus compensation]
+    E --> CQRS[CQRS<br/>separate read and write models]
+    F --> ES[Event sourcing<br/>events are the source of truth]
+```
+
+Read the labels as reasons, not product recommendations. For example, `Kafka`
+can implement an event stream, but choosing it does not by itself answer
+whether the workflow needs an outbox, a saga, or neither.
+
+---
+
 ## Problem -> Pattern Choice
 
 ### 1. Slow follow-up work after a successful write

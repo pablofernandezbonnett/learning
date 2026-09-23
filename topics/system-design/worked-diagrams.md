@@ -23,6 +23,26 @@ Quick term guide for this companion file:
 
 ---
 
+## Diagram Design Rules
+
+These diagrams are a learning aid, not an architecture inventory. Each one
+should answer one question that prose alone makes slower to inspect.
+
+For new diagrams, use this small visual contract:
+
+- put the question in the heading: for example, "what happens when payment capture fails?"
+- show one primary concern per diagram: component boundary, request flow, state transition, or failure recovery
+- label arrows with the action or fact that moves (`reserve stock`, `publish OrderConfirmed`, `release reservation`), not a vague `call`
+- make the durable source of truth and every asynchronous handoff visible when they affect correctness
+- put the failure path beside the happy path or in its own small diagram; do not hide compensation in a generic box
+- omit tools and components that do not change the answer to the question
+
+Strong default: begin with the smallest flow that protects the invariant, then
+add a second diagram only when the retry, state transition, or recovery path
+would otherwise remain unclear.
+
+---
+
 ## Exercise 1: Global Checkout System
 
 ### 1a. Component Architecture
