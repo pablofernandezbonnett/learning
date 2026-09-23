@@ -35,3 +35,5 @@ Current labs include:
 - SQL query review with PostgreSQL plans and index changes
 - algorithm practice companions in Java and Kotlin
 - Kotlin backend examples for correctness, async boundaries, Kafka-style delivery, caching, and JVM behavior
+- [interactive system-design exercises](./system-design-exercises/README.md)
+  that preserve the initial model, decisions, failures, and refined design
