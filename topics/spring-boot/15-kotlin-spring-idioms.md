@@ -1,272 +1,110 @@
-# 12. Kotlin + Spring Boot Idioms
+# Kotlin With Spring Boot
 
-Topics that don't appear in docs 01–11 but are critical when using Kotlin with Spring Boot 3.
-This is not the main Spring path, but it is a high-value supporting
-reference when the stack is Kotlin-heavy.
+Kotlin makes nullability and data shapes explicit, but Spring proxies,
+persistence, transactions, and JSON still follow their own runtime rules.
+Use this note when those boundaries meet.
 
----
+## Proxies and Open Classes
 
-## 1. Why `plugin.spring` Is Required
-
-All Kotlin classes are `final` by default. Spring's CGLIB proxy mechanism works by **subclassing** your beans at runtime. If a class is `final`, CGLIB cannot subclass it, and Spring throws:
-
-```
-Cannot subclass final class com.learning.mastery.web.ProductController
-```
-
-The `kotlin("plugin.spring")` Gradle plugin auto-opens classes annotated with:
-- `@Component`, `@Service`, `@Repository`, `@Controller`, `@RestController`
-- `@Configuration`
-- `@Transactional`, `@Cacheable`, `@Async`
-
-**Without the plugin**, you would have to manually mark every Spring-managed class with `open`:
+Kotlin classes and members are final by default. Spring features that need a
+class-based proxy cannot subclass a final class. The `kotlin("plugin.spring")`
+compiler plugin opens classes and members annotated with common Spring
+stereotypes and related annotations, including meta-annotated stereotypes
+such as `@Service`.
 
 ```kotlin
-// Without plugin.spring — verbose and error-prone
-open class ProductController(...) { ... }
-
-// With plugin.spring — Kotlin compiler opens it for you
-class ProductController(...) { ... }   // ← looks final, but plugin.spring opens it
-```
-
----
-
-## 2. `plugin.jpa` for Entity No-Arg Constructors
-
-JPA (Hibernate) requires a **no-arg constructor** to instantiate entities via reflection. Kotlin data classes don't have one by default unless all properties have defaults.
-
-The `kotlin("plugin.jpa")` plugin generates a synthetic no-arg constructor for classes annotated with:
-- `@Entity`
-- `@MappedSuperclass`
-- `@Embeddable`
-
-```kotlin
-// Without plugin.jpa:
-// Hibernate throws: "No default constructor for entity: User"
-
-@Entity
-class User {
-    @Id var id: Long? = null
-    var email: String = ""
-    var name: String = ""
-    // plugin.jpa generates: User() { } behind the scenes
+plugins {
+    kotlin("plugin.spring")
 }
 ```
 
-Use `var` properties (not `val`) on entities — Hibernate needs to set them after calling the no-arg constructor.
+This is a useful default for a Kotlin Spring application. A class does not
+need a proxy merely because Spring constructs it, and interface-based proxies
+have different constraints. Check the actual proxy boundary when
+`@Transactional`, caching, or async behavior is missing. Calls from one method
+to another on the same object can bypass proxy advice.
 
----
+## JPA Entities and Constructors
 
-## 3. Data Classes as DTOs — `@field:` Prefix
+JPA needs a suitable no-argument constructor for entity creation. The
+`kotlin("plugin.jpa")` compiler plugin generates one for `@Entity`,
+`@Embeddable`, and `@MappedSuperclass` classes. Hibernate proxying and lazy
+loading also depend on whether classes and members can be subclassed; check
+the plugin behavior for the Kotlin and persistence versions in the project.
 
-Kotlin data classes replace Java records for DTOs. However, Bean Validation annotations must use the `@field:` use-site target to reach the backing field:
+Use entity classes for persistence state and data classes for ordinary DTOs.
+Avoid assuming that a data class's generated `equals`, `hashCode`, and
+`toString` are safe for a mutable entity or lazy association. Choose property
+mutability from the mapping and domain rule; `var` is common, but “every entity
+field must be `var`” is too broad.
+
+## Validation and JSON Boundaries
+
+A Kotlin constructor property can produce a parameter, field, and getter. Put
+a validation annotation on the element the validator actually inspects. For
+field-based Bean Validation, make that target explicit:
 
 ```kotlin
-// WRONG — annotation is on the constructor parameter, Bean Validation ignores it
 data class CreateProductRequest(
-    @NotBlank val name: String,          // ← does nothing
-)
-
-// CORRECT — @field: targets the backing field
-data class CreateProductRequest(
-    @field:NotBlank val name: String,    // ← Bean Validation picks this up
-    @field:DecimalMin("1") val priceYen: BigDecimal,
+    @field:NotBlank val name: String,
     @field:Min(0) val initialStock: Int,
 )
 ```
 
-Why: Kotlin generates a field, a constructor parameter, and a getter for each `val`. `@NotBlank` without `@field:` defaults to the constructor parameter, which Bean Validation doesn't inspect.
+Do not assume an unqualified annotation lands on the field; target selection
+depends on the annotation and Kotlin compiler behavior. Test validation
+through the HTTP boundary, including a missing field and a wrong type.
 
----
+Jackson's Kotlin module supports Kotlin constructor and nullability metadata
+for common DTO deserialization. Add the module when using Jackson with Kotlin
+and test malformed JSON rather than assuming every null or absent value is
+rejected in the same way.
 
-## 4. Sealed Classes for Domain State vs Java Sealed Classes
+## Coroutines and Transactions
 
-Kotlin sealed classes are more powerful than Java sealed classes (Java 21+) for domain modeling:
+Spring MVC and WebFlux can accept suspending controller functions when the
+coroutine integration is configured. A `suspend` declaration makes suspension
+possible; a blocking JPA or JDBC call remains blocking.
 
-```kotlin
-sealed class PaymentResult {
-    data class Success(val transactionId: String) : PaymentResult()
-    data class Declined(val reason: String) : PaymentResult()
-    data class Error(val cause: Throwable) : PaymentResult()
-}
+The transaction choice matters more than the syntax:
 
-// Exhaustive when — compiler enforces all branches
-fun handlePayment(result: PaymentResult): String = when (result) {
-    is PaymentResult.Success  -> "Charged: ${result.transactionId}"
-    is PaymentResult.Declined -> "Declined: ${result.reason}"
-    is PaymentResult.Error    -> "Error: ${result.cause.message}"
-    // No else needed — compiler verifies all cases are covered
-}
-```
-
-Compare to throwing exceptions from a service method — sealed classes make the error path explicit in the type system and force callers to handle all cases.
-
----
-
-## 5. Coroutines with `@Transactional`
-
-Spring 6+ supports `@Transactional` on `suspend` functions when `spring-tx` and `kotlinx-coroutines-reactor` are on the classpath:
+- **Imperative JPA/JDBC:** `PlatformTransactionManager` transactions are
+  normally bound to the current thread. Keep blocking persistence work inside
+  a proxied transactional service method. Do not assume a coroutine dispatcher
+  switch or a new coroutine carries that transaction.
+- **Reactive data access:** `ReactiveTransactionManager` uses Reactor context.
+  For suspending work, Spring documents `TransactionalOperator.executeAndAwait`
+  as a transaction boundary; participating data access must use the same
+  reactive context.
 
 ```kotlin
-@Service
-class OrderService(private val repo: OrderRepository) {
-
-    @Transactional
-    suspend fun placeOrder(order: Order) {
-        repo.save(order)                    // both in the same transaction
-        repo.decrementStock(order.items)    // rolled back if this throws
+// Sketch for coroutine-aware reactive data access, not for JPA:
+suspend fun updateBoth(operator: TransactionalOperator) =
+    operator.executeAndAwait {
+        updateOrder()
+        updateInventory()
     }
-}
 ```
 
-**What works:**
-- `@Transactional` on `suspend` functions in `@Service` beans.
-- Rollback on exception still works.
+The calls in that sketch must participate in the reactive transaction; an
+external provider call does not become part of it. See
+[transactions](./03-transactions-and-isolation.md) for the local database
+boundary and
+[distributed workflows](../architecture/03-distributed-transactions-and-events.md)
+for remote effects.
 
-**What doesn't work:**
-- Switching dispatchers (`withContext(Dispatchers.IO)`) inside a `@Transactional suspend` function. The transaction is bound to a coroutine context, not a thread. Switching to `Dispatchers.IO` may break the transaction association.
-- `@Async` + coroutines together — use coroutines instead of `@Async` when you need non-blocking behavior.
+## Coroutines or Virtual Threads?
 
-**Safe pattern for blocking DB calls:**
+Coroutines help compose suspension and cancellation when the client and data
+APIs support them. Virtual threads let blocking-style Java code wait without
+occupying a platform thread for the whole wait in supported cases. Neither
+removes connection-pool limits, authorization checks, or the need to bound
+concurrency. Choose from the stack's actual I/O model and measure the result.
 
-```kotlin
-// Use a transactional wrapper, then switch to IO inside a non-transactional scope
-@Transactional
-suspend fun findAndUpdateUser(userId: Long): User {
-    val user = withContext(Dispatchers.IO) { userRepository.findById(userId) }
-        ?: throw UserNotFoundException(userId)
-    user.lastActive = Instant.now()
-    // withContext(Dispatchers.IO) is safe HERE only if the JPA session is thread-bound.
-    // For real safety, call a separate @Transactional method from a coroutineScope.
-    return user
-}
-```
+## Further Reading
 
----
-
-## 6. `suspend` Functions in Controllers
-
-Spring MVC supports `suspend` controller functions via the `kotlinx-coroutines-reactor` bridge:
-
-```kotlin
-@RestController
-@RequestMapping("/api/products")
-class ProductController(private val aggregator: ProductAggregatorService) {
-
-    // Spring MVC wraps this suspend call in a Mono and handles it correctly
-    @GetMapping("/{id}/bundle")
-    suspend fun getBundle(@PathVariable id: String): ProductBundle =
-        aggregator.getBundleForProduct(id)
-}
-```
-
-The bridge converts the `suspend` function into a `Mono<T>` transparently. No additional configuration needed beyond having `kotlinx-coroutines-reactor` on the classpath.
-
----
-
-## 7. Coroutines vs Virtual Threads
-
-Do not explain these as if one simply replaces the other.
-
-They solve different problems at different layers:
-
-- **Kotlin coroutines**: language-level concurrency model with `suspend`,
-  structured concurrency, cancellation propagation, and coroutine-aware APIs
-- **Java virtual threads**: JVM runtime model that makes blocking code cheaper
-  to schedule, especially in Java 21+ server applications
-
-Why coroutines are strong:
-
-- mature and production-proven in Kotlin systems
-- natural when your service layer, clients, and team already work in Kotlin
-- better fit when you want structured concurrency for fan-out/fan-in flows
-- expressive for async orchestration without dropping into callback style
-
-Why virtual threads are strong:
-
-- very practical for existing blocking Spring MVC, JDBC, and Java-heavy stacks
-- lower migration cost when you want to keep imperative code style
-- useful when most dependencies are still blocking and you do not want a larger async model shift
-
-Where people get the comparison wrong:
-
-- virtual threads do not magically turn blocking I/O into non-blocking I/O
-- coroutines are not just "lighter threads"; they carry a different programming model
-- JPA, JDBC, and many client libraries still have their own runtime limits no matter which model you use
-
-Simple decision rule:
-
-- Kotlin-heavy service with real coroutine usage and structured concurrency needs -> coroutines are a strong default
-- Java-heavy or blocking Spring service where you want simpler adoption on Java 21+ -> virtual threads are often the easier win
-- mixed team or unclear benefit -> do not force either model as ideology
-
----
-
-## 8. Kotlin-Idiomatic Null Handling in Spring
-
-Avoid Java's `@Nullable`/`@NonNull` — Kotlin's type system handles this:
-
-```kotlin
-// Java Spring Data — Optional<User>
-Optional<User> findByEmail(String email);
-
-// Kotlin Spring Data — nullable return type
-fun findByEmail(email: String): User?   // null = not found, no Optional wrapper needed
-
-// Usage: Kotlin's Elvis operator instead of Optional.orElseThrow()
-val user = userRepository.findByEmail(email) ?: throw UserNotFoundException(email)
-```
-
-Configure strict null safety for Spring's own annotations in `build.gradle.kts`:
-
-```kotlin
-tasks.withType<KotlinCompile> {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")  // Spring's @Nullable → Kotlin nullable
-    }
-}
-```
-
----
-
-## 9. Jackson + Kotlin: Why `jackson-module-kotlin` Is Required
-
-Jackson, by default, requires a no-arg constructor and setters to deserialize JSON into an object. Kotlin data classes have neither — they use a primary constructor with `val` properties.
-
-`jackson-module-kotlin` adds:
-1. Support for primary constructor deserialization (uses constructor parameters, not setters).
-2. Handling of Kotlin's `null` safety — throws on missing non-nullable fields.
-3. Correct serialization of `object` singletons and `sealed` classes.
-
-```kotlin
-// Without jackson-module-kotlin:
-// InvalidDefinitionException: No suitable constructor found for CreateProductRequest
-
-// With jackson-module-kotlin (declared in build.gradle.kts):
-// Works correctly — Jackson uses the primary constructor
-data class CreateProductRequest(
-    val name: String,
-    val priceYen: BigDecimal,
-)
-```
-
-Spring Boot auto-configures `jackson-module-kotlin` when it detects the dependency. No manual `ObjectMapper` configuration needed.
-
----
-
-## Quick Reference: Java → Kotlin Conversion Table
-
-| Java pattern | Kotlin equivalent |
-|---|---|
-| `record Dto(String name) {}` | `data class Dto(val name: String)` |
-| `@NotBlank String name` | `@field:NotBlank val name: String` |
-| `Optional<User>` return | `User?` return |
-| `List.of("a", "b")` | `listOf("a", "b")` |
-| `Map.of("k", "v")` | `mapOf("k" to "v")` |
-| `instanceof` check | `is` + smart cast |
-| `static` method | `companion object { fun ... }` |
-| String concatenation `"Hello " + name` | String template `"Hello $name"` |
-| `class Foo extends Bar implements Baz` | `class Foo : Bar(), Baz` |
-| `@ConditionalOnClass(Foo.class)` | `@ConditionalOnClass(Foo::class)` |
-| `@ConditionalOnMissingBean(X.class)` | `@ConditionalOnMissingBean(X::class)` |
-| `getters/setters` | Kotlin properties (auto-generated) |
+- [Spring Kotlin coroutine support](https://docs.spring.io/spring-framework/reference/languages/kotlin/coroutines.html): controllers and reactive transactions.
+- [Spring transaction context](https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-decl-explained.html): thread-bound and reactive boundaries.
+- [Kotlin Spring compiler plugin](https://kotlinlang.org/docs/all-open-plugin.html#spring-support): class opening for proxies.
+- [Kotlin JPA compiler plugin](https://kotlinlang.org/docs/no-arg-plugin.html#jpa-support): generated no-argument constructors.
+- [Kotlin annotation targets](https://kotlinlang.org/docs/annotations.html#annotation-use-site-targets): field, getter, and parameter placement.

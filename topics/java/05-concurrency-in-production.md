@@ -137,7 +137,7 @@ fun buildCheckoutView(userId: String, executor: ExecutorService): CheckoutView {
         .thenCombine(pricing) { cartView, pricingView ->
             CheckoutView(cart = cartView, pricing = pricingView)
         }
-        .orTimeout(250, TimeUnit.MILLISECONDS) // one request budget for the whole fan-out
+        .orTimeout(250, TimeUnit.MILLISECONDS) // bounds this future's wait, not child I/O
         .join()
 }
 ```
@@ -159,7 +159,7 @@ public CheckoutView buildCheckoutView(String userId, ExecutorService executor) {
 
     return cart
         .thenCombine(pricing, CheckoutView::new)
-        .orTimeout(250, TimeUnit.MILLISECONDS) // one request budget for the whole fan-out
+        .orTimeout(250, TimeUnit.MILLISECONDS) // bounds this future's wait, not child I/O
         .join();
 }
 ```
@@ -172,6 +172,11 @@ Why this matters:
 - the budget belongs to the user-facing request, not to each child call independently
 - fan-out is only useful if the calls are actually independent
 - cheap task creation is not permission to multiply downstream load without a budget
+
+`CompletableFuture.orTimeout` completes the future exceptionally; it does not
+interrupt the running suppliers. Configure deadlines on each HTTP client call,
+pass the remaining request budget downstream, and bound queued work. Otherwise
+the caller may time out while the dependency calls keep consuming capacity.
 
 Do not parallelize when:
 
@@ -194,12 +199,12 @@ class ExportController(
 ) {
     fun startExport(request: ExportRequest): ResponseEntity<String> {
         if (!permits.tryAcquire()) {
-            return ResponseEntity.status(429).body("export capacity is full")
+            return ResponseEntity.status(503).body("export capacity is full")
         }
 
         try {
             exportService.run(request) // bounded expensive work
-            return ResponseEntity.accepted().body("export started")
+            return ResponseEntity.ok("export completed")
         } finally {
             permits.release()
         }
@@ -216,12 +221,12 @@ public final class ExportController {
 
     public ResponseEntity<String> startExport(ExportRequest request) {
         if (!permits.tryAcquire()) {
-            return ResponseEntity.status(429).body("export capacity is full");
+            return ResponseEntity.status(503).body("export capacity is full");
         }
 
         try {
             exportService.run(request); // bounded expensive work
-            return ResponseEntity.accepted().body("export started");
+            return ResponseEntity.ok("export completed");
         } finally {
             permits.release();
         }
@@ -238,6 +243,11 @@ Short rule:
 
 > bounded work plus a clear "busy" answer is healthier than pretending every
 > request can always start immediately
+
+This example runs the export before responding, so a successful response is
+`200 OK`. Use `202 Accepted` only when the work is accepted for later
+processing and the API provides a way to learn its outcome. A shared-capacity
+limit is shown as `503`; a per-client rate limit could instead use `429`.
 
 ---
 
@@ -349,3 +359,5 @@ Then try:
   exercise `Production concurrency`
 
 Implement the scenario yourself if you want to observe queueing and bounded admission.
+
+References: [Java `CompletableFuture` API](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/CompletableFuture.html) for timeout and cancellation behavior; [HTTP semantics](https://www.rfc-editor.org/rfc/rfc9110.html) for `202` and `503` responses.

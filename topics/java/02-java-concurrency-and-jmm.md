@@ -176,7 +176,7 @@ class CounterService {
     fun incrementAndGet(): Int =
         counter.incrementAndGet() // atomically add 1 and return the new value
 
-    fun get(): Int = counter.get() // safe current read of the latest counter value
+    fun get(): Int = counter.get() // atomic read of the current value
 }
 ```
 
@@ -194,7 +194,7 @@ public final class CounterService {
     }
 
     public int get() {
-        return counter.get(); // safe current read of the latest counter value
+        return counter.get(); // atomic read of the current value
     }
 }
 ```
@@ -217,7 +217,8 @@ If two values must stay consistent together, a plain atomic is usually not enoug
 
 ## 4. `volatile`: Visibility, Not Full Safety
 
-`volatile` is useful when one thread must see the latest value written by another.
+`volatile` is useful when a thread must observe updates to a shared flag or
+reference without using a lock for that single value.
 
 Good minimal example:
 
@@ -227,7 +228,7 @@ class Worker {
     private var stopped = false
 
     fun stop() {
-        stopped = true // write latest value so the worker thread can see it
+        stopped = true // publish the stop flag to the worker thread
     }
 
     fun runLoop() {
@@ -250,7 +251,7 @@ public final class Worker {
     private volatile boolean stopped = false;
 
     public void stop() {
-        stopped = true; // write latest value so the worker thread can see it
+        stopped = true; // publish the stop flag to the worker thread
     }
 
     public void runLoop() {
@@ -300,7 +301,7 @@ That is still broken because `counter++` is still read, add, write.
 
 Short rule:
 
-> `volatile` helps one thread see the latest value; it does not make multi-step updates atomic
+> `volatile` makes writes to that variable visible across threads; it does not make multi-step updates atomic
 
 ---
 

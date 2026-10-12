@@ -11,7 +11,8 @@ A JWT is a token format for sending JSON claims between systems.
 In practice it often contains user or session-related data and is signed so the receiver can detect tampering.
 
 That does not mean the contents are secret.
-Most JWTs you see in apps are only encoded, not encrypted, so anyone holding the token can often read the claims.
+A signed JWT is encoded, not encrypted; someone holding it can read its
+claims unless the token is also encrypted.
 This is one of the first misconceptions worth killing early.
 
 Short rule:
@@ -38,6 +39,8 @@ Teams also tend to adopt JWT for architectural reasons they cannot clearly expla
 
 The important thing is not just naming the parts.
 You should understand what the server must validate before trusting the token and what information is still unsafe to trust too eagerly even after validation.
+A token profile defines the claims and validation rules for one intended use,
+such as an access token for a particular API.
 
 - header, payload, signature
 - claims such as `iss`, `sub`, `aud`, `exp`, `iat`
@@ -54,7 +57,7 @@ Common failures:
 - decoding a token without actually verifying it
 - accepting the wrong algorithm
 - weak shared secret for HMAC-signed tokens
-- trusting claims without validating issuer, audience, and expiry
+- trusting claims without validating the issuer, audience, lifetime, and token purpose required by the chosen token profile
 - putting too much authority in client-held claims
 
 The repeated failure pattern is confusing "I can read this token" with "I can trust this token".
@@ -69,7 +72,7 @@ Keep the trust model narrow and explicit.
 Use the token to carry identity or session-related claims, but keep sensitive authorization decisions anchored in server-side rules and current application state where needed.
 
 - verify signature with the expected algorithm
-- validate `iss`, `aud`, and `exp`
+- validate the claims required by the token profile; for access tokens shared across services, this normally includes expected `iss`, `aud`, and expiry
 - keep token lifetime short
 - treat token claims as input that still needs a sound trust model
 - do not use JWT just because it feels modern; use it when the architecture benefits from it
@@ -81,14 +84,14 @@ Use the token to carry identity or session-related claims, but keep sensitive au
 Strong default:
 
 - the server verifies the token, not just decodes it
-- issuer, audience, expiry, and accepted algorithm are explicit
+- issuer, audience, lifetime, intended token type, and accepted algorithm are checked as required by the token profile
 - short-lived access tokens stay narrow in purpose
 - the token helps establish identity or API access context, but server-side authorization still decides the business action
 
 Bad vs better:
 
 - bad: "it is a JWT, so it is secure by design"
-- better: "it is only trustworthy if the signature, issuer, audience, expiry, and intended use are all validated correctly"
+- better: "it is trustworthy for this use only when its signature and the claims required by this token profile are validated"
 
 - bad: "the token says `isAdmin=true`, so the business action is obviously allowed"
 - better: "claims can support the authorization model, but sensitive decisions still need a clear server-side trust rule"
@@ -108,7 +111,7 @@ Look closely at whether the library call actually verifies the token or merely d
 - token parsing versus token verification APIs
 - accepted algorithms
 - hardcoded secrets
-- missing issuer or audience validation
+- missing issuer or audience validation when the token profile requires it
 - business logic that trusts `role` or `isAdmin` claims too easily
 
 ---
@@ -129,6 +132,8 @@ If you can explain that scenario clearly, you already understand more than many 
 ## 9. Resources
 
 - formal reference: [RFC 7519](https://www.rfc-editor.org/rfc/rfc7519)
+- secure implementation: [RFC 8725](https://www.rfc-editor.org/rfc/rfc8725)
+- token validation guidance: [OWASP JWT Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_Cheat_Sheet.html)
 - defense: [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - practice: [PortSwigger JWT Attacks](https://portswigger.net/web-security/jwt)
 

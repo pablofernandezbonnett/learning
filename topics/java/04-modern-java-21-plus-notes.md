@@ -63,18 +63,26 @@ Practical stance:
 
 Important status note:
 
-- as of JDK 25, structured concurrency is still a **preview** API
+- as of JDK 27, structured concurrency is still a **preview** API
 
-Tiny mental model:
+JDK 27 preview example (enable preview features when compiling and running;
+the enclosing method handles `InterruptedException` and `ExecutionException`):
 
 ```java
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+try (var scope = StructuredTaskScope.open()) {
     var pricing = scope.fork(() -> pricingClient.fetch(productId));
     var stock = scope.fork(() -> stockClient.fetch(productId));
-    scope.join().throwIfFailed();
+    scope.join(); // throws ExecutionException if either subtask fails
     return new ProductView(pricing.get(), stock.get());
 }
 ```
+
+Earlier preview releases used `ShutdownOnFailure`; JDK 25/26 used a different
+failure exception from JDK 27. Use the API documented for the project's JDK
+version rather than copying a preview snippet across releases.
+Cancellation interrupts the other subtask, but that work must respond to
+interruption. A call that ignores it can delay scope closure; keep downstream
+deadlines as well.
 
 That is the kind of backend scenario it targets:
 
@@ -213,7 +221,8 @@ For Spring Boot teams, the most relevant modern-Java interaction is:
 
 But even there, you need to remember:
 
-- pinned virtual threads still matter
+- on JDK 25, native or foreign calls can still pin a virtual thread; the
+  earlier `synchronized` pinning limitation was addressed after JDK 21
 - blocking dependencies are still blocking
 - scheduler behavior changes
 - if everything becomes daemon-thread based, JVM liveness can surprise you
@@ -250,5 +259,7 @@ The point is to understand when these tools are useful.
 
 - [JEP 444: Virtual Threads](https://openjdk.org/jeps/444)
 - [JEP 505: Structured Concurrency](https://openjdk.org/jeps/505)
+- [JDK 25 `StructuredTaskScope` API](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/concurrent/StructuredTaskScope.html)
+- [JDK 27 `StructuredTaskScope` API](https://docs.oracle.com/en/java/javase/27/docs/api/java.base/java/util/concurrent/StructuredTaskScope.html)
 - [JEP 506: Scoped Values](https://openjdk.org/jeps/506)
 - [JEP 465: String Templates](https://openjdk.org/jeps/465)

@@ -55,8 +55,8 @@ Define that business rule explicitly.
 Kafka producer idempotence reduces duplicates from producer retries, and
 `acks=all` waits for the configured in-sync replicas to acknowledge a write.
 Neither protects a separate database write or an external side effect. For a
-database change that must lead to an event, use the
-[outbox pattern](./02-message-brokers-and-delivery-semantics.md#reliable-publication).
+database change that must lead to an event, design a durable handoff such as
+the [outbox pattern](./02-message-brokers-and-delivery-semantics.md#reliable-publication).
 
 ## Retry and Replay
 

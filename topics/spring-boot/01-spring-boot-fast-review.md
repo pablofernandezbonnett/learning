@@ -69,9 +69,11 @@ Spring feature or tune an annotation.
 - A local transaction protects local data. It does not make a remote call
   atomic with that data; use [workflow patterns](../architecture/16-distributed-workflow-pattern-choice.md)
   when several systems must participate.
-- A healthy JVM is not proof that the service can take traffic. Check
-  readiness against the dependencies that make this service useful, and expose
-  only the operational endpoints the platform needs.
+- A healthy JVM is not proof that the service can take traffic. Readiness
+  should describe whether this instance can serve requests; add shared
+  downstream checks only after considering what happens if every instance
+  becomes unready during one dependency outage. Expose only the operational
+  endpoints the platform needs.
 
 For Kotlin-specific proxy, nullability, and interoperability choices, use
 [Kotlin and Spring](./15-kotlin-spring-idioms.md). For schema changes, use

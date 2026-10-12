@@ -110,10 +110,11 @@ Short rule:
 
 Kotlin plus Spring is productive, but there are a few rules you must remember:
 
-- Spring proxies need `plugin.spring`
-- JPA entities usually need `plugin.jpa`
+- class-based Spring proxies need open classes; `plugin.spring` commonly supplies that
+- JPA entities need a suitable no-argument constructor; `plugin.jpa` commonly supplies that
 - validation annotations on data classes often need `@field:`
-- Jackson needs `jackson-module-kotlin`
+- Jackson needs `jackson-module-kotlin` to handle common Kotlin DTO
+  constructor and nullability metadata
 
 That means the language is cleaner, but the framework still has runtime rules.
 

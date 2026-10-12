@@ -74,10 +74,14 @@ and dead-letter volume so asynchronous work cannot fail silently.
 
 ## Reliable Publication
 
-If a committed database change must produce a broker event, the publisher
-needs an [outbox](../architecture/03-distributed-transactions-and-events.md).
-Broker delivery rules start after publication; they cannot make a separate
-database write and publish atomic.
+If a committed database change must reliably produce a broker event, design a
+durable handoff. A
+[transactional outbox](../architecture/03-distributed-transactions-and-events.md)
+is a common choice: save the event with the business change, then publish it
+with retries. Change data capture (CDC) can instead relay committed database
+changes when its ownership and recovery behavior fit. Broker delivery rules
+start after publication; they cannot make a separate database write and
+publish atomic by themselves.
 
 ## Review Questions
 

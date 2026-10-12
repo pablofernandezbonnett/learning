@@ -54,7 +54,10 @@ whether it should receive traffic. Probe paths and their availability depend
 on the deployment setup. Avoid making liveness depend on a shared downstream
 service: an outage there could restart every instance. If a separate
 management port is used, check that probes reflect the application's real
-traffic path. For the system-level decision, see
+traffic path. A shared dependency in readiness also needs a deliberate choice:
+its outage could remove every instance from service. Spring Boot does not add
+external health checks to its readiness probe by default. For the wider
+operational decision, see
 [observability](../devops/03-observability-and-monitoring.md).
 
 ## Test the Boundary That Matters

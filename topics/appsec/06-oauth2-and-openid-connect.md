@@ -10,12 +10,14 @@ They are not.
 OAuth 2.0 is an authorization framework for delegated access to protected resources.
 OpenID Connect, usually called OIDC, is an identity layer on top of OAuth 2.0.
 
-In simple terms, OAuth helps one system obtain limited access to another system on a user's behalf.
+In simple terms, OAuth lets a client obtain limited access to protected resources,
+either on a user's behalf or, with an appropriate client grant, on its own behalf.
 OIDC adds a standard way to know who the user is, which is why it is used for modern login and single sign-on flows.
 
 Short rule:
 
-> OAuth is mainly about access to APIs; OIDC is what you add when you need login and identity
+> OAuth is about delegated or client access to protected resources; OIDC adds a
+> standard identity layer for user login
 
 ---
 
@@ -47,6 +49,7 @@ Focus first on who issues each token, who consumes it, and what decision that to
 - ID token
 - scopes
 - authorization code flow
+- client credentials for suitable service-to-service access
 - PKCE
 
 ---
@@ -140,6 +143,7 @@ It is a good diagnostic: this topic becomes much easier once the sequence is vis
 ## 9. Resources
 
 - formal reference: [RFC 6749](https://www.rfc-editor.org/rfc/rfc6749)
+- current security guidance: [RFC 9700](https://www.rfc-editor.org/rfc/rfc9700.html)
 - OIDC reference: [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html)
 - defense: [OWASP OAuth2 Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/OAuth2_Cheat_Sheet.html)
 

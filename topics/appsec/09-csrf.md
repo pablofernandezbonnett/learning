@@ -50,7 +50,7 @@ The session cookie may correctly identify the user, but the server still needs a
 
 Common failures:
 
-- no CSRF token on sensitive actions
+- no effective CSRF defense on sensitive actions
 - token present but not properly validated
 - relying only on request method
 - relying only on referer checks
@@ -64,10 +64,13 @@ A team may know one CSRF mitigation exists and then overestimate what that one c
 ## 5. How To Build It Better
 
 Treat state-changing browser actions as needing both authentication and request integrity.
-That is why anti-CSRF tokens and sound cookie settings work well together instead of competing with each other.
+Anti-CSRF tokens are a common defense. Checks based on `Origin` or `Referer`,
+or on Fetch Metadata headers that describe the browser request's context,
+can also help when the application's flows and fallback behavior have been
+checked. Sound cookie settings add another layer.
 
-- use anti-CSRF tokens for sensitive browser-originating actions
-- validate them strictly on the server
+- use a framework-supported CSRF defense for sensitive browser-originating actions
+- if using anti-CSRF tokens, validate them strictly on the server
 - use `SameSite` deliberately
 - avoid mutating state through unsafe `GET` behavior
 - understand when your app is cookie-backed and when it is not
@@ -89,7 +92,7 @@ Bad vs better:
 - better: "the session proves identity, but the server still needs a signal that this state-changing request came from a legitimate app flow"
 
 - bad: "we set `SameSite`, so CSRF is solved"
-- better: "we use token-based request integrity plus cookie settings that fit the real browser flow"
+- better: "we enforce a CSRF defense that fits the browser flow and choose cookie settings deliberately"
 
 Small practical rule:
 
@@ -102,7 +105,7 @@ Small practical rule:
 You are looking for actions that matter and that a browser can trigger automatically.
 Password changes, payment actions, admin operations, and profile updates are the usual places to start.
 
-- forms or state-changing endpoints with no request integrity token
+- forms or state-changing endpoints with no effective CSRF defense
 - auth that depends only on browser-sent cookies
 - change endpoints reachable by `GET`
 - framework CSRF protections disabled without a clear replacement
@@ -116,7 +119,7 @@ Take one browser-based update action and ask:
 
 - does the browser send auth automatically?
 - what protects intent?
-- is there a CSRF token?
+- what CSRF defense is enforced and tested?
 - what is the `SameSite` setting?
 - could the action be triggered cross-site?
 
