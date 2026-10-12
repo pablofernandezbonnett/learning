@@ -137,5 +137,5 @@ If you can answer those questions confidently in DevTools, you are already build
 
 ## 10. Internal Repo Links
 
-- [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): deeper explanation of session-based auth, cookie behavior, and the web tradeoff versus JWT
-- [../spring-boot/01-spring-boot-fast-review.md](../spring-boot/01-spring-boot-fast-review.md): practical Spring notes on secure cookies, CSRF, and browser-session behavior
+- [Authentication choices](../security/01-auth-sessions-vs-jwt.md): when to choose a server session or token model
+- [../security/03-spring-and-jvm-appsec.md](../security/03-spring-and-jvm-appsec.md): Spring security boundaries and browser-facing checks

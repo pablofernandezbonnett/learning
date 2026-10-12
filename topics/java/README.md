@@ -1,4 +1,4 @@
-# Java Refresh for Backend Engineers
+# Java and JVM
 
 Use this folder as a practical Java refresh when your mental model is strongest
 in Java `8` or `11` and needs updating for modern backend work.
@@ -51,16 +51,14 @@ If time is limited:
 ## Companion Lab
 
 Use [../../labs/java-modern-features/README.md](../../labs/java-modern-features/README.md)
-for a small Java `21` example focused on records, sealed types, pattern
+for small Java `21` exercises focused on records, sealed types, pattern
 matching, and virtual threads.
 
-Use `VirtualThreadsRequestBudgetLab` inside that lab when you want the
-backend-specific virtual-thread example rather than only the language-feature
-walkthrough.
+Its second exercise covers request budgets with virtual threads.
 
-For concurrency drills with runnable output, also use
-[../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md)
-topics `jvm/concurrency` and `jvm/concurrency-production`.
+For concurrency drills, also use
+[Kotlin backend boundary exercises](../../labs/kotlin-backend-examples/README.md),
+especially JVM and production concurrency.
 
 For the Kotlin coroutine model, use
 [../kotlin/03-kotlin-coroutines-for-backend.md](../kotlin/03-kotlin-coroutines-for-backend.md).

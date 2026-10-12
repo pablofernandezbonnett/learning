@@ -1,70 +1,39 @@
 # Architecture and Distributed Systems
 
-Use this folder for practical architecture refresh around service boundaries,
-distributed flows, failure handling, and network behavior.
-The goal is to understand how backend systems stay correct and operable once the
-work is split across processes, databases, queues, and teams.
+Use this block to decide where software boundaries belong and what changes
+when work crosses a process, database, network, or team boundary. Start from
+the business need and failure behavior, then choose the smallest mechanism
+that makes the system correct and operable.
 
-Focus:
+## Service and Data Boundaries
 
-- monolith versus microservices decisions, which are really decisions about team boundaries and operational cost
-- retries, timeouts, circuit breakers, and graceful degradation, meaning how the system behaves when one dependency is slow or down but the whole product should not collapse
-- distributed transactions, outbox, and idempotent consumers, meaning how you keep a cross-system workflow safe when one local transaction no longer covers the whole flow
-- networking, tracing, and event-driven flows so you can reason about where requests go and why failures become harder to debug
-- caching, concurrency, service discovery, and other mechanics that affect scale, latency, and coordination
+- [Choose application and service boundaries](./01-monolith-vs-microservices.md): when a service split earns its cost.
+- [Shared database during a split](./18-shared-db-and-independent-deployments.md): deployment versus write ownership.
+- [Cross-domain reads](./19-database-per-service-and-read-model-migration.md): API composition, projections, and reporting.
+- [Domain-driven design](./09-domain-driven-design.md): business language and model boundaries.
+- [Hexagonal architecture](./21-hexagonal-architecture.md): keep business rules independent from adapters and frameworks.
 
-Decision boundary for workflow and integration notes:
+## Workflows and Integration
 
-- use `03` when the problem is distributed transaction replacement, outbox, compensation, or event-driven consistency
-- use `13` when the problem is integration with enterprise or legacy systems and boundary translation matters more than pure distributed-system theory
-- use `16` when several patterns sound plausible and you need help choosing the smallest one that actually fits
+- [Choose a distributed workflow pattern](./16-distributed-workflow-pattern-choice.md): begin with the coordination gap.
+- [Recover a cross-service workflow](./03-distributed-transactions-and-events.md): partial states, compensation, outbox, and retries.
+- [Webhooks, events, and reactive code](./06-reactive-and-event-driven-basics.md): three different boundaries.
+- [Integrate external systems](./13-enterprise-integration-patterns.md): translation, update cadence, and reconciliation.
+- [Edge patterns](./17-gateway-vs-bff-vs-edge-patterns.md): gateway, backend for frontend, reverse proxy, and service mesh.
+- [Self-service edge platforms](./20-self-service-edge-platforms.md): provide shared edge capability to teams safely.
 
-## Recommended Order
+## Failure and Scale Mechanics
 
-1. [01-monolith-vs-microservices.md](./01-monolith-vs-microservices.md): how to choose service boundaries without treating microservices as a default maturity badge
-2. [02-resiliency-patterns.md](./02-resiliency-patterns.md): retries, timeouts, circuit breakers, fallback behavior, and the cost of each choice
-3. [03-distributed-transactions-and-events.md](./03-distributed-transactions-and-events.md): what replaces one big transaction when a workflow crosses services, including outbox and compensation
-4. [04-networking-fundamentals.md](./04-networking-fundamentals.md): HTTP, gRPC, DNS, load balancing, and the network-level realities behind service-to-service calls
-5. [05-distributed-tracing.md](./05-distributed-tracing.md): how to follow one request across several hops without guessing from logs alone
-6. [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md): when asynchronous flows help and when they mainly add complexity
-7. [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md): how to choose between queue, event stream, outbox, saga, and `CQRS` based on the real coordination problem
-8. [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md): how to choose between gateway, `BFF`, reverse proxy, and service mesh without adding edge layers by default
-9. [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md): how to reason about transitional architectures where deploys are split before data ownership is cleanly split
-10. [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md): how to replace old shared-database joins with API composition, projections, or read models once write ownership is split
-11. [20-self-service-edge-platforms.md](./20-self-service-edge-platforms.md): how to give many teams safe self-service edge capability without exposing raw infrastructure power or turning platform into a ticket bottleneck
+- [Resiliency patterns](./02-resiliency-patterns.md): timeouts, retries, circuit breakers, and degraded behavior.
+- [Networking fundamentals](./04-networking-fundamentals.md): HTTP, DNS, load balancing, and network failure.
+- [Distributed tracing](./05-distributed-tracing.md): follow one request across services.
+- [Caching strategies](./07-caching-strategies.md): improve reads while managing stale data and invalidation.
+- [Concurrency models](./08-concurrency-models-comparison.md): compare ways to run work concurrently.
+- [Consistent hashing](./10-consistent-hashing.md): distribute keys while limiting reshuffling.
+- [Service discovery](./11-service-discovery.md): locate changing service instances.
+- [Leader election and leases](./12-consensus-and-leader-election.md): coordinate workers without assuming exactly-once effects.
 
-## Refresh
+## Domain Examples
 
-- [01-monolith-vs-microservices.md](./01-monolith-vs-microservices.md)
-- [02-resiliency-patterns.md](./02-resiliency-patterns.md)
-- [03-distributed-transactions-and-events.md](./03-distributed-transactions-and-events.md)
-- [04-networking-fundamentals.md](./04-networking-fundamentals.md)
-- [05-distributed-tracing.md](./05-distributed-tracing.md)
-- [06-reactive-and-event-driven-basics.md](./06-reactive-and-event-driven-basics.md)
-- [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md)
-- [17-gateway-vs-bff-vs-edge-patterns.md](./17-gateway-vs-bff-vs-edge-patterns.md)
-- [18-shared-db-and-independent-deployments.md](./18-shared-db-and-independent-deployments.md)
-- [19-database-per-service-and-read-model-migration.md](./19-database-per-service-and-read-model-migration.md)
-- [20-self-service-edge-platforms.md](./20-self-service-edge-platforms.md)
-
-## Required
-
-- [07-caching-strategies.md](./07-caching-strategies.md): where cache helps, where stale data hurts, and how to think about invalidation
-- [09-domain-driven-design.md](./09-domain-driven-design.md): how to shape boundaries and business language without turning `DDD` (`Domain-Driven Design`) into ceremony
-- [11-service-discovery.md](./11-service-discovery.md): how services find each other in dynamic environments such as Kubernetes
-- [21-hexagonal-architecture.md](./21-hexagonal-architecture.md): how to keep use cases and domain rules independent from HTTP, JPA, and provider-specific details
-
-## Growth
-
-- [08-concurrency-models-comparison.md](./08-concurrency-models-comparison.md): shared-memory threads, goroutines, coroutines, and virtual threads in practical backend terms
-- [10-consistent-hashing.md](./10-consistent-hashing.md): how distributed caches and partitioned systems spread load without reshuffling everything
-- [12-consensus-and-leader-election.md](./12-consensus-and-leader-election.md): how one instance becomes the active coordinator safely, and why this is harder than a plain lock
-- [13-enterprise-integration-patterns.md](./13-enterprise-integration-patterns.md): practical message and integration patterns without turning the topic into acronym soup
-- [14-b2b-vs-b2c-commerce-systems.md](./14-b2b-vs-b2c-commerce-systems.md): how requirements change when the same platform serves `B2C` (end consumers) versus `B2B` (business accounts)
-- [15-retail-inventory-and-fulfillment-systems.md](./15-retail-inventory-and-fulfillment-systems.md): real operational tradeoffs around stock, reservation, order routing, and fulfillment
-
-## Core Rule
-
-- service boundaries matter more than service count
-- local correctness, replay safety, and recovery paths matter more than diagram density
-- distributed systems move complexity into communication and operations
+- [B2B and B2C commerce](./14-b2b-vs-b2c-commerce-systems.md): buyer identity, contract pricing, and approval decisions.
+- [Inventory and fulfillment](./15-retail-inventory-and-fulfillment-systems.md): sellable stock, reservation, and physical work.

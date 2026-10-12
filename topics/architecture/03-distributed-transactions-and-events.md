@@ -1,603 +1,93 @@
-# Distributed Transactions & Event-Driven Architecture
+# Recovering a Workflow Across Services
 
-> Primary fit: `Shared core / Payments / Fintech`
+A local database transaction can commit an order and its own records together.
+It cannot roll back a payment or stock reservation already committed by a
+different service. A cross-service workflow therefore needs explicit states,
+safe retries, and a way to recover from partial progress.
 
-You do not need to memorize every pattern name here, but you do need a clear mental model
-for one recurring backend question: "what happens when one business
-operation spans multiple services and something fails in the middle?"
+Use the [pattern choice guide](./16-distributed-workflow-pattern-choice.md)
+first if you have not yet established that the work crosses independent write
+owners. This note covers the recovery mechanics.
 
-In a monolith, you use `@Transactional` to ensure a write to the `Users` table and the `Orders` table either both succeed or both fail.
+## Model the Business Outcome
 
-In a microservices world, the `Users` table and `Orders` table belong to different databases owned by different services. You cannot use one simple local database transaction across them. This is one of the hardest recurring backend problems once data and ownership are split across services.
+For an order requiring payment authorization and stock reservation, record an
+order as `PENDING` before assuming it can be confirmed. Each step has a local
+transaction and reports a result. The workflow moves to `CONFIRMED` only after
+the required results are known.
 
-## Why This Matters
+A timeout leaves the outcome **unknown**. The remote step might have succeeded
+even though its response was lost. Before retrying, use a stable operation ID
+so the owner can recognize the same request, or query its recorded result.
 
-This topic matters because many important backend workflows look simple from the
-UI and then become tricky as soon as state is split across service boundaries.
+If stock cannot be reserved after payment was authorized, cancel the
+authorization and mark the order `CANCELLED`. That cancellation is a new
+business action, called a **compensation**; it does not erase the earlier
+database commit. If payment was already captured, the compensating action may
+instead be a refund. Compensation itself can fail and must be retried or
+escalated until the business outcome is settled.
 
-If you can explain how the system behaves after partial success, timeout, or
-duplicate delivery, you are already doing the part that matters most in
-real-world architecture work and many strong interviews.
+## Coordinate the Steps
 
-Plain-English version:
+A **saga** is a workflow of local transactions with explicit forward and
+compensating actions. There are two common coordination styles:
 
-- one step may already have committed in Service A
-- another step may fail in Service B
-- now the system is in a half-finished business state
-- the real job is making that state safe and recoverable
+| Style | How it works | Main cost |
+| --- | --- | --- |
+| Choreography | Each participant reacts to events and emits its result | The overall state can be hard to see when the chain grows |
+| Orchestration | One workflow component records state and commands the next step | The coordinator needs durable state and recovery logic |
 
-Pattern-choice follow-up:
+Start with a small, visible workflow. Choose orchestration when a long or
+business-critical sequence needs one place to track progress and compensation.
+Neither style removes the need for idempotent commands, timeouts, and clear
+ownership of stuck cases.
 
-- [16-distributed-workflow-pattern-choice.md](./16-distributed-workflow-pattern-choice.md)
+## Publish a Committed Change Reliably
 
-Quick terms used here:
+Saving an order and publishing `OrderPlaced` to a broker are two writes to
+different systems. If the database commits and publishing fails, a downstream
+step may never start. An **outbox** stores the business change and an event
+record in the same local database transaction:
 
-- `eventual consistency` = different parts of the system may agree a little later instead of all at once
-- `compensation` = a new business action that semantically undoes an earlier step
-- `choreography` = services react to each other's events without one central coordinator
-- `orchestration` = one central workflow component tells the other services what step to run next
-- `projection` = a read-optimized view built from source data or events
-
----
-
-## Smallest Mental Model
-
-Most of this topic is really about one question:
-
-> when one business operation spans several boundaries, how do we keep the
-> result safe and recoverable when one step succeeds and a later step fails?
-
-The useful first split is:
-
-- `saga` for workflow recovery across services
-- `outbox` for reliable state change plus event publication
-- `CQRS` when read and write shapes have clearly diverged
-- `event sourcing` when history itself is part of the product or audit value
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- distributed transactions are just regular transactions with more services
-- if each service is clean enough, the full business workflow will stay clean
-- a broker or a workflow engine automatically solves consistency
-
-Better mental model:
-
-- every service boundary is a place where uncertainty appears
-- local database transactions stop at the local database
-- cross-service correctness comes from explicit state transitions,
-  compensation, idempotency, and recovery logic
-
-Small concrete example:
-
-- weak approach: order service writes the order, then calls payment, then calls
-  inventory, and if inventory fails it "expects rollback"
-- better approach: order stays `PENDING`, payment authorization and inventory
-  reservation are explicit steps, and compensation or later confirmation moves
-  the workflow safely
-
-Smallest code example:
-
-```kotlin
-@Transactional
-fun createLocalOrder(order: Order, ledgerEntry: LedgerEntry) {
-    orderRepository.save(order)
-    ledgerRepository.save(ledgerEntry)
-}
+```text
+transaction: save pending order + save outbox event
+after commit: relay publishes event to broker
+after broker acknowledgment: relay marks event as published
 ```
 
-That is still one local consistency boundary.
-Now compare it with the first distributed shape:
-
-```kotlin
-fun createDistributedOrder(order: Order) {
-    orderRepository.save(order.copy(status = OrderStatus.PENDING))
-    paymentClient.authorize(order.id)
-    inventoryClient.reserve(order.id)
-}
-```
-
-The second example is where the topic really starts:
-the order may already be saved when a later remote step fails, so the system
-needs explicit recovery instead of pretending one rollback can still protect the
-whole workflow.
-
-Strong default:
-
-- pick the smallest pattern that solves the actual failure shape
-- do not reach for choreography, orchestration, CQRS, or event sourcing just
-  because the names sound more advanced
-
-Reusable takeaway:
-
-> In distributed workflows, I first ask whether the problem is workflow
-> recovery, dual-write safety, read/write divergence, or audit-grade history.
-> That tells me whether I need saga, outbox, CQRS, or event sourcing.
-
-Short reusable answer:
-
-> First I show the local transaction that really can roll back. Then I show the
-> same business flow crossing a remote boundary, where a saved local state can
-> outlive a failed later step. That is why saga and outbox exist.
-
----
-
-## 0. Quick Pattern Choice
-
-Use this mental model:
-
-- **Saga:** one business workflow spans several services and you need explicit forward steps plus compensation
-- **Outbox Pattern:** one service must both save state and publish an event reliably
-- **CQRS:** writes and reads behave very differently, so one model no longer serves both well
-- **Event Sourcing:** the event history itself is part of the product, audit, or compliance value
-
-If these names feel abstract, the practical translation is:
-
-- saga = workflow recovery problem
-- outbox = dual-write safety problem
-- CQRS = write model and read model have diverged
-- event sourcing = history itself matters, not only latest state
-
-These patterns are related, but they solve different problems.
-
-Why this section matters:
-
-- the correct pattern buys clarity for one kind of problem
-- the cost is almost always more moving parts and more care in how you run the system
-
----
-
-## 1. The Saga Pattern
-
-A Saga is a sequence of local transactions.
-Each service commits its own step locally, then the workflow moves on to the next step.
-
-If a local transaction fails (e.g., Out of Stock), the saga executes a series of **Compensating Transactions** that undo the changes made by the preceding local transactions.
-
-`Compensating transaction` sounds abstract, but it usually means a concrete business undo action:
-
-- cancel an authorization
-- release a reservation
-- issue a refund
-- mark an order as cancelled
-
-Important clarification:
-
-- this is **not** a database rollback across all services
-- each service has already committed its own local transaction
-- a compensating transaction is a **new business action** that semantically undoes the earlier step
-
-Concrete example:
-
-- in many card flows, `Payment Service` authorizes first and captures later
-- if `Inventory Service` fails before capture, the saga compensates by cancelling the payment authorization
-- if money was already captured when a later step fails, the saga cannot roll back the original payment transaction in a DB sense
-- instead, it performs a new action such as `RefundPayment`
-
-Important payment nuance:
-
-- `authorize` usually comes before `capture`
-- `authorize` reserves or approves the funds
-- `capture` finalizes the charge
-- if the failure happens before capture, compensation is often cancelling the authorization
-- if the failure happens after capture, compensation is usually `RefundPayment`
-
-Practical explanation:
-
-> We cannot keep one ACID transaction across several services without hurting availability badly, so the safer model is local transactions plus compensation and eventual consistency.
-
-`ACID` here means the usual local database guarantees around atomicity,
-consistency, isolation, and durability.
-The important limit is that those guarantees stop at the local database boundary.
-
-Visual anchor:
-
-```mermaid
-sequenceDiagram
-    participant O as Order Service
-    participant P as Payment Service
-    participant I as Inventory Service
-
-    O->>O: create pending order
-    O-->>P: OrderCreated
-    P->>P: authorize payment
-    P-->>O: PaymentAuthorized
-    O-->>I: ReserveInventory
-    I->>I: try reserve stock
-    alt inventory reserved
-        I-->>O: InventoryReserved
-        O-->>P: CapturePayment
-        P->>P: capture authorized payment
-        P-->>O: PaymentCaptured
-        O->>O: mark order approved
-    else out of stock
-        I-->>O: OutOfStock
-        O-->>P: CancelAuthorization (compensation)
-        O->>O: mark order cancelled
-    end
-```
-
-### A. Saga Choreography (Decentralized)
-There is no central coordinator. Each service listens for events from other services and reacts.
-1.  **Order Service** creates a *Pending* Order and publishes `OrderCreatedEvent`.
-2.  **Payment Service** listens to `OrderCreatedEvent`, authorizes the card, and publishes `PaymentAuthorizedEvent`.
-3.  **Inventory Service** listens to `PaymentAuthorizedEvent`, reserves stock, and publishes `InventoryReservedEvent`.
-4.  **Payment Service** listens to `InventoryReservedEvent`, captures the authorized payment, and publishes `PaymentCapturedEvent`.
-5.  **Order Service** listens to `PaymentCapturedEvent` and marks the Order as *Approved*.
-
-*   *If Payment Authorization Fails:* Payment Service publishes `PaymentAuthorizationFailedEvent`. Order Service listens, and marks Order as *Cancelled*.
-*   *If Inventory Fails Before Capture:* Inventory Service publishes `OutOfStockEvent`. Payment Service or Order Service triggers `CancelAuthorization`, and the Order becomes *Cancelled*.
-*   *Pros:* Simple for 2 or 3 services. No single point of failure.
-*   *Cons:* The workflow can become hard to follow because the state machine is spread across several services.
-*   *Use it when:* The workflow is still small, the event chain is easy to explain, and a central coordinator would add more machinery than value.
-*   *Avoid it when:* The flow is long or nobody can easily answer "what step is this order in right now?"
-### B. Saga Orchestration (Centralized)
-A central coordinator (the Orchestrator) tells the participating services what local transactions to execute.
-1.  **Order Service** creates a *Pending* Order and creates an `OrderSagaCoordinator`.
-2.  The **Coordinator** sends an `AuthorizePayment` command to the Payment Service.
-3.  Payment Service replies with `PaymentAuthorized`.
-4.  The **Coordinator** then sends a `ReserveInventory` command to the Inventory Service.
-5.  If Inventory Service replies with `InventoryReserved`, the **Coordinator** sends `CapturePayment` to the Payment Service and then marks the Order as *Approved*.
-6.  If Inventory Service replies with `InventoryExhausted_Failure`, the **Coordinator** executes the *Compensating Transaction*: it sends `CancelAuthorization` to the Payment Service and marks the Order as *Cancelled*.
-7.  If some later step fails after capture already happened, compensation becomes `RefundPayment` instead of `CancelAuthorization`.
-
-*   *Pros:* Best for complex workflows (4+ steps). Centralized logic is easy to test and monitor. No cyclic dependencies.
-*   *Cons:* Requires building or adopting explicit workflow infrastructure such as Temporal, AWS Step Functions, or Camunda.
-*   *Use it when:* The workflow is long-lived, business-critical, and needs one place to reason about the whole state machine.
-*   *Avoid it when:* The flow is simple enough that a central orchestrator would mostly add extra machinery.
-### Example domains
-
-**Commerce example:**
-
-- checkout creates a pending order
-- payment authorization succeeds
-- inventory reservation fails for one SKU
-- the workflow compensates by cancelling the payment authorization or refunding, then marks the order cancelled
-
-**Payments example:**
-
-- payment request is accepted and a local payment intent is created
-- fraud or balance validation later fails in another step
-- the workflow compensates by marking the payment as failed or reversing the prior money action, instead of pretending one global rollback exists
-
----
-
-## 2. CQRS (Command Query Responsibility Segregation)
-
-In traditional CRUD systems, you use the same database model to write data (Commands) and read data (Queries).
-
-**The Problem:** In complex domains, the way you write data (e.g., validating complex business rules before inserting an Order) is very different from how you query it (e.g., generating a massive join-heavy dashboard for the sales team). The database gets locked by heavy read queries, starving the write queries.
-
-`Command path` means the side that validates and commits business changes.
-`Query path` means the side optimized for reading, searching, or reporting.
-
-**The Solution (CQRS):**
-Separate the read and write models completely, often into different databases.
-
-1.  **Command Path:** Processes complex business logic and writes to a relational database (e.g., Postgres). Optimized for ACID guarantees.
-2.  **Synchronization:** When data is written to the Postgres DB, an event is fired (e.g., via Debezium CDC or an Outbox pattern) to Kafka.
-3.  **Query Path:** A separate service consumes the Kafka event and builds a highly denormalized, read-optimized view of the data in a different database (e.g., Elasticsearch for search, or MongoDB for fast document retrieval). The UI queries *this* database.
-
-`CDC` means `Change Data Capture`: copying committed database changes into another
-system so downstream consumers can react without the write path making a fragile
-direct call to every dependency.
-
-*   *Trade-off:* High architectural complexity and introduces eventual consistency. That means the read side may be a little behind the write side for a short time.
-*   *Pros:* The write side and the read side can each be optimized for their real job. Heavy reads stop competing directly with critical writes.
-*   *Cons:* More infrastructure, more synchronization logic, and the read side may be a little behind the write side.
-*   *Use it when:* The write model and read model are genuinely different, especially when heavy reads would otherwise compete with critical writes.
-*   *Avoid it when:* One normal relational model still serves both reads and writes without pain.
-### Example domains
-
-**Commerce example:**
-
-- command side writes orders and stock movements into Postgres
-- query side builds denormalized read models for product pages, order history, or dashboards
-- this keeps heavy read traffic away from the critical write flow
-
-**Payments example:**
-
-- command side handles payment requests and strict state transitions
-- query side builds merchant dashboards, customer history views, or reconciliation read models
-- that lets the payment write flow stay strict while the reporting side stays fast
-
-If you want the Spring-oriented follow-up on when this stays a projection,
-becomes a dedicated read model, or grows into fuller `CQRS`, see
-[`../spring-boot/22-practical-cqrs-and-read-models.md`](../spring-boot/22-practical-cqrs-and-read-models.md).
-
----
-
-## 3. Event Sourcing
-
-Instead of storing the *current state* of an entity, you store a sequence of *state-changing events*.
-
-*   **Traditional DB:** `AccountBalance = $100` (You don't know how it got there unless you have complex audit logs).
-*   **Event Sourced DB:**
-    1.  `AccountOpenedEvent($0)`
-    2.  `DepositedEvent($200)`
-    3.  `WithdrawnEvent($100)`
-    *(The current balance is calculated by replaying the events.)*
-
-`Replay` here means reading the historical events again in order to rebuild the
-current state or a derived view.
-
-*   *Pros:* 100% reliable audit log (Financial systems love this). "Time travel" debugging—you can recreate the state of the system at any given second in the past.
-*   *Cons:* Extremely steep learning curve. Querying is hard (you usually combine Event Sourcing with CQRS to build read projections).
-*   *Use it when:* A full event history is itself part of the product or compliance value.
-*   *Avoid it when:* You mainly need current state and ordinary audit logging is enough.
-### Example domains
-
-**Commerce example:**
-
-- less common for ordinary catalogue or checkout flows
-- could still make sense for domains where a full history of stock movements or allocation decisions is itself valuable
-
-**Payments example:**
-
-- much easier to justify in money-sensitive domains
-- a payment or ledger domain may value the exact event history for audit, reconciliation, and investigation, not only the latest state
-
----
-
-## 4. The Outbox Pattern (Solving the Dual-Write Problem)
-
-This is one of the most common reliability patterns in event-driven systems because it
-solves a very common failure mode cleanly.
-
-**The Problem (Dual-Write):**
-
-In a Saga, each step must do two things atomically: write to its own database AND publish
-an event to Kafka. The naive implementation does both:
-
-```kotlin
-// BROKEN — these two operations are NOT atomic
-orderRepository.save(order)             // 1. Write to Postgres
-kafkaTemplate.send("orders", event)     // 2. Publish to Kafka — may fail or disconnect
-```
-
-By **naive implementation**, we mean the straightforward code most people write first:
-
-- do the database write
-- then call Kafka, RabbitMQ, SNS, or another broker
-- assume both steps either succeed together or fail together
-
-They do not. They are two separate systems with two separate failure modes.
-
-If step 1 succeeds and step 2 fails (network blip, Kafka down, app crash), the order is
-saved but the event is never published. The Saga stalls permanently. The inventory is never
-reserved. The payment is never captured. **The order is a ghost.**
-
-**The Solution (Outbox Pattern):**
-
-Insert the event into an `outbox` table in the **same local database transaction** as the
-business write. A separate relay process reads the outbox and publishes to Kafka.
-
-`Relay` here means the small background component that turns an unpublished
-outbox row into a broker event later.
-
-Visual anchor:
-
-```mermaid
-flowchart LR
-    Client["Client Request"] --> Service["Order Service"]
-    Service --> Tx["One Local DB Transaction"]
-    Tx --> Order["orders table"]
-    Tx --> Outbox["outbox table"]
-    Outbox --> Relay["Polling Relay or CDC"]
-    Relay --> Broker["Kafka / Broker"]
-    Broker --> Consumer["Inventory / Payment Consumer"]
-    Consumer --> Dedup["Idempotent Consumer / processed_events"]
-```
-
-```
-Step 1 — One DB transaction (atomic):
-    BEGIN;
-      INSERT INTO orders (...)       -- business write
-      INSERT INTO outbox (event_type, payload, published=false)  -- event staging
-    COMMIT;
-
-Step 2 — Relay process (separate):
-    SELECT * FROM outbox WHERE published = false;
-    kafkaTemplate.send(...);
-    UPDATE outbox SET published = true WHERE id = ...;
-```
-
-Smallest implementation:
-
-1. In the service transaction, save the business row and an outbox row together.
-2. A relay process reads unpublished outbox rows.
-3. The relay publishes the event to the broker.
-4. The relay marks the row as published, or records `published_at`.
-5. Consumers stay idempotent because relay retries can produce duplicates.
-
-Minimal schema:
-
-```sql
-CREATE TABLE outbox (
-    id UUID PRIMARY KEY,
-    aggregate_type TEXT NOT NULL,
-    aggregate_id TEXT NOT NULL,
-    event_type TEXT NOT NULL,
-    payload JSONB NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    published_at TIMESTAMP NULL
-);
-```
-
-Minimal service code:
-
-```kotlin
-@Transactional
-fun placeOrder(cmd: PlaceOrderCommand) {
-    val order = orderRepository.save(Order.pending(cmd))
-
-    val event = OutboxEvent(
-        id = UUID.randomUUID(),
-        aggregateType = "order",
-        aggregateId = order.id.toString(),
-        eventType = "OrderCreated",
-        payload = objectMapper.writeValueAsString(
-            mapOf("orderId" to order.id, "userId" to cmd.userId)
-        )
-    )
-
-    outboxRepository.save(event)
-}
-```
-
-Smallest relay:
-
-```kotlin
-fun publishPendingOutboxRows() {
-    val batch = outboxRepository.findTop100ByPublishedAtIsNullOrderByCreatedAtAsc()
-
-    batch.forEach { row ->
-        kafkaTemplate.send("orders", row.payload)
-        outboxRepository.markPublished(row.id)
-    }
-}
-```
-
-**Why it works:**
-- If the app crashes after COMMIT, the outbox row is there — the relay will publish it on
-  restart. At-least-once delivery guaranteed.
-- If the relay fails after publishing but before marking `published = true`, it will
-  re-publish on next run. The consumer must be idempotent (deduplicate by event ID).
-
-*   *Use it when:* One service must persist state and emit an event reliably without a
-single cross-system transaction.
-*   *Avoid it when:* The service does not publish integration events at all, or a direct
-local transaction inside one database is enough.
-**Pros:**
-
-- turns a fragile dual write into one local durable transaction
-- easy to explain and defend in code and design reviews
-- makes event loss much less likely than direct publish-after-save
-
-**Tradeoffs / Cons:**
-
-- adds outbox storage and relay logic
-- at-least-once delivery means consumers still need deduplication
-- you need monitoring here because stuck outbox rows become real incidents
-
-### Example domains
-
-**Commerce example:**
-
-- order service commits the order locally
-- the same transaction writes an outbox row like `OrderConfirmed`
-- later consumers such as inventory, warehouse, or analytics react later without making checkout wait on synchronous enterprise calls
-
-**Payments example:**
-
-- payment service commits the payment intent or authorization result locally
-- the same transaction writes an outbox row like `PaymentAuthorized`
-- ledger, notification, or risk consumers process it later without trusting a fragile direct DB-plus-broker dual write
-
-**CDC as an alternative relay:**
-- **CDC (Change Data Capture):** a way to observe committed database changes and turn them into events afterward
-- **Debezium:** a popular CDC tool that reads the Postgres write-ahead log (`WAL`) and emits those changes to Kafka
-
-Instead of writing your own polling relay, you can let Debezium stream committed outbox
-rows from Postgres to Kafka automatically. No polling loop needed. This is what the
-inventory architecture patterns shown in the system-design materials in this repo.
-
-Practical rule:
-
-- start with a polling outbox relay when you want the simplest thing to reason about
-- move to CDC + Debezium when you already run Kafka seriously and want lower-latency,
-  infrastructure-managed event publication from the database log
-
-Practical framing:
-
-> The Outbox Pattern converts a distributed transaction (DB + broker) into a local
-> transaction plus at-least-once delivery. It trades exactly-once publishing for
-> reliability, then pushes deduplication to consumers where it is cheaper and easier
-> to enforce.
-
-If you are still learning this pattern, a safe honest answer is:
-
-> I have not operated this pattern deeply at large scale yet, but the model I trust is:
-> keep the business write local and durable, stage the event in the same transaction, publish
-> asynchronously, and make consumers idempotent because duplicates are cheaper than silent
-> event loss.
-
----
-
-## 5. Consumer Idempotency (Deduplication)
-
-The other half of the Outbox Pattern. Since the relay guarantees at-least-once delivery,
-consumers will occasionally receive the same event twice (relay restart, Kafka consumer
-rebalance, network retry).
-
-**Solution: processed-events table**
-
-```sql
-CREATE TABLE processed_events (
-    event_id    UUID PRIMARY KEY,
-    processed_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-```kotlin
-@Transactional
-fun handleOrderCreated(event: OrderCreatedEvent) {
-    if (processedEventRepository.existsById(event.id)) {
-        log.info("[InventoryConsumer] Duplicate event {}, skipping", event.id)
-        return   // idempotent: already processed
-    }
-    inventoryService.softReserve(event.orderId, event.items)
-    processedEventRepository.save(ProcessedEvent(event.id))
-}
-```
-
-The insert into `processed_events` and the business operation happen in the same
-transaction — if either fails, both roll back. The event will be re-delivered and
-re-processed correctly.
-
-*   *Use it when:* The system or broker sending you the event delivers at-least-once and duplicate events are possible.
-*   *Avoid it when:* You are still assuming the broker will deliver exactly once at the
-business-effect level and therefore skipping deduplication entirely.
-### Example domains
-
-**Commerce example:**
-
-- inventory consumer receives `OrderCreated` twice after a relay retry
-- deduplication prevents reserving the same stock twice
-
-**Payments example:**
-
-- ledger or notification consumer receives `PaymentAuthorized` twice
-- deduplication prevents duplicate ledger entries or duplicate customer notifications
-
----
-
-## 6. Practical Summary By Domain
-
-If you only want the shortest practical summary, use this:
-
-### Commerce / Ecommerce
-
-- **Saga** makes sense for checkout-style workflows that span order, inventory, and payment, especially when one step can fail after another already committed.
-- **Outbox Pattern** is a strong default when order or inventory writes must reliably trigger warehouse, analytics, notification, or downstream retail systems.
-- **Consumer Idempotency** matters because inventory, reservation, and order events can be retried, and duplicate handling errors create visible customer problems.
-- **CQRS** becomes credible when read traffic and read shapes diverge sharply from the write flow, such as catalogue views, dashboards, search, or order-history read models.
-- **Event Sourcing** is usually not the default answer; it only becomes worth it when a full history of stock or allocation decisions is itself valuable.
-
-### Payments / Fintech
-
-- **Saga** is strong for payment flows that cross payment intent, authorization, risk, ledger, notification, or reconciliation steps, where one global rollback does not exist.
-- **Outbox Pattern** is one of the safest high-signal answers because payment and ledger state changes often need reliable async publication to other critical consumers.
-- **Consumer Idempotency** is essential because duplicate money-side effects are much more dangerous than duplicate low-risk side effects.
-- **CQRS** is useful for merchant dashboards, reporting, customer history views, and reconciliation read models, where strict write logic and read-heavy views have different needs.
-- **Event Sourcing** is much more defensible here than in ordinary ecommerce, especially for ledger-like or audit-heavy domains where the event history itself has compliance or investigation value.
-
-### Smallest Reusable Summary
-
-For commerce flows, a strong default is usually `Saga + Outbox + Idempotency`, with
-`CQRS` only when read traffic or read shape clearly diverges from writes.
-
-For payment flows, the same default still works, but `CQRS` becomes easier to justify
-for reporting and `Event Sourcing` becomes more credible for ledger-like domains where
-audit history is part of the product value.
+The relay must retry unpublished records. If it publishes successfully but
+crashes before recording that success, it may publish again. Therefore each
+event needs a stable ID and the consumer must tolerate duplicates. Monitor the
+age of unpublished records: a growing backlog means committed work is waiting
+for downstream processing.
+
+The outbox solves publication after a local commit. It does not, by itself,
+finish or compensate a multi-service business workflow. A saga may use an
+outbox for its messages, but the two patterns solve different gaps.
+
+## Make Each Effect Safe to Retry
+
+For a consumer changing its own database, claim the event ID and perform the
+business update in one local transaction. A uniqueness constraint on that ID
+prevents concurrent deliveries from applying the effect twice. Checking
+whether an ID exists and then writing it later is not enough: two consumers
+can pass that check together.
+
+For a remote payment, email, or other external effect, the local transaction
+cannot cover the remote system. Pass a stable idempotency key when supported,
+record the result, and provide a way to reconcile an unknown outcome. See
+[broker delivery and duplicate effects](../api/02-message-brokers-and-delivery-semantics.md)
+for the delivery mechanics.
+
+## Operate the Unfinished States
+
+Track how many workflows are pending, how long each step has waited, how many
+compensations fail, and whether outbox records are stuck. Keep enough history
+to answer which step last succeeded and whether retrying it is safe. Give
+operators a way to inspect and repair cases that cannot complete automatically.
+
+## Decision Rule
+
+Write down every partial state and unknown outcome before choosing a broker or
+workflow engine. Use a saga for cross-owner recovery, an outbox for reliable
+publication of local changes, and idempotency for effects that can be retried.

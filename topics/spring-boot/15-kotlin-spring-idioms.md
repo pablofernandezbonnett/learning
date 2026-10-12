@@ -1,8 +1,5 @@
 # 12. Kotlin + Spring Boot Idioms
 
-> Primary fit: `Supporting reference for Kotlin-based Spring work`
-
-
 Topics that don't appear in docs 01–11 but are critical when using Kotlin with Spring Boot 3.
 This is not the main Spring path, but it is a high-value supporting
 reference when the stack is Kotlin-heavy.
@@ -202,14 +199,6 @@ Simple decision rule:
 - Kotlin-heavy service with real coroutine usage and structured concurrency needs -> coroutines are a strong default
 - Java-heavy or blocking Spring service where you want simpler adoption on Java 21+ -> virtual threads are often the easier win
 - mixed team or unclear benefit -> do not force either model as ideology
-
-Interview-safe answer:
-
-> In Kotlin services, coroutines are a mature and powerful option because they
-> give me structured concurrency and clear async composition. Virtual threads
-> are also strong, but they solve a different problem: they make blocking code
-> cheaper to run on the JVM. I choose based on the stack and libraries, not by
-> treating them as interchangeable.
 
 ---
 

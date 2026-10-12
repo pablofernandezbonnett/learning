@@ -1,7 +1,5 @@
 # Concurrency in Production
 
-> Primary fit: `Shared core`
-
 Use this after [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md).
 
 The first concurrency note teaches the primitives.
@@ -345,10 +343,9 @@ Read first:
 - [02-java-concurrency-and-jmm.md](./02-java-concurrency-and-jmm.md)
 - [../databases/02-database-locks-and-concurrency.md](../databases/02-database-locks-and-concurrency.md)
 
-Then run:
+Then try:
 
 - [../../labs/kotlin-backend-examples/README.md](../../labs/kotlin-backend-examples/README.md)
-  topic `jvm/concurrency-production`
+  exercise `Production concurrency`
 
-The runnable companion is useful here because queueing, bounded admission, and
-cross-instance races are easier to trust once you can observe them.
+Implement the scenario yourself if you want to observe queueing and bounded admission.

@@ -1,321 +1,47 @@
-# Go Project Shape, Errors, and Context
+# Go Service Shape, Errors, and Context
 
-Use this after the runnable examples when you want the minimum Go mental model
-that helps you start writing backend code without accidentally writing
-Java-shaped Go.
+A small service needs clear boundaries between HTTP, business rules, and external I/O. Add packages when those boundaries become useful; a file or type does not need its own package by default.
 
----
-
-## 1. Why This Matters
-
-The first Go trap for a JVM engineer is usually not syntax.
-
-It is one of these:
-
-- too many abstractions too early
-- treating errors like exception messages instead of values
-- losing cancellation and timeout control across boundaries
-
-If you get package shape, errors, and `context.Context` roughly right, small Go
-services become much easier to read and extend.
-
----
-
-## 2. Smallest Useful Mental Model
-
-For small backend code, start with four rules:
-
-1. packages group code by responsibility, not by framework layer ceremony
-2. interfaces belong near the code that consumes them
-3. errors are returned values, often wrapped with more context
-4. `context.Context` carries request-scoped cancellation, deadlines, and trace-like values across boundaries
-
-Plain-English version:
-
-> Keep the code flat, pass cancellation through, and make failures explicit.
-
----
-
-## 3. Bad Mental Model Vs Better Mental Model
-
-Bad mental model:
-
-- "I should create controller, service, repository, mapper, DTO, and interface
-  for each one before the first endpoint exists."
-
-Better mental model:
-
-- "I should add only the structure that makes one boundary or one risky behavior
-  easier to reason about."
-
-Bad mental model:
-
-- "Errors are mostly strings that I log and move on."
-
-Better mental model:
-
-- "Errors are part of control flow. I return them, wrap them, inspect them, and
-  map them clearly at the boundary."
-
-Bad mental model:
-
-- "If I need a context, I can just create `context.Background()` anywhere."
-
-Better mental model:
-
-- "Request work should usually inherit the caller's context so timeout and
-  cancellation still mean something downstream."
-
----
-
-## 4. Small Concrete Example
-
-This is the kind of shape that fits many small services:
-
-```go
-package reservation
-
-import (
-	"context"
-	"errors"
-	"fmt"
-)
-
-var ErrReservationNotFound = errors.New("reservation not found")
-
-type Reservation struct {
-	ID     string
-	SKU    string
-	Amount int
-}
-
-// The interface lives next to the service that needs it.
-// It describes the dependency from the consumer side.
-type Store interface {
-	Save(ctx context.Context, r Reservation) error
-	FindByID(ctx context.Context, id string) (Reservation, error)
-}
-
-type Service struct {
-	store Store
-}
-
-func NewService(store Store) Service {
-	return Service{store: store}
-}
-
-func (s Service) Get(ctx context.Context, id string) (Reservation, error) {
-	reservation, err := s.store.FindByID(ctx, id)
-	if err != nil {
-		if errors.Is(err, ErrReservationNotFound) {
-			return Reservation{}, err
-		}
-		return Reservation{}, fmt.Errorf("find reservation %s: %w", id, err)
-	}
-	return reservation, nil
-}
-```
-
-What matters here:
-
-- the service accepts `context.Context` because request-scoped work may timeout
-  or be cancelled
-- the service owns the interface because it defines what it needs
-- the error is wrapped with more context using `%w`, so callers can still use
-  `errors.Is(...)`
-
-At the HTTP boundary, that often becomes:
-
-```go
-result, err := service.Get(r.Context(), reservationID)
-switch {
-case err == nil:
-	writeJSON(w, http.StatusOK, result)
-case errors.Is(err, ErrReservationNotFound):
-	writeJSON(w, http.StatusNotFound, errorResponse{Error: "not found"})
-default:
-	writeJSON(w, http.StatusInternalServerError, errorResponse{Error: "internal error"})
-}
-```
-
-This is the main Go flow:
-
-- do the work
-- return the error
-- inspect the error at the boundary that knows how to translate it
-
----
-
-## 5. Strong Default
-
-For a small Go backend service, this is a good default:
-
-- start with one module and a small number of packages
-- keep `main` for wiring only
-- define interfaces only where a real boundary or test seam exists
-- accept `context.Context` on request-scoped service, DB, or outbound HTTP methods
-- wrap errors once per boundary with enough detail to explain what failed
-- compare semantic errors with `errors.Is`, not string matching
-
-Small project shape:
+## Start with the Request Flow
 
 ```text
-my-service/
-  go.mod
-  cmd/api/main.go
-  internal/config/config.go
-  internal/reservation/service.go
-  internal/reservation/store.go
-  internal/httpapi/router.go
+HTTP handler → service decision → store or external client
+      ↑               ↑                    ↑
+ status and JSON   domain error       I/O error or timeout
 ```
 
-Why this shape is enough:
+The handler parses and validates the request, calls the service, and translates known outcomes into HTTP responses. The service owns rules such as duplicate handling. A store or client owns one external interaction. Keep configuration and wiring at the entry point.
 
-- `cmd/api` makes the entrypoint obvious
-- `internal/...` says the packages are app-internal
-- the service code is still small enough to scan without framework archaeology
+Define a small interface near the code that consumes a dependency only when substitution is useful. [Go foundations](./00-go-foundations.md) covers how interfaces and wrapped errors work.
 
----
+## Preserve Cancellation
 
-## 6. Where JVM Engineers Usually Overbuild
-
-Common overcorrections:
-
-- creating an interface for every struct before there is a consumer need
-- splitting packages too early
-- building annotation-like magic through helper layers
-- hiding errors behind generic wrappers that lose the real failure
-
-Short rule:
-
-> In Go, duplication is often cheaper than premature abstraction.
-
-That does not mean "write messy code".
-It means "earn each layer by making one real problem easier."
-
----
-
-## 7. Context Rule That Matters Most
-
-Use the caller's context for request-scoped work.
-
-Good:
+Pass the incoming request context through service, database, and client calls. Derive a shorter timeout for a slow dependency; call its cancel function when finished.
 
 ```go
-func (s Service) Reserve(ctx context.Context, req Request) error {
-	return s.inventoryClient.Reserve(ctx, req.SKU, req.Amount)
-}
-```
-
-Weak:
-
-```go
-func (s Service) Reserve(_ context.Context, req Request) error {
-	ctx := context.Background()
-	return s.inventoryClient.Reserve(ctx, req.SKU, req.Amount)
-}
-```
-
-Why the weak version is weak:
-
-- request timeout no longer propagates
-- shutdown and cancellation signals no longer propagate
-- tracing and request metadata can get lost
-
-If you need a shorter deadline for one dependency call, derive from the incoming
-context:
-
-```go
-ctx, cancel := context.WithTimeout(ctx, 800*time.Millisecond)
+callCtx, cancel := context.WithTimeout(ctx, inventoryTimeout)
 defer cancel()
+result, err := inventory.Reserve(callCtx, request)
 ```
 
----
+Creating `context.Background()` inside request work discards the caller's cancellation and deadline. A timeout limits waiting; it does not tell you whether an upstream write happened. Resolve that uncertainty with the operation's idempotency contract.
 
-## 8. One Practical Rule About Interfaces
+## Keep Error Meaning Across Boundaries
 
-Good default:
+Return a domain error for expected outcomes, such as “reservation ID used with different data.” Wrap an I/O error with the operation that failed. At the HTTP boundary, map known errors to stable, safe responses; log unexpected details internally. Do not expose upstream response bodies or internal error strings to clients.
 
-- return concrete types
-- accept interfaces when the caller should be able to swap behavior
+## Own Concurrent Work
 
-Why:
+For each goroutine started by a request, answer:
 
-- concrete return values are easier to understand
-- tiny consumer-owned interfaces are easier to fake in tests
-- producer-owned interface hierarchies often bring Java habits into Go without payoff
+- Which context stops it when the request ends?
+- Who waits for its result or error?
+- What bounds parallel calls to the database or provider?
 
----
-
-## 9. Concurrency Needs Ownership, Not Just Goroutines
-
-A goroutine is cheap to start, but it is still work that needs an owner.
-
-For request-scoped concurrent work, make these questions answerable:
-
-- which context cancels it
-- who waits for its result or error
-- what bounds the amount of parallel work
-- what happens if the caller leaves early
-
-One small pattern matters when a caller can time out before a goroutine sends
-its result:
-
-```go
-type StockResult struct {
-	Units int
-	Err   error
-}
-
-result := make(chan StockResult, 1)
-go func() {
-	units, err := client.Available(ctx, sku)
-	result <- StockResult{Units: units, Err: err}
-}()
-
-select {
-case stock := <-result:
-	return stock.Units, stock.Err
-case <-ctx.Done():
-	return 0, ctx.Err()
-}
-```
-
-The buffered channel prevents the sender from getting stuck if cancellation
-wins the `select`. It is not a substitute for passing `ctx` to `Available`:
-the downstream client must also observe cancellation and stop its own work.
-
-For fan-out where the first failure should cancel sibling work, `errgroup` is
-often clearer than manually combining `WaitGroup`, an error channel, and
-cancellation. Keep parallelism bounded by the downstream limit rather than
-launching one goroutine per input without a cap.
-
-Finally, run concurrent code under the race detector:
-
-```bash
-go test -race ./...
-```
-
-It finds data races exercised by the test; it does not prove that untested
-interleavings are safe.
-
----
-
-## 10. Takeaway
-
-The first useful Go design rule is not "use patterns."
-
-It is:
-
-> keep the project small, pass `context` through real work, and treat errors as
-> explicit control flow instead of hidden exceptional flow.
+Use a bounded worker pool or concurrency limit for fan-out. A buffered result channel can prevent a sender from blocking after the caller leaves, but the downstream operation must also observe cancellation. Run concurrent tests with the race detector; it finds only races exercised by those tests.
 
 ## Further Reading
 
-- [Go race detector](https://go.dev/doc/articles/race_detector)
-- [`errgroup` package](https://pkg.go.dev/golang.org/x/sync/errgroup)
-
-- [Go: Errors are values](https://go.dev/blog/errors-are-values)
-- [Go blog: Working with errors in Go 1.13](https://go.dev/blog/go1.13-errors)
-- [Go blog: Context](https://go.dev/blog/context)
-- [Effective Go](https://go.dev/doc/effective_go)
+- [Go context package](https://pkg.go.dev/context) for cancellation and deadlines.
+- [Go error wrapping](https://go.dev/blog/go1.13-errors) for preserving error identity.
+- [Go race detector](https://go.dev/doc/articles/race_detector) for exercised data races.

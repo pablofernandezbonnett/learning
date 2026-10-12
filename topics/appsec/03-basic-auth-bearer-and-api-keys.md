@@ -145,5 +145,5 @@ That comparison forces you to think in terms of blast radius, not just syntax.
 
 ## 10. Internal Repo Links
 
-- [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): broader repo note on common auth shapes, bearer semantics, and session versus token tradeoffs
-- [../security/04-advanced-auth-and-sso.md](../security/04-advanced-auth-and-sso.md): deeper explanation of API keys, machine-to-machine auth, and advanced auth patterns
+- [Authentication choices](../security/01-auth-sessions-vs-jwt.md): choose a session or token model by client type
+- [Service identity and SSO](../security/04-advanced-auth-and-sso.md): choose credentials for workloads and enterprise login

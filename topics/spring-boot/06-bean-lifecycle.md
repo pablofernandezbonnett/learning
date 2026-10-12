@@ -1,164 +1,55 @@
-# Bean Lifecycle: `@PostConstruct`, `BeanPostProcessor`, `@PreDestroy`
+# Bean Initialization and Shutdown
 
-> Primary fit: `Platform / Growth lane`
+A bean has work around its useful lifetime: Spring creates it, injects
+dependencies, runs initialization callbacks, makes it available, and later
+runs destruction callbacks when the managed scope ends. This matters when
+startup blocks, a resource leaks, or cleanup never runs.
 
+For object creation, injection, and scope selection, start with
+[IoC and dependency injection](./05-ioc-deep-dive.md).
 
-## The Full Lifecycle (expanded from doc 01)
+## Keep Initialization Small
 
-Spring manages beans through a precise lifecycle. Understanding each phase is useful when debugging startup behavior, proxies, and shutdown issues.
+`@PostConstruct` runs after dependencies have been injected, during bean
+initialization. Use it for quick local validation or preparation that needs
+the injected configuration. A failure can prevent the application context
+from starting.
 
-Smallest mental model:
+Avoid slow database calls, remote requests, or broad cache warm-up in this
+hook. The bean is still being initialized, and Spring warns that external
+bean access here can cause startup lock problems. Work that must begin after
+regular singleton initialization needs a later lifecycle hook, such as
+`SmartInitializingSingleton` or a context-refresh listener; its failure and
+readiness behavior still need an explicit design.
 
-- Spring creates the object
-- injects dependencies
-- runs initialization hooks
-- may wrap the bean with proxy behavior
-- destroys it on shutdown
+## Clean Up Owned Resources
 
-```
-Class scanning / @Bean factory method
-         ↓
-1. Instantiation (constructor)
-         ↓
-2. Populate Properties (dependency injection)
-         ↓
-3. Aware interfaces (BeanNameAware, ApplicationContextAware, etc.)
-         ↓
-4. BeanPostProcessor.postProcessBeforeInitialization()
-         ↓
-5. @PostConstruct / InitializingBean.afterPropertiesSet()
-         ↓
-6. BeanPostProcessor.postProcessAfterInitialization()   ← proxies created HERE
-         ↓
-   [Bean is ready — in use]
-         ↓
-7. @PreDestroy / DisposableBean.destroy()
-```
+`@PreDestroy` runs as a managed bean is destroyed during orderly shutdown.
+It is useful for closing a resource the bean owns. Cleanup must be bounded:
+a crashed process or forced termination can skip the callback.
 
-## @PostConstruct — Initialization Hook
+For a `prototype` bean, Spring runs initialization callbacks but does not
+track the instance for destruction. The caller that receives it must manage
+its later cleanup. A singleton has one managed instance per container;
+request-scoped beans end with their request in a web-aware context.
 
-Run code once all dependencies have been injected and bean initialization is finishing.
-Typical use cases: warm up caches, validate config, or start resources that should begin only after bean wiring is complete.
+## Know Where Framework Hooks Fit
 
-```kotlin
-@Service
-class ProductCacheService(private val repository: ProductRepository) {
+A `BeanPostProcessor` can inspect or wrap beans before and after their
+initialization callbacks. Spring uses post-processors for several container
+features, including some proxy creation. Application code rarely needs to
+implement one just to observe startup. If a transaction or cache annotation
+does not run, inspect the call path in [proxies and AOP](./07-proxies-and-aop.md)
+before adding lifecycle code.
 
-    private val log = LoggerFactory.getLogger(javaClass)
-    private val cache = mutableMapOf<String, Product>()
+Ask three questions when a lifecycle issue appears:
 
-    // Constructor runs first — repository is already injected here
-    // (Kotlin constructor injection is always safe, unlike Java field injection)
+1. Who creates this object, and what scope owns it?
+2. Does initialization do work that should happen after startup instead?
+3. Who closes each resource if shutdown is incomplete or the bean is a prototype?
 
-    @PostConstruct
-    fun init() {
-        // At this point, ALL dependencies are injected
-        log.info("[ProductCacheService] Warming up product cache...")
-        repository.findAll().forEach { cache[it.id] = it }
-        log.info("[ProductCacheService] Cache warm-up complete. {} products loaded.", cache.size)
-    }
-}
-```
+## Further Reading
 
-**Why not do this work in the constructor?**
-With constructor injection, dependencies are already available in the constructor.
-So the real issue is not always "the dependency is null".
-
-The real issue is lifecycle timing:
-
-- the bean is not fully initialized yet
-- `@PostConstruct` has not run
-- post-processors and proxy wrappers may not have finished
-
-Practical rule:
-
-- constructor: cheap setup and fail-fast validation
-- `@PostConstruct`: startup work that touches other beans, external resources, or warm-up logic
-
-## @PreDestroy — Cleanup Hook
-
-Run code when the application is shutting down (graceful shutdown). Close connections, flush buffers, release resources.
-
-```kotlin
-@Service
-class WebSocketSessionManager {
-
-    private val log = LoggerFactory.getLogger(javaClass)
-    private val sessions: MutableSet<WebSocketSession> = ConcurrentHashMap.newKeySet()
-
-    fun register(session: WebSocketSession) { sessions.add(session) }
-    fun unregister(session: WebSocketSession) { sessions.remove(session) }
-
-    @PreDestroy
-    fun shutdown() {
-        log.info("[WebSocketSessionManager] Closing {} active sessions...", sessions.size)
-        sessions.forEach { session ->
-            try {
-                session.close(CloseStatus.SERVICE_RESTARTED)
-            } catch (e: IOException) {
-                log.warn("Failed to close session {}", session.id, e)
-            }
-        }
-        log.info("[WebSocketSessionManager] All sessions closed.")
-    }
-}
-```
-
-## BeanPostProcessor — The Extension Point
-
-`BeanPostProcessor` is a container hook that can inspect or wrap every bean before and after initialization.
-This is how Spring implements proxies for `@Transactional`, `@Async`, `@Cacheable`, etc.
-
-```kotlin
-@Component
-class TimingBeanPostProcessor : BeanPostProcessor {
-
-    private val log = LoggerFactory.getLogger(javaClass)
-
-    override fun postProcessBeforeInitialization(bean: Any, beanName: String): Any {
-        // Called before @PostConstruct
-        if (beanName.endsWith("Service")) {
-            log.debug("[BPP] Before init: {}", beanName)
-        }
-        return bean  // IMPORTANT: always return the bean (or a wrapper)
-    }
-
-    override fun postProcessAfterInitialization(bean: Any, beanName: String): Any {
-        // Called after @PostConstruct — this is where Spring creates CGLIB proxies
-        // for @Transactional, @Async, @Cacheable, @Retryable, etc.
-        if (beanName.endsWith("Service")) {
-            log.debug("[BPP] After init: {} (class: {})", beanName, bean.javaClass.simpleName)
-            // If @Transactional, bean.javaClass.simpleName shows "ProductService$$SpringCGLIB$$0"
-        }
-        return bean
-    }
-}
-```
-
-## Key Interview Questions
-
-**Q: Why does @Transactional not work when calling a method from within the same class?**
-
-Because `@Transactional` works via a CGLIB proxy. When you call `this.someMethod()`, you bypass the proxy — the transaction interceptor never runs. See doc 03 for the full explanation.
-
-**Q: What happens if @PostConstruct throws?**
-
-The ApplicationContext fails to start. The exception propagates up and Spring aborts startup.
-
-**Q: What's the difference between @PostConstruct and InitializingBean.afterPropertiesSet()?**
-
-Functionally identical. `@PostConstruct` is preferred because it's a standard Java annotation, not a Spring interface, so your code is less coupled to the framework.
-
-**Q: Are @PreDestroy hooks guaranteed to run?**
-
-Only on graceful shutdown (`context.close()` or SIGTERM handled by Spring Boot). A `kill -9` or JVM crash skips them.
-
-## Scope Interaction with Lifecycle
-
-| Scope        | @PostConstruct | @PreDestroy         |
-|--------------|----------------|---------------------|
-| Singleton    | Once on startup | Once on shutdown    |
-| Prototype    | Once per new instance | NOT called (Spring doesn't track prototypes after giving them out) |
-| Request      | Once per HTTP request | End of request |
-
-See `src/main/kotlin/com/learning/mastery/ioc/BeanLifecycleDemo.kt` for runnable code.
+- [Spring lifecycle callbacks](https://docs.spring.io/spring-framework/reference/core/beans/factory-nature.html)
+- [`@PostConstruct` and `@PreDestroy`](https://docs.spring.io/spring-framework/reference/core/beans/annotation-config/postconstruct-and-predestroy-annotations.html)
+- [Prototype lifecycle](https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html)

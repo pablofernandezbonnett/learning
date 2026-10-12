@@ -1,4 +1,4 @@
-# Kotlin Refresh for Java and Spring Engineers
+# Kotlin for JVM Services
 
 Use this folder as a Kotlin bridge for someone who already knows Java, Spring,
 and backend service design.
@@ -18,7 +18,7 @@ Working style:
 - keep mapping Kotlin features back to familiar Java and Spring use cases
 - prefer the smallest useful Kotlin feature over clever language tricks
 - treat readability and correctness as more important than idiomatic flair
-- keep Java as the reference baseline in the background, even when the runnable examples here stay Kotlin-first by design
+- keep Java as the reference baseline in the background, even when Kotlin is the language used for practice
 
 ## Stable Practical Baseline
 
@@ -54,7 +54,7 @@ before you optimize the concurrency model.
 ## Working Loop
 
 1. read the backend bridge doc first
-2. run the small labs selectively
+2. try the small labs selectively
 3. keep mapping Kotlin features back to Java and Spring use cases
 4. stop once the new syntax stops feeling like the main challenge
 
@@ -70,7 +70,7 @@ Do not treat it as mandatory before writing ordinary Kotlin services.
 Many teams get clear value from Kotlin first through null safety, cleaner DTOs,
 sealed-state modeling, and better Java interoperability.
 
-Use the lab after that when you want runnable examples:
+Use the lab after that when you want practice prompts:
 
 - [../../labs/kotlin-basics/README.md](../../labs/kotlin-basics/README.md)
 - [../../topics/spring-boot/15-kotlin-spring-idioms.md](../../topics/spring-boot/15-kotlin-spring-idioms.md) for Spring-specific coroutine boundaries

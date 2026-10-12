@@ -1,231 +1,102 @@
-# 10. Spring Data: Repositories, Query Shape, and Auditing
+# Spring Data: Use Repositories Without Hiding Data Access
 
-> Primary fit: `Shared core`
+Spring Data creates repository implementations from interfaces. It removes
+routine data-access code, but each store still has its own query and
+consistency behavior. Use a repository while the operation remains clear;
+inspect or write the query when its cost or behavior matters.
 
+This note uses Spring Data JPA examples. For database choice, start with
+[Choose a data store](../databases/04-sql-vs-nosql.md).
 
-Spring Data gives you a similar repository programming model across JPA (`Java Persistence API`), MongoDB, and Redis, but the underlying storage behavior is still very different.
-
-This note is not about memorizing advanced names.
-It is about knowing when the repository abstraction is enough and when you need something more explicit.
-
-Important reminder:
-
-> The programming model may look similar, but JPA, Mongo, and Redis do not
-> behave like interchangeable backends. The repository abstraction is shared.
-> The persistence model is not.
-
-## Why This Matters
-
-Spring Data is very productive until the repository abstraction starts hiding
-important query-shape or storage-model decisions.
-
-This matters because many backend teams can move fast with repositories at the
-start and then lose clarity later if they treat JPA, MongoDB, and Redis as if
-the same abstraction meant the same persistence behavior.
-
-This note uses Java and Kotlin side by side in the main Spring Data examples
-because repository and projection patterns are common comparison points in
-mixed JVM backend teams.
-
-## Smallest Mental Model
-
-Spring Data gives you a shared repository programming style, not a shared
-storage model.
-
-The practical question is:
-
-- when is repository convenience enough
-- when does query shape, performance, or storage behavior require a more
-  explicit tool
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- if Spring Data exposes the same repository interface style, the backends are
-  close enough
-- derived queries and repositories are always the cleanest option
-- the abstraction removes the need to think about query shape
-
-Better mental model:
-
-- repository style is a convenience layer over very different stores
-- query shape and access pattern still decide whether repositories, projections,
-  templates, or explicit SQL are the right tool
-- productivity is good until it starts hiding the real cost of the storage model
-
-Small concrete example:
-
-- weak approach: keep stretching a derived query method until the name becomes a
-  paragraph
-- better approach: stay with repositories for conventional access, then move to
-  projections, specifications, templates, or explicit queries when the shape
-  demands it
-
-Strong default:
-
-- use repositories for normal aggregate CRUD and simple lookup patterns
-- step outside the abstraction once the query or storage behavior becomes the
-  real problem
-
-Reusable takeaway:
-
-> I use Spring Data repositories for the simple path, but I do not confuse the
-> shared abstraction with shared storage behavior. Once query shape or backend
-> behavior matters, I move to the more explicit tool.
-
-### 1. Interface-based Projections
-
-Projection means:
-
-- do not fetch the whole row or entity if you only need a few fields
-- ask the database for the smaller shape you actually need
-
-Don't fetch the whole Entity if you only need the `name` and `email`.
-```kotlin
-interface UserSummary {
-    fun getName(): String
-    fun getEmail(): String
-}
-
-// In Repository
-fun findByRole(role: UserRole): List<UserSummary>
-// Result: Spring generates a SQL that SELECTs only 'name' and 'email'.
-```
-
-<details>
-<summary>Java version</summary>
+## Start With Simple Repository Methods
 
 ```java
-public interface UserSummary {
+interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
+    Optional<User> findFirstByOrderByCreatedAtDesc();
+}
+```
+
+Spring Data derives these queries from the method names. Use this for simple
+lookups and existence checks. When a method name grows into a description of
+several joins and filters, make the query explicit so its shape is visible.
+`existsByEmail` expresses an existence check directly; verify the generated
+query and index if the path is important.
+
+## Return the Shape the Caller Needs
+
+A closed interface projection can return a small read shape without loading
+an entity for every row:
+
+```java
+interface UserSummary {
     String getName();
     String getEmail();
 }
 
-// In Repository
-List<UserSummary> findByRole(UserRole role);
-// Result: Spring generates a SQL that SELECTs only 'name' and 'email'.
-```
-
-</details>
-
-Kotlin note: Spring Data's projection proxies work with Kotlin `fun` declarations
-(not properties). Use `fun getName()` not `val name: String` in projection interfaces.
-
-### 2. Derived Query Methods
-
-Spring parses the method name to generate queries.
-- `findFirstByOrderByCreatedAtDesc()`: Perfect for "latest" record.
-- `existsByEmail(email: String)`: More efficient than `findByEmail() != null`.
-- Return `T?` (nullable) instead of `Optional<T>` — Spring Data handles this natively in Kotlin.
-
-Practical rule:
-
-- use derived queries for straightforward lookup patterns
-- stop when the method name starts becoming a sentence
-
-### 3. Entity Auditing
-
-Auditing means automatically recording metadata such as:
-
-- when the row was created
-- when it was last changed
-- who changed it
-
-Don't manually set `updatedAt` or `createdBy`. Use `@EnableJpaAuditing` and:
-- `@CreatedDate`, `@LastModifiedDate` (handled automatically).
-- `@CreatedBy`, `@LastModifiedBy` (integrates with Spring Security via `AuditorAware<String>`).
-
-```kotlin
-// In your @Configuration or @SpringBootApplication class:
-@Bean
-fun auditorProvider(): AuditorAware<String> = AuditorAware {
-    // Replace with: SecurityContextHolder.getContext().authentication?.name
-    Optional.of("system")
+interface UserRepository extends JpaRepository<User, Long> {
+    List<UserSummary> findByRole(UserRole role);
 }
 ```
 
-<details>
-<summary>Java version</summary>
+For a derived JPA query, Spring Data can limit selection to the projection's
+top-level properties. A nested property may require a join that materializes
+more of the related object. Inspect the SQL instead of assuming every
+projection reads only the declared fields. For fetch plans, lazy loading, and
+N+1, see [JPA and Hibernate](./04-jpa-hibernate-performance-traps.md).
+
+## Compose Optional Filters
+
+A JPA `Specification` represents a reusable query predicate. It is useful
+when a search screen has optional filters that would create many derived
+method variants. Add `JpaSpecificationExecutor<User>` to the repository,
+then compose only the filters supplied by the caller:
 
 ```java
-// In your @Configuration or @SpringBootApplication class:
-@Bean
-public AuditorAware<String> auditorProvider() {
-    return () -> Optional.of("system");
+Specification<User> filters = isActive();
+if (role != null) {
+    filters = filters.and(hasRole(role));
 }
+Page<User> users = userRepository.findAll(filters, PageRequest.of(0, 20));
 ```
 
-</details>
+Here, `isActive()` and `hasRole(role)` are small methods returning
+`Specification<User>`. Keep pagination and the resulting joins under review:
+composition makes filters easier to maintain, but it does not make a costly
+query cheap.
 
-### 4. Specifications For Dynamic Filters
+## Record Who and When
 
-When a search screen has many optional filters, a single derived query method stops being practical.
-That is where `Specification` helps.
+Spring Data JPA auditing can fill creation and modification timestamps with
+`@CreatedDate` and `@LastModifiedDate`. Add an auditing listener to the
+entity and enable JPA auditing in configuration. If you also record the actor
+with `@CreatedBy` or `@LastModifiedBy`, provide an `AuditorAware` that
+resolves the current principal. Decide how background jobs represent their
+actor; a hard-coded user in sample configuration is not a production policy.
 
-It means:
+Auditing is metadata, not a substitute for an application event or immutable
+history when changes must be reconstructed.
 
-- build the query piece by piece
-- include only the conditions that are actually present
-- avoid one giant hard-coded query method name
+## Leave the Repository Abstraction When Needed
 
-```kotlin
-object UserSpecifications {
-    fun isActive(): Specification<User> =
-        Specification { root, _, cb -> cb.isTrue(root.get("active")) }
+| Work | Starting choice |
+|---|---|
+| Simple entity lookup or update | Repository method |
+| Small read response | Projection or explicit DTO query |
+| Optional JPA filters | Specifications with query review |
+| Reporting, bulk change, or database-specific SQL | Explicit JPQL, SQL, or a lower-level data-access tool |
 
-    fun hasRole(role: UserRole?): Specification<User> =
-        Specification { root, _, cb -> role?.let { cb.equal(root.get<UserRole>("role"), it) } }
-}
+The repository API does not make JPA, MongoDB, and Redis interchangeable.
+For MongoDB, use repositories for straightforward document access and
+`MongoTemplate` when the operation needs explicit updates or aggregation.
+For Redis key operations, use `RedisTemplate`; Spring Cache serves simple
+method-level caching. Choose the store from its data and failure model first.
+For their storage models, see [MongoDB](../databases/07-mongodb-in-depth.md)
+and [Redis](../databases/06-redis-in-depth.md).
 
-// Usage: null-safe composition
-val spec = Specification.where(UserSpecifications.isActive())
-    .and(UserSpecifications.hasRole(role))   // ignored if role is null
-```
+## Further Reading
 
-<details>
-<summary>Java version</summary>
-
-```java
-public final class UserSpecifications {
-
-    private UserSpecifications() {
-    }
-
-    public static Specification<User> isActive() {
-        return (root, query, cb) -> cb.isTrue(root.get("active"));
-    }
-
-    public static Specification<User> hasRole(UserRole role) {
-        return (root, query, cb) ->
-            role == null ? null : cb.equal(root.get("role"), role);
-    }
-}
-
-Specification<User> spec = Specification.where(UserSpecifications.isActive())
-    .and(UserSpecifications.hasRole(role));
-```
-
-</details>
-
-See `src/main/kotlin/com/learning/mastery/data/` for full examples.
-
-### 5. Know When To Leave the Repository Abstraction
-
-Repositories are productive, but they are not always the right final tool.
-
-- **JPA / Postgres**:
-  - stay with repositories for normal aggregate CRUD (create, read, update, delete) and conventional filters
-  - move to projections, JPQL (Java Persistence Query Language), native SQL, or `JdbcTemplate` when query shape and performance matter more than repository convenience
-- **MongoDB**:
-  - repositories are fine for basic document access
-  - use `MongoTemplate` for aggregations, explicit updates, and more complex document operations
-- **Redis**:
-  - repository-style access is not the main value
-  - `RedisTemplate` or Spring Cache is often the better fit for counters, sessions, rate limits, and cache-aside patterns
-
-Good senior rule:
-
-> Use the repository abstraction when it keeps the code simple. Step outside it
-> as soon as the storage model or query shape starts demanding more explicit
-> control.
+- [Spring Data JPA projections](https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html)
+- [Spring Data JPA specifications](https://docs.spring.io/spring-data/jpa/reference/jpa/specifications.html)
+- [Spring Data JPA auditing](https://docs.spring.io/spring-data/jpa/reference/auditing.html)

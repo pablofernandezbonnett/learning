@@ -1,244 +1,72 @@
-# Local Kubernetes Lab with kind or k3d and Terraform
-
-> Primary fit: `Platform / Growth lane`
-
-
-This document turns the cloud path into a practical lab.
-
-The goal is not to simulate all of AWS locally.
-
-The goal is to build a small but realistic deployment flow:
-
-- package services with Docker
-- run them in a local Kubernetes cluster
-- provision Kubernetes resources with Terraform
-- expose the system through a real cluster edge
-
-Smallest mental model:
-
-- this lab is not about simulating a cloud provider perfectly
-- it is about practicing the deploy chain from image to cluster to edge routing
-
----
-
-## Why kind or k3d
-
-For a backend engineer learning locally, `kind` and `k3d` are both good choices.
-
-Why they are good:
-
-- lightweight
-- fast startup
-- good enough for local cluster learning
-- easier to treat as disposable lab environments
-
-Practical rule:
-
-- `kind`: closer to upstream Kubernetes, simple mental model
-- `k3d`: very fast, lightweight, convenient local k3s workflow
-
-You do not need both. Pick one and stick with it for the lab.
-
-If your main goal is learning Kubernetes concepts and Terraform flow, either is
-fine.
-
----
-
-## What The Lab Should Teach You
-
-At minimum, your lab should force you to understand:
-
-- image building
-- container registry or image loading into the cluster
-- Deployment, Service, and edge routing
-- ConfigMap and Secret usage
-- readiness and liveness probes
-- internal service-to-service networking
-- how Terraform creates and updates Kubernetes resources
-
-That is already a very good lab.
-
----
-
-## Use Terraform, Not Manual kubectl
-
-If the learning goal includes infrastructure and platform thinking, do not stop
-at:
-
-- `kubectl apply -f deployment.yaml`
-
-That is still useful, but it misses the Infrastructure as Code part.
-
-A better lab is:
-
-- Terraform creates the namespace
-- Terraform creates the Deployment
-- Terraform creates the Service
-- Terraform creates the edge routing resources
-
-This teaches a more realistic workflow:
-
-- declarative infra
-- plan/review/apply mindset
-- repeatable local environments
-
----
-
-## Recommended Lab Shape
-
-Do not start with five services unless you really want the complexity.
-
-A sensible progression is:
-
-### Phase 1
-
-- one backend service
-- one database
-- one public route
-
-### Phase 2
-
-- add a gateway or edge service
-- add a second backend service
-- add service-to-service communication
-
-### Phase 3
-
-- expand to your three backend systems plus the gateway
-- introduce shared concerns like config, tracing headers, and failure handling
-
-This reduces the chance of turning the lab into platform chaos too early.
-
----
-
-## Edge Recommendation
-
-Yes, using a real cluster edge controller is the right move.
-
-For this lab, prefer:
-
-- `Traefik`
-- `Gateway API`
-
-Why this is the better default now:
-
-- `ingress-nginx` is in retirement
-- `Gateway API` is the modern Kubernetes direction
-- `Traefik` is a practical local choice, especially in `k3d` / `k3s` style setups
-
-Why it matters:
-
-- you learn the public entry point concept
-- you route traffic by host/path
-- you see the difference between internal `Service` access and external traffic
-
-Your local browser flow can then look like:
-
-- `http://localhost/api/...` -> Traefik -> Gateway/HTTPRoute -> internal services
-
-That is much closer to a real deployment shape than port-forwarding every
-service separately.
-
----
-
-## Image Flow in Local Clusters
-
-One of the first surprises in local Kubernetes is:
-
-- your Docker image existing on the host does not automatically mean the cluster
-  can use it
-
-Depending on the setup, you may need to:
-
-- load images into `kind`
-- use the local registry pattern
-- configure `imagePullPolicy` carefully
-
-This is a good learning moment because it forces you to understand that the
-cluster runtime is a separate environment.
-
----
-
-## Terraform Minimum For This Lab
-
-You do not need advanced Terraform.
-
-You do need enough to model Kubernetes resources clearly.
-
-Minimum concepts:
-
-- provider configuration
-- variables
-- resources
-- outputs
-- `plan` and `apply`
-
-If you want a clean first milestone, aim for Terraform-managed:
-
-- namespace
-- config map
-- secret
-- deployment
-- service
-- `Gateway` / `HTTPRoute`
-
-That is enough.
-
----
-
-## Suggested Project Requirements
-
-If you want the lab to be meaningful, give yourself these rules:
-
-1. Every service runs from a Docker image built with a multi-stage Dockerfile.
-2. Every app container runs as non-root.
-3. The database uses a volume for persistence.
-4. All Kubernetes resources are created through Terraform.
-5. The gateway is reachable through Traefik and a real routing resource, not
-   just direct service ports.
-6. At least one service exposes readiness and liveness health endpoints.
-
-That already teaches the right habits.
-
----
-
-## How This Connects to Your Background
-
-This kind of lab fits your profile well because it builds on things you already
-know:
-
-- Spring Boot services
-- gateway boundaries
-- databases and caches
-- integrations and runtime behavior
-
-What is new is the deployment and infrastructure layer around them.
-
-That makes it a strong expansion path without forcing a full stack reset.
-
----
-
-## Interview Framing
-
-You can later describe it like this:
-
-> I built a local cloud lab to close the gap between backend service
-> implementation and runtime operations. The goal was not to imitate AWS in
-> detail, but to practice the deploy chain end-to-end: Docker packaging, local
-> Kubernetes orchestration, Terraform-managed resources, Traefik/Gateway API
-> routing, and production-style health and configuration patterns.
-
----
+# Local Kubernetes Deployment Lab
+
+Use a disposable local cluster to follow one application from image to
+traffic and recovery. Pick one local cluster tool, such as kind or k3d.
+The lab teaches workload behavior; it does not imitate a cloud provider.
+
+## Minimum Setup
+
+- One small HTTP service with a health endpoint
+- A container image the cluster can pull or load
+- A Deployment and a Service
+- Readiness and liveness probes
+- CPU and memory requests
+
+Use the [Kubernetes runtime note](../devops/04-kubernetes-crash-course.md)
+for the meaning of these objects. Follow the chosen cluster tool's current
+image-loading instructions; a host image is not automatically visible
+inside every local cluster.
+
+## Exercises
+
+1. **Start:** deploy one replica and reach it through the Service or a
+   temporary port forward. Explain which component owns the stable address.
+2. **Release:** build a second image, roll it out, and observe when the new
+   Pod becomes ready. Keep both image versions compatible while they overlap.
+3. **Failure:** make readiness fail. Check whether traffic stops reaching the
+   instance without forcing a restart. Then test a liveness failure
+   separately.
+4. **Capacity:** apply an unrealistically small memory limit, observe the
+   failure, restore a measured value, and record the difference between a
+   request and a limit.
+5. **Recovery:** deploy a bad version, detect it from an application signal,
+   roll back, and confirm the user-facing path works again.
+
+Keep one service until these steps are clear. Add a database or external
+route only if it teaches a new boundary you want to inspect.
+
+## Solution guide
+
+```text
+start: Service selects ready Pods; an unready Pod receives no new traffic
+release: new Pods become ready before old capacity is removed
+failure: readiness removes traffic; liveness asks for a restart
+capacity: requests influence placement; limits bound usage
+recovery: detect bad behavior, roll back, verify the user-facing route
+```
+
+Compare that expected sequence with what you observed. If the rollout loses
+capacity or rollback does not restore service, inspect the probe, resource
+settings, and application signal before adding another component.
+
+## Optional IaC Extension
+
+Once the workload works, manage one stable resource through Terraform.
+Review a plan, apply it, inspect state, and make a second change. Use either
+Terraform or another chosen source of truth for that resource; do not let
+two tools overwrite each other's changes. See
+[infrastructure as code](./02-infrastructure-as-code-and-platform-boundaries.md).
+
+## What to Record
+
+- Image version and how it reached the cluster
+- Which probe controlled traffic and which caused a restart
+- Time to ready, rollout result, and rollback result
+- Resource settings and the observed failure
+- One difference between local success and production readiness
 
 ## Further Reading
 
-- kind:
-  https://kind.sigs.k8s.io/
-- k3d:
-  https://k3d.io/
-- Kubernetes Gateway API:
-  https://kubernetes.io/docs/concepts/services-networking/gateway/
-- Traefik Gateway API provider:
-  https://doc.traefik.io/traefik/reference/install-configuration/providers/kubernetes/kubernetes-gateway/
-- Terraform Kubernetes provider:
-  https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs
+- [kind documentation](https://kind.sigs.k8s.io/)
+- [k3d documentation](https://k3d.io/)
+- [Kubernetes tutorials](https://kubernetes.io/docs/tutorials/)

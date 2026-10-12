@@ -1,219 +1,86 @@
 # System Design Drills
 
-> Primary fit: `Shared core`
-
-Use this after [system-design-guide.md](./system-design-guide.md).
-
-This file exists so system design does not stay as passive reading.
-Each drill is small on purpose.
-The goal is to practice the answer shape until the core moves become automatic.
-
-Why this matters:
-
-- system-design skill improves much more through repetition than through one more diagram
-- short drills expose whether you can actually state the invariant, source of truth, and recovery path
-- this file keeps practice small enough to repeat instead of only admire
-
-Smallest mental model:
-
-- one good drill answer should make the critical write path and failure shape visible fast
-- if the answer stays vague, adding more boxes usually does not help
-
-Working rule:
-
-1. clarify only what changes the design
-2. state the invariant
-3. name the source of truth
-4. walk the critical write path
-5. explain retries, duplicates, and recovery
-
-Strong default:
-
-- answer each drill in 12-15 minutes
-- optimize for a clean correctness story, not diagram density
-
----
-
-## 1. Drill: Retry-Safe Checkout Commit
-
-Prompt:
-
-> Design a checkout write path that should not charge twice or create two paid
-> orders when the client retries.
-
-What to clarify:
-
-- is `PENDING` acceptable
-- does the payment provider support idempotency keys
-- do we reserve stock before or after payment authorization
-
-Answer spine:
-
-- invariant: one purchase intent must not create two paid orders
-- source of truth: relational order and payment tables
-- request identity: idempotency key or stable checkout session ID
-- write path: create `PENDING` attempt, call provider safely, move through valid states
-- async path: webhook confirms uncertain provider result
-- recovery: replay-safe webhook handling and reconciliation for stuck pending state
-
-Common traps:
-
-- pretending one synchronous call fully settles money
-- treating local transaction as if it covers the provider too
-- forgetting duplicate webhook delivery
-
----
-
-## 2. Drill: Hot SKU Inventory Reservation
-
-Prompt:
-
-> A small set of products is extremely hot during flash sales. Design the
-> reservation path so stock does not oversell.
-
-What to clarify:
-
-- exact correctness requirement for final stock
-- expected peak write contention per SKU
-- how long a reservation can stay held before release
-
-Answer spine:
-
-- invariant: final committed stock must not go below zero
-- source of truth: inventory table, not Redis cache
-- critical write path: decrement or reserve inside one protected DB rule
-- concurrency choice: optimistic for moderate conflicts, pessimistic or atomic update for hot rows
-- async path: release expired holds later
-- recovery: sweeper for stale reservations and metrics for contention or failed claims
-
-Common traps:
-
-- using only in-memory locks
-- caching final stock truth
-- discussing replicas before the write rule is safe
-
----
-
-## 3. Drill: Webhook Intake
-
-Prompt:
-
-> Design a payment webhook endpoint that must accept valid events quickly and
-> never apply the same business transition twice.
-
-What to clarify:
-
-- provider signature model
-- retry behaviour of the provider
-- whether downstream work can happen after acknowledgement
-
-Answer spine:
-
-- invariant: one external event must not create duplicate internal effects
-- source of truth: processed-event store plus business state tables
-- intake path: verify signature, claim event ID, perform valid transition, acknowledge fast
-- async path: publish downstream work after durable local success
-- recovery: provider retry, internal replay, and visibility into stuck or rejected events
-
-Common traps:
-
-- trusting unsigned payloads
-- doing expensive work before acknowledging
-- deduplicating with a race-prone read-then-write check
-
----
-
-## 4. Drill: Notification Fan-Out
-
-Prompt:
-
-> After an order becomes paid, email, analytics, fraud, and warehouse systems
-> should react independently.
-
-What to clarify:
-
-- does the user wait for any of these follow-up actions
-- does any consumer require replay
-- do all consumers need the same payload shape
-
-Answer spine:
-
-- invariant: paid order state should remain correct even if follow-up systems lag
-- source of truth: order state in the transactional store
-- write path: move order to `PAID`, persist outbox event
-- async path: broker fan-out to independent consumers
-- recovery: replay-safe consumers, retry policy, DLT ownership
-
-Common traps:
-
-- coupling all side effects into the request path
-- using direct HTTP calls where replayable events would fit better
-- assuming one broken consumer should block all others forever
-
----
-
-## 5. Drill: Search Projection
-
-Prompt:
-
-> Product catalog writes are correctness-sensitive, but product browse and
-> search traffic is much heavier. Design the write/read split.
-
-What to clarify:
-
-- how stale search results can be
-- whether browse needs full-text search or just filtering
-- who owns catalog truth
-
-Answer spine:
-
-- invariant: product truth comes from the write store, not the search index
-- source of truth: catalog database
-- write path: durable product update first
-- async path: event or outbox updates projection store
-- recovery: replay or rebuild projection from source events or source DB
-
-Common traps:
-
-- treating the projection as the only truth
-- hiding propagation delay from the product team
-- skipping rebuild strategy
-
----
-
-## 6. Self-Review Rubric
-
-Score each category `0-2`:
-
-- invariant is explicit
-- source of truth is explicit
-- critical write path is explicit
-- async boundary is explicit
-- retry and duplicate behaviour is explicit
-- recovery path is explicit
-- tradeoff is explicit
-
-Interpretation:
-
-- `12-14`: strong practical answer
-- `8-11`: usable but missing one or two important layers
-- `0-7`: still too vague or too box-driven
-
----
-
-## 7. How To Practice
-
-A good short loop is:
-
-1. set a 12-15 minute timer
-2. answer one drill out loud or in markdown
-3. grade it with the rubric
-4. rewrite only the missing pieces
-
-If the answer feels weak, do not add more boxes first.
-Usually the missing part is one of:
-
-- invariant
-- source of truth
-- duplicate prevention
-- recovery path
+Use these prompts after the [general design method](./00-general-system-design-method.md).
+Try each one before reading its decision check. The point is to practise a
+reasoned choice under a constraint, not to memorize a diagram.
+
+For each drill, state the promise, the owner of the final decision, what the
+caller sees, what can be repeated, and how unfinished work is found.
+
+## 1. A Payment Request Times Out
+
+**Prompt:** A payment authorization request times out. The provider may have
+processed it, and the customer retries checkout. What should the API return?
+Can it send another authorization? How will it learn the original result?
+
+**Decision check:** Keep the local attempt and order pending. Use a stable
+operation ID to query the provider or retry idempotently if supported.
+Reconcile attempts that never receive a conclusive response. A timeout means
+*unknown*, not *declined*. See the [checkout case](./checkout-to-fulfillment-end-to-end.md)
+for the full flow.
+
+## 2. An Order Commits but Publication Fails
+
+**Prompt:** A confirmed order should start fulfillment through an event. The
+process crashes between committing the order and publishing the event. What
+belongs in the local transaction? What if the publisher crashes after the
+broker accepts the event?
+
+**Decision check:** Commit an outbox record with the order. Relay it later;
+publication may repeat after a crash, so use a stable event ID and a consumer
+that records its local effect once. External follow-up needs its own retry
+safety. Monitor unpublished-event age. The outbox closes the local
+database-to-broker gap, not every later workflow gap.
+See [cross-service recovery](../architecture/03-distributed-transactions-and-events.md).
+
+## 3. Callbacks Arrive Late or Out of Order
+
+**Prompt:** A payment provider sends a success callback twice, then an older
+pending callback. Fulfillment has already begun. Which message may change
+local state, and when must you query the provider?
+
+**Decision check:** Authenticate and durably accept the callback; deduplicate
+its ID and apply only a valid business transition. An older message must not
+silently move a confirmed order backward. If arrival order cannot establish
+the actual outcome, reconcile against the provider's record. See
+[webhook intake](../api/03-webhooks-basics.md).
+
+## 4. The Last Units of One SKU Are Contended
+
+**Prompt:** A flash sale sends many reservation requests for a few remaining
+units. More application replicas do not improve the final write. Must the
+buyer get an immediate result, or may the request remain pending?
+
+**Decision check:** Keep the guarded reservation at the inventory owner.
+Control admission and measure contention. For immediate confirmation, bound
+concurrent writes and return a clear unavailable result. If pending is
+acceptable, a queue can smooth intake, but workers still need a safe final
+write. A stale browse projection never promises the last unit. See
+[inventory and fulfillment](../architecture/15-retail-inventory-and-fulfillment-systems.md).
+
+## 5. Search Reads Threaten Catalogue Writes
+
+**Prompt:** Catalogue writes are reliable, but search queries are slow and
+compete with them. How stale may search results be? Would an index, cache,
+projection, or dedicated search store solve the measured problem?
+
+**Decision check:** Keep catalogue writes with their owner. Measure and tune
+the current queries first. If the read shape or load remains different,
+build a projection and state its lag and rebuild path. Search results may be
+stale; the search copy does not become the final product record. See
+[cross-domain read choices](../architecture/19-database-per-service-and-read-model-migration.md).
+
+## Self-Review
+
+After each answer, check that you can explain:
+
+- the invariant and source of truth;
+- the immediate response and later work;
+- a retry, duplicate, timeout, and partial failure;
+- the main security or access boundary;
+- the first likely capacity limit, an observable signal, and an operator recovery path;
+- why the chosen mechanism earns its complexity.
+
+The [worked diagrams](./worked-diagrams.md) show three of these decisions
+visually. Redraw one only if the drawing exposes a boundary your explanation
+missed.

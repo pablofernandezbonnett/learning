@@ -1,11 +1,8 @@
-# Spring Cloud and Service Integration for Backend Engineers
-
-> Primary fit: `Platform / Growth lane`
-
+# Spring Cloud and Service Integration
 
 This is not a "learn all of Spring Cloud" document.
 
-For most backend engineers, the useful part is understanding how Spring-based
+The useful part is understanding how Spring-based
 services talk to each other, externalize configuration, and stay resilient in
 cloud or microservice environments.
 
@@ -90,36 +87,11 @@ Think of it as "Spring support for running many services together."
 
 ### 1. Gateway Patterns
 
-You do not need to master every Spring Cloud Gateway filter.
-
-A gateway is the service at the edge that receives incoming traffic first and decides where it should go.
-
-You do need to understand why teams use a gateway:
-
-- route requests to the right backend
-- centralize auth and rate limiting
-- hide internal service topology
-- inject request metadata like correlation IDs
-
-The important question is not "Do I know every annotation?" but:
-
-> When should a concern live at the gateway, and when should it stay inside the service?
-
-Good gateway concerns:
-
-- authentication at the edge
-- rate limiting
-- path-based routing
-- request logging / trace headers
-
-Bad gateway concerns:
-
-- core business logic
-- stateful workflow orchestration
-- deep domain validation
-
-If you want the fuller gateway vs BFF vs edge decision guide, see
-[`../architecture/17-gateway-vs-bff-vs-edge-patterns.md`](../architecture/17-gateway-vs-bff-vs-edge-patterns.md).
+Decide which edge responsibility is needed before choosing framework
+configuration. Use [the edge-layer guide](../architecture/17-gateway-vs-bff-vs-edge-patterns.md)
+for routing, shared policy, BFF composition, and service boundaries. In a
+Spring implementation, then inspect how routes, shared filters, and identity
+or trace context are configured and tested.
 
 ### 2. Service-to-Service Clients
 

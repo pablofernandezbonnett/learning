@@ -1,300 +1,78 @@
-# 01 — Dart 3 Features
+# Dart 3: Records, Patterns, and Closed States
 
-Dart 3 (released May 2023) is the largest language update since null safety.
-Three features — records, patterns, and sealed classes — work together and change
-how you model and process data in Flutter apps.
+Use these features when they make the possible values or outcomes clearer. They work together: a record can return a few values, a pattern can unpack them, and a sealed class can make a `switch` cover every known outcome.
 
----
+## Records: a few values without a new class
 
-## 1. Records
-
-Records are anonymous, immutable, lightweight value types. They are typed tuples —
-think of them as `data class` without needing to define a class.
-
-### Positional records
+A record is an immutable group of typed fields. It fits a local result whose fields do not need a long-lived domain identity:
 
 ```dart
-(String, int) fetchCoordinates() => ('Tokyo', 35);
+({String sku, int quantity}) summarizeLine() =>
+    (sku: 'SKU-1', quantity: 2);
 
 void main() {
-  final (city, latitude) = fetchCoordinates();   // destructuring
-  print('$city: $latitude');
+  final (:sku, :quantity) = summarizeLine();
+  print('$sku: $quantity');
 }
 ```
 
-### Named records
+Named fields help the caller understand the values. Use a class for a public DTO or domain concept that needs validation, methods, or a stable contract. A record is not automatically the right replacement for such a type.
+
+## Patterns: inspect and unpack one shape
+
+Patterns appear in declarations, `if-case`, and `switch`. They are useful when the structure already tells you what to do:
 
 ```dart
-({String name, double price}) fetchProduct() =>
-    (name: 'Fleece Jacket', price: 8990.0);
-
-final product = fetchProduct();
-print(product.name);    // named field access
-print(product.price);
-```
-
-### Mixed (positional + named)
-
-```dart
-(int, {String label, bool active}) = (42, label: 'primary', active: true);
-```
-
-### Records as return values (replaces output parameters)
-
-Before Dart 3, returning multiple values required creating a class or using a `List`:
-```dart
-// Old — awkward
-Map<String, dynamic> validateForm(String email, String password) => {
-  'isValid': email.contains('@') && password.length >= 8,
-  'error': 'Invalid email',
-};
-
-// Dart 3 — clean and typed
-(bool isValid, String? error) validateForm(String email, String password) {
-  if (!email.contains('@')) return (false, 'Invalid email');
-  if (password.length < 8) return (false, 'Password too short');
-  return (true, null);
-}
-
-final (isValid, error) = validateForm(email, password);
-```
-
-### Records as Map entries
-
-```dart
-final inventory = {
-  'SKU-001': (stock: 42, warehouse: 'Tokyo'),
-  'SKU-002': (stock: 0, warehouse: 'Osaka'),
-};
-
-for (final MapEntry(key: sku, value: (:stock, :warehouse)) in inventory.entries) {
-  print('$sku: $stock units at $warehouse');
-}
-```
-
----
-
-## 2. Pattern Matching
-
-Patterns let you destructure and match data in `switch` expressions, `if-case`
-statements, and variable declarations.
-
-### switch expression (not statement)
-
-The old `switch` statement returns nothing. The new `switch` expression returns a value.
-
-```dart
-// Old — verbose switch statement
-String label;
-switch (status) {
-  case OrderStatus.pending:
-    label = 'Pending';
-    break;
-  case OrderStatus.shipped:
-    label = 'Shipped';
-    break;
-  case OrderStatus.delivered:
-    label = 'Delivered';
-    break;
-}
-
-// Dart 3 — switch expression
-final label = switch (status) {
-  OrderStatus.pending   => 'Pending',
-  OrderStatus.shipped   => 'Shipped',
-  OrderStatus.delivered => 'Delivered',
+String stockLabel(Object? value) => switch (value) {
+  int n when n > 0 => '$n available',
+  int() => 'Out of stock',
+  _ => 'Unknown stock',
 };
 ```
 
-### Destructuring in switch
+The guard after `when` narrows one case. Keep a simple `if` when matching a structure would make the rule harder to read.
+
+## Sealed classes: every outcome has a case
+
+A sealed class defines a type family whose direct subtypes stay in the same library. The analyzer can check whether a switch handles the family:
 
 ```dart
-sealed class Shape {}
-class Circle extends Shape { final double radius; Circle(this.radius); }
-class Rectangle extends Shape { final double w, h; Rectangle(this.w, this.h); }
-
-double area(Shape shape) => switch (shape) {
-  Circle(radius: final r)               => 3.14 * r * r,
-  Rectangle(w: final w, h: final h)    => w * h,
-};
-```
-
-### if-case
-
-```dart
-// Match and destructure in a single if
-final response = {'status': 200, 'data': {'id': '123', 'name': 'Jacket'}};
-
-if (response case {'status': 200, 'data': final Map data}) {
-  print('Success: ${data['name']}');
-}
-
-// With records
-final result = fetchProduct();
-if (result case (true, final product?)) {   // non-null pattern
-  print('Got: ${product.name}');
-}
-```
-
-### List patterns
-
-```dart
-final items = ['first', 'second', 'third'];
-
-switch (items) {
-  case []:
-    print('Empty');
-  case [final only]:
-    print('Single: $only');
-  case [final first, ...]:       // rest pattern — matches any remaining elements
-    print('Starts with: $first');
-}
-```
-
-### Guard clauses (when)
-
-```dart
-final message = switch (price) {
-  final p when p <= 0    => 'Free',
-  final p when p < 1000  => 'Affordable: ¥$p',
-  final p                => 'Premium: ¥$p',
-};
-```
-
----
-
-## 3. Sealed Classes
-
-A `sealed` class can only be subclassed within the same library file. The compiler
-knows all possible subtypes, so `switch` expressions on sealed classes are exhaustive
-— the compiler errors if you miss a case.
-
-```dart
-// payment_result.dart
 sealed class PaymentResult {}
 
-class PaymentSuccess extends PaymentResult {
+final class Paid extends PaymentResult {
   final String transactionId;
-  const PaymentSuccess(this.transactionId);
+  Paid(this.transactionId);
 }
 
-class PaymentFailed extends PaymentResult {
+final class Rejected extends PaymentResult {
   final String reason;
-  const PaymentFailed(this.reason);
+  Rejected(this.reason);
 }
 
-class PaymentPending extends PaymentResult {
-  const PaymentPending();
-}
-```
-
-```dart
-// Usage — exhaustive switch (compiler error if a case is missing)
-Widget buildPaymentStatus(PaymentResult result) => switch (result) {
-  PaymentSuccess(transactionId: final id) => SuccessBanner(id: id),
-  PaymentFailed(reason: final r)          => ErrorBanner(reason: r),
-  PaymentPending()                        => const CircularProgressIndicator(),
+String message(PaymentResult result) => switch (result) {
+  Paid(transactionId: final id) => 'Paid: $id',
+  Rejected(reason: final reason) => 'Rejected: $reason',
 };
 ```
 
-**Sealed class vs enum:**
-- Enum: all variants have the same shape (no fields per variant).
-- Sealed class: each subclass can have different fields — use for domain states.
+If you add another result variant, review each exhaustive switch. An enum is enough when variants do not need different data; a sealed family helps when each outcome carries its own fields.
 
-**Equivalent to:**
-- Kotlin: `sealed class` — identical concept
-- Android ViewModel: `UiState` sealed class pattern — same thing in Dart now
+## Class modifiers: choose a real boundary
 
----
+| Modifier | Main purpose outside its library |
+| --- | --- |
+| `final class` | Prevent extending or implementing the class |
+| `interface class` | Allow implementation of a contract, but not inheritance of its implementation |
+| `base class` | Allow inheritance while requiring subclasses to use the base implementation |
+| `sealed class` | Keep the subtype family closed for exhaustive handling |
 
-## 4. Class Modifiers
+Start with an ordinary class. Add a modifier when the public inheritance or implementation rule matters to callers. See the [official class modifier guide](https://dart.dev/language/class-modifiers) for the full combinations.
 
-Dart 3 introduced modifiers that restrict how a class can be used outside its library.
+## Decision check
 
-### final class
+- Is this a temporary group of values or a durable domain type?
+- Does the code need to handle every outcome explicitly?
+- Is a pattern clearer than a simple condition?
+- Is the class modifier protecting an actual library boundary?
 
-Cannot be extended, implemented, or mixed in outside the library.
-Use for value objects whose identity you want to control.
-
-```dart
-final class Money {
-  final int amountJpy;
-  final String currency;
-  const Money(this.amountJpy, this.currency);
-}
-
-// In another file:
-// class DiscountedMoney extends Money {}  // ERROR — cannot extend final class
-```
-
-### interface class
-
-Can only be `implements`, never `extends`. Enforces the contract without allowing
-implementation reuse.
-
-```dart
-interface class ProductRepository {
-  Future<List<Product>> getProducts() => throw UnimplementedError();
-  Future<Product> getById(String id) => throw UnimplementedError();
-}
-
-// Elsewhere:
-class MockProductRepository implements ProductRepository { ... }   // OK
-// class CachingRepository extends ProductRepository { ... }       // ERROR
-```
-
-### base class
-
-Can be `extends` but not `implements` outside the library. Guarantees that all
-concrete subclasses go through your base logic.
-
-```dart
-base class BaseApiService {
-  final Dio _client;
-  BaseApiService(this._client);
-
-  Future<T> get<T>(String path) async { ... }
-}
-
-class ProductApiService extends BaseApiService { ... }    // OK
-// class FakeApi implements BaseApiService { ... }        // ERROR
-```
-
-### mixin class
-
-Can be used as both a `mixin` (with `with`) and a regular class (with `extends`).
-
-```dart
-mixin class Loggable {
-  void log(String message) => debugPrint('[${runtimeType}] $message');
-}
-
-class ProductService with Loggable { ... }    // as mixin
-class BaseService extends Loggable { ... }    // as class
-```
-
-### Quick reference
-
-| Modifier | extend | implement | mixin |
-|---|---|---|---|
-| (none) | yes | yes | no |
-| `abstract` | yes | yes | no |
-| `final` | no | no | no |
-| `interface` | no | yes | no |
-| `base` | yes | no | no |
-| `sealed` | no (same library only) | no | no |
-| `mixin class` | yes | yes | yes |
-
----
-
-## Practical Summary
-
-"Dart 3's records replace the pattern of creating a throwaway class just to return
-two values from a method — I use them extensively for repository result types and
-form validation. Sealed classes with exhaustive switch expressions are the equivalent
-of Kotlin's sealed classes: the compiler enforces that every state is handled, which
-is exactly the guarantee you want for UI state modeling. Class modifiers let you
-express architectural boundaries in the type system — `interface class` for repository
-contracts, `final class` for value objects you don't want subclassed. Patterns tie
-all of this together: switching on a sealed class and destructuring its fields in
-one expression eliminates the boilerplate that made this pattern verbose in Dart 2."
+Sources: [records](https://dart.dev/language/records), [patterns](https://dart.dev/language/patterns), [sealed classes](https://dart.dev/language/class-modifiers#sealed), [class modifiers](https://dart.dev/language/class-modifiers).

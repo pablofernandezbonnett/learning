@@ -131,4 +131,4 @@ The value of the exercise is in learning to recognize dangerous construction pat
 
 ## 10. Internal Repo Links
 
-- [../security/02-web-and-api-security.md](../security/02-web-and-api-security.md): broader backend AppSec note on unsafe input trust, API exposure, and high-value web risks around business endpoints
+- [Web and API security](../security/02-web-and-api-security.md): place input and authorization checks in the request flow

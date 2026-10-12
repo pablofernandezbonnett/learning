@@ -1,101 +1,46 @@
-# 4. Spring Boot "Magic": Auto-Configuration
+# Spring Boot Auto-Configuration
 
-> Primary fit: `Platform / Growth lane`
+Auto-configuration explains why adding a dependency can make a feature
+available without writing its setup by hand. Spring Boot loads candidate
+configuration classes and registers their beans only when their conditions
+match. It is a defaulting mechanism, not a promise that every dependency
+creates every possible bean.
 
+`@SpringBootApplication` enables auto-configuration. Candidate classes are
+declared by Spring Boot or library jars; current Boot auto-configuration jars
+list them in
+`META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`.
+Conditions can check the classpath, properties, and beans already registered.
+See [conditional beans](./09-conditional-beans.md) for those checks.
 
-Why can you just add a dependency and "it works"? This is the core of Spring Boot.
+## Diagnose a Surprising Bean
 
-## Why This Matters
+When a bean is missing or unexpected:
 
-Auto-configuration is one of the main reasons Spring Boot feels productive, and
-also one of the fastest places to get confused when the app creates beans you
-did not expect.
+1. Check whether the dependency and its auto-configuration are present.
+2. Check the active properties and profiles.
+3. Check whether an application-defined bean made Boot back away.
+4. Start with `--debug` and read the condition evaluation report for the
+   configuration in question.
 
-This matters because once teams move beyond simple starters, they need to know
-why something was auto-wired, why something was not, and how to override the
-default behavior safely.
+For example, a database dependency alone does not prove that a particular
+`DataSource` will be created. A custom `DataSource` bean can replace Boot's
+default. The report shows which condition matched or failed.
 
-## Smallest Mental Model
+## Override or Exclude Deliberately
 
-Spring Boot looks at the classpath, configuration properties, and existing beans
-to decide which framework setup to provide automatically.
+Define an application bean when only one default needs replacing. If an
+entire auto-configuration is unwanted, exclude that auto-configuration class
+through `@SpringBootApplication(exclude = ...)` or
+`spring.autoconfigure.exclude`. The exclusion targets candidate
+auto-configurations, not an arbitrary application service.
 
-The key idea is not "magic." It is conditional bean registration.
+Keep the decision local: an exclusion can remove other beans supplied by the
+same auto-configuration. Verify the final bean graph and the affected service
+behavior. For environment-specific values, use
+[profiles and external configuration](./10-profiles.md).
 
-## Bad Mental Model vs Better Mental Model
+## Further Reading
 
-Bad mental model:
-
-- Spring Boot just guesses and wires things randomly
-- adding a dependency always means "enable everything"
-- excluding auto-config is a hack for when Spring misbehaves
-
-Better mental model:
-
-- Spring Boot loads candidate configurations and then applies conditions
-- defaults appear only when the needed classes, properties, and missing beans
-  line up
-- you can override or exclude auto-config deliberately when your app needs a
-  different shape
-
-Small concrete example:
-
-- weak view: "I added the database dependency and Spring magically created a
-  datasource"
-- better view: "the datasource auto-config activated because the right classes
-  and properties existed and no custom datasource bean had replaced it"
-
-Strong default:
-
-- understand conditions first, override second, exclude third
-
-Reusable takeaway:
-
-> Spring Boot auto-configuration is conditional registration, not random magic.
-> It activates when the right classes, properties, and missing beans line up,
-> and I override or exclude it only when my app needs a different shape.
-
-### 📍 The "Core" Annotations
-- **`@SpringBootApplication`**: A 3-in-1 annotation:
-  1. `@Configuration`: Marks it as a source of bean definitions.
-  2. `@ComponentScan`: Scans for beans in YOUR package.
-  3. **`@EnableAutoConfiguration`**: This is the real magic.
-
-### 📍 How `@EnableAutoConfiguration` works
-1. **The Search**: It looks for files named `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` (In newer versions) or `META-INF/spring.factories` (In older versions) in all your JARs.
-2. **The "Conditionals"**: These files list hundreds of "potential" configurations (JPA, Redis, Web, etc.).
-3. **The Filters**: Spring uses `@Conditional` annotations to decide which ones to load:
-   - `@ConditionalOnClass(DataSource.class)`: Only load if the class is present (e.g., you added the H2 dependency).
-   - `@ConditionalOnMissingBean(DataSource.class)`: Only load if YOU haven't defined your own DataSource already.
-   - `@ConditionalOnProperty(name = "spring.datasource.url")`: Only load if a property is set.
-
-### 📍 Interview Pro Tip: How to "disable" an Auto-config?
-You can exclude it in the annotation:
-
-```kotlin
-@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class])
-class MySimpleApp
-```
-
-<details>
-<summary>Java version</summary>
-
-```java
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-public class MySimpleApp { ... }
-```
-
-</details>
-
-Important clarification: `exclude` is for **auto-configuration classes**, not for arbitrary classes.
-
-- **Valid**: `DataSourceAutoConfiguration::class`, `SecurityAutoConfiguration::class`
-- **Not the intended use**: `MyCustomClass::class` if it is just your own `@Configuration`, `@Component`, or service class
-
-Why: Spring Boot builds a list of candidate auto-configurations from its auto-configuration imports metadata, and `exclude` removes entries from that list. If your class is not one of those auto-configuration entries, excluding it does not mean "disable this random class".
-
-Interview-safe answer: "I use `exclude` only for specific Spring Boot auto-configuration classes. For my own classes, I control registration with component scan boundaries, explicit imports, profiles, or conditional properties."
-
-### 📍 When to use it?
-- **Starters**: When creating a library for other teams to use.
-- **Microservices**: To share common security/logging config without copy-pasting code.
+- [Spring Boot auto-configuration](https://docs.spring.io/spring-boot/reference/using/auto-configuration.html)
+- [Creating auto-configuration](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)

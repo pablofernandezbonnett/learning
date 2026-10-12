@@ -1,91 +1,104 @@
-# MongoDB In-Depth: Architecture, Indexing, and Best Practices
+# MongoDB: Model Documents From the Workload
 
-> Primary fit: `Shared core`
+MongoDB stores records as documents. Its main design choice is what belongs in
+one document: data read and changed together may fit there, while independent
+or unbounded data usually needs a separate collection. Start with the required
+queries and write rules, then check how the model behaves as records grow.
 
+## Decide What One Document Owns
 
-MongoDB is the most popular NoSQL document database. It is flexible and scales horizontally well, but terrible data modeling or missing indexes can cause severe performance bottlenecks.
+Suppose a product page reads a product's name, status, category, and a small
+set of variable attributes together. Those fields can live in one product
+document. Reviews can grow without a fixed bound and have a separate update
+rate, so store them separately and query them by product ID when needed.
 
----
-
-## 1. High Availability and Scaling Architecture
-
-### Replica Sets (High Availability)
-A Replica Set is a group of MongoDB instances that maintain the same data set. This provides redundancy and high availability.
-*   **Primary node:** Receives all write operations.
-*   **Secondary nodes:** Replicate the operations from the primary.
-*   **Elections:** If the primary crashes, secondaries vote to elect a new primary automatically.
-*   *Interview context:* You can configure reads to go to secondary nodes to reduce the load on the primary (Eventual Consistency).
-
-### Sharding (Horizontal Scaling)
-When a single machine can no longer hold the data or handle the read/write load, you partition the data across multiple machines.
-*   **Shard Key:** A field chosen to distribute documents. (e.g., `user_id` or `country`).
-*   Choosing the wrong shard key leads to **jumbo chunks** (too much data on one shard) or **hot shards** (all writes hitting only one server).
-
----
-
-## 2. Projections: Returning Only What You Need
-
-A common mistake in MongoDB (especially with ORMs like Spring Data MongoDB) is fetching massive documents when the client only needs a few fields.
-
-**What is a Projection?**
-It instructs the database engine to only transmit specific fields over the network.
-*   *Reduces Network Latency:* Less data to send.
-*   *Reduces Memory Usage:* Your application server allocates less RAM deserializing JSON.
-
-**Example (Spring Data MongoDB):**
-Instead of fetching the whole `Product` (with 50 fields, arrays, embedded reviews):
-```kotlin
-@Query(value="{ 'categoryId' : ?0 }", fields="{ 'name' : 1, 'price' : 1, '_id': 0 }")
-fun findNamesAndPricesByCategory(categoryId: String): List<ProductSummary>
+```json
+{
+  "_id": "sku-123",
+  "categoryId": "jackets",
+  "status": "ACTIVE",
+  "name": "Running jacket",
+  "updatedAt": { "$date": "2026-10-01T12:00:00Z" },
+  "attributes": { "color": "navy", "sizes": ["S", "M", "L"] }
+}
 ```
-This tells MongoDB to *only* return `name` and `price`. `_id` is excluded explicitly.
 
----
+Embedding avoids another read and lets one document update atomically. It
+also makes the document grow and can repeat the same facts in several places.
+Referencing keeps independently growing data separate but adds reads or a
+`$lookup` join. MongoDB has a 16 MiB document size limit; avoid arrays that
+can grow without a bound well before reaching it.
 
-## 3. Indexing & The ESR Rule
+An operation on one document is atomic. MongoDB also supports transactions
+across documents when a rule needs them; account for their cost and scope
+instead of assuming a document model removes every cross-record invariant.
+See [store choice](./04-sql-vs-nosql.md) for the earlier decision about which
+business fact the store should own.
 
-Indexes make database queries fast by avoiding a **Collection Scan** (reading every single document).
+## Design Queries and Indexes Together
 
-### Types of Indexes
-1.  **Single Field Index:** On a single key (e.g., `email`).
-2.  **Compound Index:** On multiple fields (e.g., `{ lastName: 1, firstName: 1 }`). Order matters entirely!
-3.  **Multikey Index:** Used to index elements of an array.
+For a catalog screen that filters active products by category and sorts by
+update time, write the actual query before proposing an index:
 
-### The ESR Rule (Equality, Sort, Range)
-When creating a Compound Index to optimize a query, the fields in the index MUST follow this order:
-1.  **E (Equality):** Fields matched exactly (e.g., `status = "ACTIVE"`).
-2.  **S (Sort):** Fields used to order the results (e.g., `ORDER BY createdAt DESC`).
-3.  **R (Range):** Fields filtered by range (e.g., `price > 100`, `$gt`, `$in`).
+```javascript
+db.products.find(
+  { categoryId: "jackets", status: "ACTIVE" },
+  { name: 1, status: 1, _id: 0 }
+).sort({ updatedAt: -1 }).limit(30)
+```
 
-**Example Question:** Optimize the query: "Find all active users, sorted by registration date, older than 25 years."
-*   *Query:* `{ status: "ACTIVE", age: { $gt: 25 } } sort: { registeredAt: -1 }`
-*   *Correct Index (ESR):* `{ status: 1, registeredAt: -1, age: 1 }`
+A candidate compound index is
+`{ categoryId: 1, status: 1, updatedAt: -1 }`: equality filters precede the
+sort field. MongoDB's **ESR guideline** (equality, sort, range) is a useful
+starting point for field order, not a rule that overrides measured query
+behavior. Check selectivity, result size, and the `explain()` plan on
+representative data. Every added index also costs storage and write work.
 
----
+A **projection** selects the fields returned to the caller, as in the query
+above. It can reduce transferred data, but does not by itself make a poor
+filter efficient. Arrays may use multikey indexes; check the actual plan when
+filtering or sorting through array fields.
 
-## 4. The Aggregation Pipeline
+## Use Aggregation for a Defined Read
 
-The Aggregation Pipeline is MongoDB's framework for data transformation (similar to `GROUP BY` and complex `JOIN`s in SQL). It passes documents through a multi-stage pipeline.
+An aggregation pipeline processes documents in stages: `$match` filters,
+`$group` aggregates, `$project` shapes output, and `$lookup` joins data from
+another collection. Put a selective `$match` early when it can use an index
+and still preserve the intended result. Some stages depend on earlier
+transformations, and the optimizer may reorder eligible stages, so "always
+put `$match` first" is not a safe rule.
 
-*   `$match`: Filters documents (always do this FIRST to reduce the pipeline size, ideally using an index).
-*   `$group`: Groups documents by a specified key and applies accumulators (e.g., `$sum`, `$avg`).
-*   `$project`: Reshapes each document (adding/removing fields).
-*   `$lookup`: Performs a "Left Outer Join" with another collection. (Use sparingly, as NoSQL databases are not optimized for joins).
+Use `$lookup` when the required read needs it and the measured plan is
+acceptable. If a page repeatedly joins large, changing collections, revisit
+the document boundary or build a read model with an explicit freshness rule.
 
----
+## Plan Replication and Sharding Separately
 
-## 5. Document Design: Embedding vs. Referencing
+A replica set has a writable primary and secondary members. Reads directed to
+a secondary can lag behind a write to the primary. Choose read preference,
+read concern, and write concern from the freshness and durability needed by
+each operation. These settings control where reads go, what data they may see,
+and how a write is acknowledged. Test failover and client retry behavior.
 
-"We are building a blog. Should comments be embedded in the Post document, or stored in a separate collection?"
+Sharding spreads a collection across nodes by a shard key. Check that common
+queries can route efficiently and that writes distribute across key values.
+A hot key or a poor query can remain a bottleneck after sharding. Plan how
+cross-shard work and later key changes will be handled before using sharding
+as a response to load.
 
-*   **Embedding (Storing an Array of Comments in the Post):**
-    *   *Pros:* Fastest read time (1 query fetches post + comments). Great if data is accessed together.
-    *   *Cons:* MongoDB documents have a 16MB limit. If a post goes viral and gets 100,000 comments, the document exceeds the limit and breaks.
-*   **Referencing (Separating Collections):**
-    *   *Pros:* Infinite scaling. Standard relational model.
-    *   *Cons:* Requires multiple queries or an expensive `$lookup`.
+## Review the Model
 
-**Rule of Thumb:** Understand the relationship bounding.
-*   *1-to-Few:* Embed (e.g., User addresses).
-*   *1-to-Many:* Reference (e.g., Product reviews).
-*   *1-to-Squillions:* Reference, possibly keeping an array of references in the parent if needed.
+1. List the main reads, updates, and business rules for each document type.
+2. Bound embedded arrays and identify facts duplicated across documents.
+3. Test the real queries and candidate indexes with `explain()`.
+4. Decide which reads may be stale and how failures affect writes.
+5. Add sharding only after measuring a limit that distribution can address.
+
+## MongoDB References
+
+- [Embedding data](https://www.mongodb.com/docs/manual/data-modeling/embedding/)
+- [Transactions](https://www.mongodb.com/docs/manual/core/transactions/)
+- [ESR index guideline](https://www.mongodb.com/docs/manual/tutorial/equality-sort-range-guideline/)
+- [Query optimization](https://www.mongodb.com/docs/manual/core/query-optimization/)
+- [Read preference](https://www.mongodb.com/docs/manual/core/read-preference/)
+- [Shard keys](https://www.mongodb.com/docs/manual/core/sharding-choose-a-shard-key/)

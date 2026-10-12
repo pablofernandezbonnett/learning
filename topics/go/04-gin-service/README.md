@@ -1,124 +1,49 @@
-# Gin Service Slice for JVM Backend Engineers
+# Exercise: Reservation API in Go
 
-This is the practical Go layer that moves past syntax refresh.
+Build a small reservation API to practice request handling, idempotency, outbound calls, and shutdown. Use `net/http` or Gin for routing; the same service decisions apply to both.
 
-It shows a small service shape that is worth studying or using
-as a bridge from Java/Spring into Go service work.
+## Contract
 
-Why `Gin` here:
+- `POST /api/v1/reservations` accepts `reservation_id`, `sku`, and a positive `quantity`.
+- `GET /api/v1/reservations/{id}` returns a stored reservation or a documented not-found response.
+- The first successful creation returns `201`. Repeating the same ID and payload returns the existing reservation without reserving stock again. Reusing the ID with different data returns `409`.
+- Invalid JSON or fields return `400`. Define safe responses for unavailable inventory, upstream timeout, and unexpected failures.
+- `GET /healthz` confirms the process can answer requests. Decide separately whether dependency health belongs in readiness checks.
 
-- it is widely used
-- the official Go tutorial still uses it for a web-service walkthrough
-- it is enough to learn one framework layer without turning the repo into a
-  router zoo
+Set a body size limit, a bounded inventory call, an explicit shutdown deadline, and structured request logging. If using Gin, keep business rules out of middleware and use its router as an `http.Server` handler.
 
-Why not start with five frameworks:
+## Build in This Order
 
-- the real transferable ideas are service shape, middleware, `context`,
-  validation, boundary handling, testing, and shutdown
-- learning `Gin`, `Echo`, `Fiber`, and `chi` at once mostly teaches duplicated
-  routing syntax
+1. Write the request/response contract and error mapping.
+2. Define a reservation service and a narrow inventory client boundary.
+3. Implement duplicate detection before the inventory call.
+4. Implement the outbound client with request context, timeout, status handling, and body cleanup.
+5. Wire the router, configuration, logging, and graceful shutdown.
+6. Test the public HTTP behavior and dependency failure paths.
 
----
+## Resolution Guide
 
-## What This Slice Covers
-
-- service shape that looks like a real backend instead of one handler file
-- routing and route groups
-- middleware for request IDs and structured access logs
-- `context` timeouts on outbound boundary calls
-- config from env
-- graceful shutdown with `signal.NotifyContext`
-- standard-library logging through `log/slog`
-- tests for success, duplicate handling, timeout, and retrieval
-
-It uses:
-
-- `Gin` for HTTP ergonomics
-- the standard library for config, logging, shutdown, HTTP client, and tests
-
----
-
-## Files
-
-| File | Role |
-|---|---|
-| `main.go` | app wiring and graceful shutdown |
-| `config.go` | env-backed config parsing |
-| `router.go` | `Gin` router, middleware, and handlers |
-| `reservation.go` | request/response models, store, and service logic |
-| `inventory.go` | outbound inventory boundary, with HTTP and stub clients |
-| `router_test.go` | route and service behavior tests |
-| `why-this-service-shape-matters.md` | why each layer exists, what problem it solves, and how to explain it clearly |
-
----
-
-## Run
-
-From [04-gin-service](.):
-
-```bash
-go run .
+```text
+POST reservation:
+  decode with a size limit; validate ID, SKU and quantity
+  find reservation by ID
+  if same payload exists: return existing result
+  if ID exists with different payload: return conflict
+  call inventory with the same idempotency key and a deadline from the request context
+  if outcome is uncertain: reconcile before treating a retry as a new write
+  persist reservation and return created result
 ```
 
-Default behavior:
+This sequence is a learning model, not an atomic production transaction. Two concurrent requests can both pass the first lookup. Use a unique constraint or conditional write for the ID, and design the inventory operation around a durable idempotency key. Decide how to recover when inventory succeeds but local persistence fails.
 
-- starts on `:8080`
-- uses an in-process stub inventory client so the example is runnable without a
-  second service
+For a local exercise, an in-memory store and fake inventory client make the cases easy to explore. They lose state on restart and cannot coordinate multiple instances. Do not infer production guarantees from them.
 
-Try:
+## Checks
 
-```bash
-curl -s http://localhost:8080/healthz
+- First creation, identical repeat, conflicting repeat, and fetch after creation.
+- Invalid JSON, missing fields, nonpositive quantity, oversized body, and unknown ID.
+- Inventory rejection, timeout, and an ambiguous upstream result.
+- Concurrent requests for the same ID: inventory must not reserve twice.
+- Cancellation reaches the outbound call; shutdown stops intake and gives active requests a bounded window.
 
-curl -s -X POST http://localhost:8080/api/v1/reservations \
-  -H "Content-Type: application/json" \
-  -d '{"reservation_id":"res-1","sku":"UT-WHITE-M","quantity":2}'
-
-curl -s http://localhost:8080/api/v1/reservations/res-1
-```
-
-Test:
-
-```bash
-go test ./...
-```
-
----
-
-## Env Vars
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `APP_ENV` | `local` | environment label for logs |
-| `HTTP_ADDR` | `:8080` | listen address |
-| `INVENTORY_MODE` | `stub` | `stub` or `http` |
-| `INVENTORY_BASE_URL` | empty | required when `INVENTORY_MODE=http` |
-| `INVENTORY_TIMEOUT_MS` | `800` | timeout for outbound inventory calls |
-| `SHUTDOWN_TIMEOUT_MS` | `5000` | graceful shutdown timeout |
-
-If you want to exercise the real HTTP boundary client:
-
-```bash
-INVENTORY_MODE=http INVENTORY_BASE_URL=http://localhost:9090 go run .
-```
-
----
-
-## What To Notice
-
-- `Gin` helps with routing, groups, JSON binding, and middleware chaining
-- `net/http`, `context`, and `http.Server` still own the server lifecycle
-- timeout handling belongs near the outbound dependency, not only in a generic
-  framework layer
-- idempotent duplicate handling belongs in the service logic, not in routing
-  syntax
-
-If you want the explicit learning layer, read
-[why-this-service-shape-matters.md](./why-this-service-shape-matters.md) next.
-
-Short rule:
-
-> Learn one Go framework as a thin productivity layer, not as a replacement for
-> understanding `net/http`, `context`, and explicit service behavior.
+Read [service shape and context](../05-project-shape-errors-and-context.md), [HTTP and API clients](../06-http-https-and-api-clients.md), and [testing](../07-testing-tooling-and-quality.md) for the reusable rules behind the exercise.

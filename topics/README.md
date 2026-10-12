@@ -18,19 +18,13 @@ Use this directory when:
 - you want a topic README to point you to any matching companion lab
 
 If you are not sure where to start at all, use the repo root [README.md](../README.md).
-If you want a role-transition path rather than a topic entrypoint, use `paths/` first.
+If the problem is broad, start with the [general system design method](./system-design/00-general-system-design-method.md).
 
 Most topic folders follow the same shape:
 
 - `Refresh`: the shortest path back into the topic when you need a quick reopen
-- `Required`: the material that matters often in real day-to-day backend work
+- `Required`: the material that matters often in real engineering work
 - `Growth`: deeper material worth adding once the core feels stable
-
-Some topic folders also make an explicit distinction between:
-
-- the canonical lane for the main backend roadmap
-- companion material used only for a concrete gap
-- adjacent awareness material that should not compete with the main path
 
 A good topic README should tell you three things quickly:
 
@@ -38,7 +32,7 @@ A good topic README should tell you three things quickly:
 - which documents to read first and why
 - any term that could otherwise feel like unexplained jargon on first contact
 
-When a topic has runnable companion code, the topic README should link to the
+When a topic has a companion exercise, the topic README should link to the
 matching lab in `labs/`.
 
 Strong default:

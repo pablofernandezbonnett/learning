@@ -1,116 +1,50 @@
-# IoC and the Bean Lifecycle
+# IoC and Dependency Injection
 
-> Primary fit: `Platform / Growth lane`
+**Inversion of control (IoC)** means Spring creates and connects application
+objects instead of each object finding or constructing its collaborators.
+**Dependency injection (DI)** is how a bean receives those collaborators.
+The result is an object graph whose wiring can be inspected and changed in
+one place.
 
-
-This topic matters because a lot of Spring behavior only makes sense once you
-understand what the container creates, wraps, and destroys for you.
-
-If you keep one line warm, keep this:
-
-> `IoC` (`Inversion of Control`) means Spring owns object creation and wiring. `DI` (`dependency injection`) is the main mechanism it uses to give objects the collaborators they need.
-
----
-
-## Smallest Useful Mental Model
-
-The Spring container does three high-value jobs:
-
-- creates beans
-- wires dependencies
-- wraps some beans with extra runtime behavior such as proxies
-
-That is why `@Transactional`, `@Async`, and some other features do not feel
-like plain method calls.
-
----
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- Spring just finds classes and injects them
-- bean lifecycle is trivia unless I write framework code
-
-Better mental model:
-
-- the container decides creation order, scope, lifecycle hooks, and proxy wrapping
-- many real Spring surprises come from misunderstanding those boundaries
-
-Small concrete example:
-
-- weak approach: call a `@Transactional` method inside the same class and expect proxy behavior
-- better approach: remember that proxy-based behavior usually appears only when the call crosses the bean boundary Spring manages
-
----
-
-## The Lifecycle
-
-1. **Instantiation**:
-   Spring finds the class and creates the bean instance.
-   How many instances it creates depends on scope:
-   with the default `singleton` scope, Spring creates one shared instance per
-   `ApplicationContext`; with `prototype`, Spring creates a new instance each
-   time that bean is requested.
-2. **Populate properties**:
-   dependencies are injected by constructor, setter, or field
-3. **Aware callbacks**:
-   Spring can tell the bean its name or give it access to the `BeanFactory`
-4. **Pre-initialization**:
-   `BeanPostProcessor.postProcessBeforeInitialization(...)`
-5. **Initialization**:
-   `@PostConstruct` and `afterPropertiesSet()`
-6. **Post-initialization**:
-   `BeanPostProcessor.postProcessAfterInitialization(...)`
-   This is where proxies such as `@Transactional` or `@Async` are often created.
-7. **Destruction**:
-   `@PreDestroy` or `destroy()`
-
-Short rule:
-
-> if a Spring behavior feels "magical," check whether it is really a lifecycle or proxy effect
-
----
-
-## Why Constructor Injection Is Usually Better
-
-- **Immutability**:
-  you can use `final` fields
-- **Easy testing**:
-  dependencies are visible and easy to pass directly in tests
-- **Fail-fast wiring**:
-  missing dependencies are exposed early
-
-Small code example:
+## Declare Required Dependencies
 
 ```java
 @Service
-public class OrderService {
+class OrderService {
     private final PaymentGateway paymentGateway;
 
-    public OrderService(PaymentGateway paymentGateway) {
+    OrderService(PaymentGateway paymentGateway) {
         this.paymentGateway = paymentGateway;
     }
 }
 ```
 
-Why this is stronger:
+Spring creates `OrderService` and supplies a `PaymentGateway` bean through
+its constructor. The dependency is visible, required, and easy to replace in
+a focused test. If several beans match the type, choose one explicitly with
+a qualifier or configuration instead of depending on an accidental choice.
 
-- the dependency is explicit
-- the bean is easier to test
-- the object shape is harder to misuse accidentally
+Spring can discover annotated components such as `@Service`, or register an
+object returned by an `@Bean` method. Both become managed beans. Use
+constructor injection for required dependencies; setter injection fits an
+optional dependency that has a sensible default. A long constructor may
+signal that one class owns too many jobs.
 
----
+## Know the Scope
 
-## Scopes
+A `singleton` bean is one shared instance per Spring container; it is the
+default. Keep request-specific mutable data out of its fields. A `prototype`
+bean is created when the container is asked for it. Injecting one prototype
+into a singleton at construction does not automatically create a fresh
+prototype on every later method call. Request-scoped beans follow an HTTP
+request when a web-aware context is present.
 
-- **singleton**:
-  one shared instance per `ApplicationContext`
-- **prototype**:
-  a new instance each time the container is asked for that bean
-- **request / session**:
-  web-aware scopes tied to the current HTTP lifecycle
+Choose a scope from the state and lifetime the object actually needs.
+Spring's handling of initialization and cleanup is described in
+[bean lifecycle](./06-bean-lifecycle.md). Interception of calls to managed
+beans is described in [proxies and AOP](./07-proxies-and-aop.md).
 
-Practical rule:
+## Further Reading
 
-- default to `singleton` unless the real lifecycle demands something else
+- [Spring dependency injection](https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-collaborators.html)
+- [Bean scopes](https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html)

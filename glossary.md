@@ -158,12 +158,11 @@ from a shared header table maintained by client and server. Reduces wire size si
 for header-heavy APIs.
 
 ### gRPC
-**Google Remote Procedure Call.** A framework for calling functions on a remote service
-as if they were local. Built on HTTP/2 + Protocol Buffers. Not an abbreviation of
-something meaningful — "g" stands for different things in each release (gRPC 1.0: "gRPC").
-
-**Practical distinction:** REST = resource-based (nouns, URLs). gRPC = function-based
-(verbs, service methods). See `topics/architecture/04-networking-fundamentals.md`.
+An RPC framework for typed service calls, commonly using Protocol Buffers to
+define contracts and HTTP/2 as its transport. The call is still remote: it
+needs a deadline and a plan for network failure. Compared with a resource-based
+HTTP API, gRPC exposes service methods. See
+[the network path](topics/architecture/04-networking-fundamentals.md).
 
 ### SSE
 **Server-Sent Events.** A one-directional push protocol over HTTP where the server streams

@@ -1,7 +1,5 @@
 # Java Concurrency and the JMM
 
-> Primary fit: `Shared core`
-
 You do not need to be a JVM concurrency specialist.
 You do need to explain shared state, blocking work, and visibility clearly when
 backend work goes past normal CRUD.
@@ -521,15 +519,9 @@ Short rule:
 
 ## 9. How To Compare Java, Kotlin, and Go Briefly
 
-Safe short comparison:
-
-- Java: explicit concurrency primitives, mature libraries, virtual threads for scalable blocking I/O
-- Kotlin coroutines: language-level async model with explicit suspension points
-- Go: lightweight goroutines and a simpler concurrency story for many small services
-
-Short explanation:
-
-> Coroutines are mainly an async programming model. Virtual threads are mainly a cheaper runtime model for blocking work. Both can help, but they are not the same tool.
+This note owns Java's memory and locking rules. For the cross-language choice
+between platform threads, virtual threads, coroutines, and goroutines, see
+[concurrency models](../architecture/08-concurrency-models-comparison.md).
 
 ---
 

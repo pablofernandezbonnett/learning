@@ -1,163 +1,79 @@
-# Kubernetes Basics for Backend Engineers
+# Kubernetes Runtime Basics
 
-> Primary fit: `Platform / Growth lane`
+Kubernetes keeps declared workloads running across a cluster. Use this note
+to understand what happens to an application instance, its traffic, and its
+resources. Kubernetes does not remove the need for compatible releases,
+useful health checks, or capacity planning.
 
+## The Runtime Path
 
-You do not need to be a Kubernetes operator.
-You do need a simple mental model for what Kubernetes solves once "run one Docker
-container" is no longer enough.
-
-This is mainly useful when the conversation pushes on deployment, availability, scaling,
-and traffic routing for containerized services.
-
----
-
-## What is Kubernetes?
-Docker lets you run one application container.
-Kubernetes helps when you need many copies, health management, service discovery, and
-controlled rollout across a fleet.
-
-That is **Container Orchestration**. Kubernetes (K8s) is the tool that automates the deployment, scaling, and management of containerized applications.
-
----
-
-## The 4 Core Concepts
-
-### 1. Pods (The smallest unit of compute)
-*   Kubernetes doesn't run Docker containers directly. It runs **Pods**.
-*   A Pod is slightly larger than a container. It usually contains *one* Docker container (e.g., your Spring Boot app), but it can contain multiple tightly coupled containers that share the same network IP and storage volume (e.g., your app + a logging agent "sidecar").
-*   *Key trait:* Pods are ephemeral. They die, they get recreated, and their IP addresses change constantly. **Never rely on a Pod's IP address.**
-
-### 2. Deployments (The Blueprint)
-*   You almost never create a Pod manually. You create a **Deployment**.
-*   A Deployment is a YAML file where you declare your desired state: *"I want 3 replicas of my User Service container running at all times, using version 2.0 of my image."*
-*   Kubernetes constantly monitors this. If a physical server crashes and takes 1 Pod with it, the Deployment Controller notices the count dropped to 2, and instantly spins up a new Pod on a healthy server to maintain the desired state of 3.
-*   *Zero-Downtime:* Deployments handle Rolling Updates automatically. When you upgrade to version 2.1, it spins up a new 2.1 Pod, kills an old 2.0 Pod, and repeats until the rollout is complete.
-
-### 3. Services (The Internal Address)
-*   Since Pods die and their IP addresses change constantly, how does the `Order Service` talk to the `User Service`?
-*   It talks to a **Service**.
-*   A Service is a stable, permanent IP address and DNS name (e.g., `http://user-service:8080`) that acts as an internal Load Balancer. It receives traffic and forwards it to the healthy Pods that back it.
-*   Even if all the User Service Pods are destroyed and recreated, the `Service` IP/DNS remains completely unchanged.
-
-### 4. Ingress / Gateway (The Public Door)
-*   By default, everything in Kubernetes is private and completely inaccessible from the public internet.
-*   Historically, teams used **Ingress** for this. The newer Kubernetes direction is **Gateway API**.
-*   In both cases, the job is the same: an intelligent Layer 7 edge that routes outside traffic to the correct internal services.
-*   *Example:*
-    *   Traffic to `api.myapp.com/users` -> `User Service`
-    *   Traffic to `api.myapp.com/orders` -> `Order Service`
-*   For local labs, `Traefik` is a practical modern controller choice.
-
----
-
-## Practical Summary
-
-Practical summary:
-
-> If we are already containerized and need replica management, rolling updates,
-> internal service discovery, and health-aware traffic routing, Kubernetes is a strong fit.
-> I think first in terms of Deployments, Services, probes, and controlled rollout,
-> not in terms of raw cluster internals.
-
----
-
-## 5. Health Probes — Liveness vs Readiness
-
-Without probes, Kubernetes sends traffic to Pods before they finish startup (Spring Boot
-takes 10–30 seconds to load context) and never restarts them when they get stuck.
-
-**Liveness Probe:** "Is this Pod alive, or should K8s restart it?"
-- If it fails, K8s kills the Pod and starts a fresh one.
-- Use case: detect infinite loops, deadlocks, memory leaks that cause the app to hang.
-- Use a **shallow** check (just HTTP 200 from the app itself — no DB or Redis calls).
-
-**Readiness Probe:** "Is this Pod ready to receive traffic?"
-- If it fails, K8s removes the Pod from the Service load balancer — traffic stops.
-- Use case: startup not complete, downstream dependency unavailable, overloaded.
-- Use a **deep** check (DB connection, Redis, required external dependencies).
-
-```yaml
-# Spring Boot Actuator exposes these endpoints automatically
-livenessProbe:
-  httpGet:
-    path: /actuator/health/liveness
-    port: 8080
-  initialDelaySeconds: 30   # Spring Boot startup buffer
-  periodSeconds: 10
-
-readinessProbe:
-  httpGet:
-    path: /actuator/health/readiness
-    port: 8080
-  initialDelaySeconds: 30
-  periodSeconds: 5
-  failureThreshold: 3       # removed from LB after 3 consecutive failures
+```text
+external route -> Service -> ready Pods
+                         ^
+                    Deployment maintains replicas
 ```
 
-**Practical tip:** "We never use the same endpoint for liveness and readiness. A liveness
-failure should restart the Pod. A readiness failure should only take it out of rotation —
-for example during a temporary DB blip, we don't want to restart all Pods, just stop
-sending them traffic until the connection recovers."
+- **Pod:** a deployable unit containing one or more tightly coupled
+  containers. Pods can be replaced; do not use one Pod's IP as a durable
+  application address.
+- **Deployment:** maintains the requested replicas for a stateless workload
+  and can replace them during a rollout.
+- **Service:** stable network abstraction over a changing set of Pods.
+- **Ingress or Gateway:** routes external traffic to Services when the
+  cluster has a suitable controller or implementation.
 
----
+These objects explain why a process can be running but still receive no
+traffic: it may not be ready, may not match the Service selector, or the
+route may be wrong.
 
-## 6. Resource Requests and Limits
+## Probes and Lifecycle
 
-Without these, one misbehaving Pod can starve neighbors of CPU or memory on the same node.
+- **Readiness:** whether an instance should receive traffic now. A failed
+  check removes it from Service endpoints; it does not restart the container.
+- **Liveness:** whether the process is stuck and needs a restart. Keep it
+  focused on a failure a restart can fix.
+- **Startup:** gives a slow-starting application time before other probes
+  begin to act.
 
-- **requests:** Guaranteed minimum. K8s uses this to decide which node to schedule the Pod on.
-- **limits:** Hard ceiling. Exceed memory limit → Pod is OOMKilled. Exceed CPU limit → throttled.
+Do not make liveness depend on a shared database: a brief database outage
+could restart every application instance. Readiness may check dependencies
+needed to serve traffic, but a too-deep check can remove all capacity
+during a temporary shared failure. Match probe design to the application
+and test the failure behavior.
 
-```yaml
-resources:
-  requests:
-    memory: "512Mi"
-    cpu: "250m"      # 250 millicores = 0.25 CPU core
-  limits:
-    memory: "1Gi"
-    cpu: "1000m"     # 1 full CPU core
-```
+On shutdown, stop accepting new work and let in-flight work complete within
+a grace period. Probe success alone does not prove the user journey works;
+watch business signals during rollout.
 
-**Rule:** Always set both. Start with `requests.memory = 512Mi`, `limits.memory = 1Gi` for
-a Spring Boot service. Monitor actual usage with `kubectl top pods` and tune. Limits set
-too low cause OOMKills on normal traffic spikes.
+## Requests, Limits, and Scaling
 
----
+Resource requests help the scheduler place Pods and reserve capacity.
+Limits constrain usage; a low CPU limit can throttle work, and a low memory
+limit can lead to termination. Set values from measurements rather than a
+universal template. See
+[container sizing](../cloud/04-container-sizing.md).
 
-## 7. Horizontal Pod Autoscaler (HPA)
+A Horizontal Pod Autoscaler (HPA) adjusts replica count from configured
+metrics. It cannot instantly handle a spike, and adding replicas can
+overload a shared database or provider. When using CPU utilization, requests
+are part of the calculation. See
+[capacity planning](../sre/05-capacity-planning-and-load-shedding.md).
 
-HPA automatically scales replicas based on a metric — CPU utilization by default, or custom
-metrics (RPS, queue depth).
+## Check a Failing Rollout
 
-```yaml
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-spec:
-  scaleTargetRef:
-    kind: Deployment
-    name: checkout-service
-  minReplicas: 2
-  maxReplicas: 20
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70    # scale up when average CPU > 70%
-```
+1. Did new Pods start and become ready?
+2. Does the Service select the intended Pods?
+3. Are requests, limits, or startup behavior causing restarts?
+4. Do old and new versions work with the current contracts and data?
+5. Did user-facing errors or latency change after traffic shifted?
 
-HPA checks metrics every 15 seconds. Scale-up takes 30–60 seconds (Pod startup +
-readiness probe passing). **You cannot rely on HPA alone for instant traffic spikes.**
+For deployment compatibility, see
+[safe deployments](./02-zero-downtime-deployments.md). For the wider
+platform and infrastructure boundary, see
+[Kubernetes and Terraform](../cloud/02-infrastructure-as-code-and-platform-boundaries.md).
 
-**Flash sale pattern:**
-Pre-scale manually the night before (`kubectl scale deployment checkout --replicas=15`).
-HPA then handles real-time adjustments during the event. The `minReplicas` acts as the
-floor — HPA will never scale below it.
+## Further Reading
 
-**Practical framing:**
-"We define resource requests on every Deployment so the scheduler can place Pods correctly,
-and limits to prevent noisy-neighbor problems. HPA manages auto-scaling on CPU — but for
-predictable spikes like a product launch, we pre-scale manually and rely on readiness probes
-to ensure traffic only reaches Pods that are genuinely ready."
+- [Kubernetes workload concepts](https://kubernetes.io/docs/concepts/workloads/)
+- [Kubernetes probes](https://kubernetes.io/docs/concepts/workloads/pods/probes/)
+- [Kubernetes resource management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)

@@ -1,4 +1,4 @@
-# JIT, Profiling, and Memory Leaks for Backend Engineers
+# JIT, Profiling, and Memory Leaks
 
 Use this note when the JVM is no longer just "the thing that runs Java" and you
 need enough runtime judgment to diagnose real backend problems.
@@ -7,7 +7,7 @@ Why this matters:
 
 - many production issues come from retention, allocation pressure, or hot code paths rather than from syntax mistakes
 - "the heap is high" is not yet a diagnosis
-- a senior backend engineer does not need to become a VM internals specialist, but does need a usable troubleshooting model
+- diagnosing a JVM problem needs a usable runtime model, not VM specialization
 
 ## Smallest Useful Mental Model
 

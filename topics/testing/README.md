@@ -1,48 +1,10 @@
-# Testing for Backend Engineers
+# Testing and Code Review
 
-Use this folder for practical testing strategy, clean code, and review judgment.
-The goal is not to maximize test count.
-The goal is to choose the smallest test surface that gives real confidence for
-the risk you are carrying.
+Use this block to decide what evidence a change needs and whether another engineer can review its risks. Start with the failure you need to catch, then choose the cheapest test that can actually catch it.
 
-Why this folder matters:
+1. [Testing strategy](./01-testing-strategies.md): match business rules, persistence, contracts, user journeys, and load risks to suitable tests.
+2. [Code review](./02-clean-code-and-code-review.md): make state changes, external effects, and failure handling visible.
 
-- many teams confuse more tests with more confidence
-- weak code shape often creates weak tests and noisy reviews
-- testing judgment is usually about risk, boundaries, and side effects, not about one ideology
+For independently deployed API or event boundaries, use [contract testing and API evolution](../api/08-contract-testing-and-api-evolution.md) for the detailed compatibility rules.
 
-Focus:
-
-- test levels by risk
-- real confidence versus mock confidence
-- code shape that is easy to read, change, and test
-
-Working style:
-
-- describe the smallest useful meaning of testing terms before adding taxonomy
-- tie each test choice back to the failure you are trying to catch
-- keep the discussion grounded in backend change risk, not abstract purity
-
-Smallest mental model:
-
-- testing is evidence for risk reduction
-- code review is where you catch weak shape before it becomes production risk
-- code that hides side effects usually produces weaker tests
-
-## Recommended Order
-
-1. [01-testing-strategies.md](./01-testing-strategies.md): how to choose unit, integration, and end-to-end tests by failure risk rather than by habit
-2. [02-clean-code-and-code-review.md](./02-clean-code-and-code-review.md): how code shape affects testability, review quality, and long-term change cost
-
-## Related Reading
-
-- [../api/08-contract-testing-and-api-evolution.md](../api/08-contract-testing-and-api-evolution.md): deeper contract-testing and compatibility guidance when service or event boundaries evolve independently
-
-## Core Rule
-
-- choose the test level by the failure that matters most
-- boundary realism matters more than test count alone
-- clean backend code makes state changes and side effects obvious
-
-That is why this folder treats test strategy and code shape as one discussion:
-code that hides side effects usually produces weaker tests and noisier reviews.
+The shared rule is simple: a readable implementation makes the important behavior easier to test, and a test is useful only when it can fail for a meaningful regression.

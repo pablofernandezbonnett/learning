@@ -1,40 +1,24 @@
 # Java Modern Features Lab
 
-This lab is a small Java `21` companion for the Java refresh path.
+Use this after [modern Java](../../topics/java/03-modern-java-for-backend-engineers.md) and [concurrency in production](../../topics/java/05-concurrency-in-production.md). The task is to use language features where they clarify a real backend rule.
 
-Use it after:
+## Exercise 1: finite payment outcomes
 
-- [../../topics/java/03-modern-java-for-backend-engineers.md](../../topics/java/03-modern-java-for-backend-engineers.md)
-- [../../topics/java/02-java-concurrency-and-jmm.md](../../topics/java/02-java-concurrency-and-jmm.md)
-- [../../topics/java/05-concurrency-in-production.md](../../topics/java/05-concurrency-in-production.md)
+Model `Succeeded(transactionId)`, `Failed(reason)`, and `Pending(nextAction)` as a closed set. Write a function that turns each outcome into an API response. Add a fourth outcome and check whether the compiler points to handling you missed.
 
-It demonstrates:
+**Guide:** a sealed type defines the allowed variants; records carry the data; an exhaustive pattern switch forces a decision for each variant. Keep payment side effects outside the formatting function.
 
-- records
-- sealed types
-- pattern matching
-- virtual threads
-- virtual threads with a request budget mindset
-
-## How To Run
-
-From this folder:
-
-```bash
-mvn compile
-java -cp target/classes modernjava.ModernJavaFeatures
-java -cp target/classes modernjava.VirtualThreadsRequestBudgetLab
+```text
+responseFor(result):
+  Succeeded -> success body
+  Failed    -> mapped error body
+  Pending   -> accepted/pending body
 ```
 
-What to observe:
+## Exercise 2: concurrent downstream calls
 
-- `ModernJavaFeatures` shows the language and runtime features
-- `VirtualThreadsRequestBudgetLab` shows the backend point more clearly:
-  virtual threads make blocking waits cheaper, but request budgets still matter
+A request calls stock, price, and fraud services. Give the whole request a deadline and each dependency a concurrency limit. Compare a small platform-thread pool with virtual threads under blocking waits. Record latency, timeouts, and downstream saturation.
 
-Smallest mental model:
+**Guide:** start the independent calls, wait only until the shared deadline, cancel or abandon unfinished work according to the client contract, and release permits. Virtual threads reduce the cost of waiting; they do not create more downstream capacity or extend the deadline.
 
-- modern Java features help model data and control flow more clearly
-- virtual threads help concurrency shape, not database, network, or timeout reality
-
-Use this lab as a supporting example, not as a full project template.
+Check one slow dependency, a saturated dependency, cancellation, and a response that arrives after the deadline. Avoid treating a synthetic thread count as proof of production capacity.

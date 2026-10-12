@@ -1,452 +1,98 @@
-# System Design Diagrams
+# Worked System Design Diagrams
 
-> Primary fit: `Retail / Ecommerce`
+Each diagram answers one question that is easy to miss in a happy-path
+architecture sketch. Read the [checkout case](./checkout-to-fulfillment-end-to-end.md)
+for the full flow and the [design drills](./system-design-drills.md)
+to practice choosing a mechanism. These diagrams focus on where the final
+decision is made and what happens after a retry or partial failure.
 
-Status:
+## How do two checkout requests avoid creating two orders?
 
-- companion file for the system-design notes in this folder
-- useful for deeper retail and workflow study after the main guide
-- best used as visual support, not as the first entry point
-
-Mermaid diagrams for worked system design exercises.
-Paste any block into a Mermaid renderer (GitHub markdown, Obsidian, draw.io, mermaid.live).
-
-Quick term guide for this companion file:
-
-- `BFF` = `Backend For Frontend`: an edge backend that shapes one response for one client type
-- `TTL` = `time to live`: how long a cache entry or temporary reservation lives before expiry
-- `CDC` = `Change Data Capture`: copying committed database changes into another system
-- `Debezium` = a common tool that reads database change logs and publishes those changes as events
-- `WAL` = `Write-Ahead Log`: the database change log Debezium reads in Postgres
-- `SSE` = `Server-Sent Events`: one-way server-to-browser streaming over HTTP
-- `WMS` = `Warehouse Management System`
-
----
-
-## Diagram Design Rules
-
-These diagrams are a learning aid, not an architecture inventory. Each one
-should answer one question that prose alone makes slower to inspect.
-
-For new diagrams, use this small visual contract:
-
-- put the question in the heading: for example, "what happens when payment capture fails?"
-- show one primary concern per diagram: component boundary, request flow, state transition, or failure recovery
-- label arrows with the action or fact that moves (`reserve stock`, `publish OrderConfirmed`, `release reservation`), not a vague `call`
-- make the durable source of truth and every asynchronous handoff visible when they affect correctness
-- put the failure path beside the happy path or in its own small diagram; do not hide compensation in a generic box
-- omit tools and components that do not change the answer to the question
-
-Strong default: begin with the smallest flow that protects the invariant, then
-add a second diagram only when the retry, state transition, or recovery path
-would otherwise remain unclear.
-
----
-
-## Exercise 1: Global Checkout System
-
-### 1a. Component Architecture
-
-```mermaid
-graph TB
-    subgraph Client
-        WEB[Web Browser]
-        APP[Mobile App]
-    end
-
-    subgraph Edge
-        CDN[CDN / WAF]
-        APIGW[API Gateway<br/>Rate Limit + Auth]
-    end
-
-    subgraph Services
-        CART[Cart Service<br/>Redis]
-        INV[Inventory Service<br/>PostgreSQL]
-        PRICE[Pricing Service<br/>Lua Rules Engine]
-        PAY[Payment Service<br/>Stripe / PayPal]
-        ORDER[Order Service<br/>PostgreSQL]
-        NOTIF[Notification Service<br/>Email / Push]
-    end
-
-    subgraph Messaging
-        MQ[Message Broker<br/>Kafka]
-    end
-
-    subgraph Storage
-        REDIS[(Redis<br/>Sessions + Cache)]
-        PG[(PostgreSQL<br/>Orders + Inventory)]
-        S3[(S3<br/>Receipts + Exports)]
-    end
-
-    WEB --> CDN --> APIGW
-    APP --> CDN
-
-    APIGW --> CART
-    APIGW --> INV
-    APIGW --> PRICE
-    APIGW --> ORDER
-    APIGW --> PAY
-
-    CART --> REDIS
-    INV --> PG
-    ORDER --> PG
-    ORDER --> MQ
-
-    MQ --> NOTIF
-    MQ --> S3
-
-    PRICE -.->|Lua scripts| S3
-```
-
-### 1a-bis. Gateway With Internal gRPC Aggregation
-
-Use this variant when the public edge still speaks normal HTTP, but the gateway or `BFF`
-(`Backend For Frontend`) has to call several internal services owned by the same organisation.
-
-```mermaid
-graph TB
-    subgraph Client
-        WEB[Web Browser]
-        APP[Mobile App]
-    end
-
-    subgraph Edge
-        CDN[CDN / WAF]
-        BFF[API Gateway / BFF<br/>Backend For Frontend<br/>REST or GraphQL outward]
-    end
-
-    subgraph Internal Services
-        ORDER[Order Service]
-        INV[Inventory Service]
-        PRICE[Pricing Service]
-        AUTH[Auth / Policy Service]
-    end
-
-    WEB --> CDN --> BFF
-    APP --> CDN --> BFF
-
-    BFF -->|gRPC unary| ORDER
-    BFF -->|gRPC unary| INV
-    BFF -->|gRPC unary| PRICE
-    BFF -->|gRPC unary| AUTH
-```
-
-Protocol note:
-
-- browser or public app traffic usually stays `REST/JSON` or `GraphQL` at the edge
-- internal gateway-to-service calls can be `gRPC` if you want typed contracts and low-overhead one-to-many backend calls from the gateway to several services
-- do not force `gRPC` if the backend is still one deployable service or if the main consumers are browsers
-
-### 1b. Checkout Flow (Happy Path)
+The application first claims a request identity with a database uniqueness
+constraint. The claim and pending order are committed together. A second
+request with the same key and payload finds the same operation; a different
+payload with that key is rejected.
 
 ```mermaid
 sequenceDiagram
-    actor Customer
-    participant API as API Gateway
-    participant Cart as Cart Service
-    participant Inv as Inventory Service
-    participant Price as Pricing Service
-    participant Pay as Payment Service
-    participant Order as Order Service
-    participant MQ as Kafka
+    actor Buyer
+    participant API as Checkout API
+    participant DB as Order database
+    participant Pay as Payment provider
 
-    Customer->>API: POST /checkout
-    API->>Cart: GET cart contents
-    Cart-->>API: items[]
-
-    API->>Price: calculateTotal(items, customerTier)
-    Note over Price: Lua rules engine<br/>applies discounts
-    Price-->>API: finalAmount
-
-    API->>Inv: reserveStock(items)
-    Note over Inv: Soft hold (TTL: 15 min)
-    Inv-->>API: reservationId
-
-    API->>Pay: authorize(amount, paymentMethod)
-    Pay-->>API: authorizationToken
-
-    API->>Order: createOrder(cart, reservation, auth)
-    Order-->>API: orderId
-
-    API->>Pay: capture(authorizationToken)
-    Pay-->>API: transactionId
-
-    API->>Inv: confirmReservation(reservationId)
-    API->>Order: updateStatus(orderId, PAID)
-
-    Order->>MQ: OrderConfirmed event
-
-    API-->>Customer: 201 Created {orderId}
+    Buyer->>API: confirm cart, key K
+    API->>DB: transaction: unique claim K + create PENDING order O1
+    DB-->>API: committed O1
+    API->>Pay: authorize with stable attempt ID A1
+    Note over API,Pay: Response is lost; provider outcome is unknown
+    API->>DB: keep attempt A1 pending for reconciliation
+    API-->>Buyer: O1 is PENDING
+    Buyer->>API: retry same cart, key K
+    API->>DB: claim K
+    DB-->>API: existing K maps to O1
+    API-->>Buyer: O1 is PENDING
 ```
 
-### 1c. Failure Scenarios
+The key prevents a duplicate *local* order. The provider effect also needs
+a stable attempt ID and a safe retry or lookup path. See
+[transaction-safe idempotency](../databases/01-idempotency-and-transaction-safety.md).
 
-```mermaid
-flowchart TD
-    START([Checkout Request]) --> RESERVE[Reserve Stock]
+## What if event publication succeeds just before a crash?
 
-    RESERVE -->|Success| AUTH[Authorize Payment]
-    RESERVE -->|Fail: out of stock| ERR1[400 Insufficient Stock]
-
-    AUTH -->|Success| CREATE[Create Order]
-    AUTH -->|Fail: declined| REL1[Release Stock Reservation]
-    REL1 --> ERR2[402 Payment Declined]
-
-    CREATE -->|Success| CAPTURE[Capture Payment]
-    CREATE -->|Fail| REL2[Release Reservation + Void Auth]
-    REL2 --> ERR3[500 Order Creation Failed]
-
-    CAPTURE -->|Success| CONFIRM[Confirm Reservation]
-    CAPTURE -->|Fail| COMP[Compensate:<br/>Release Reservation<br/>+ Update Order → FAILED]
-    COMP --> ERR4[500 Payment Capture Failed]
-
-    CONFIRM --> DONE([Order Complete])
-```
-
----
-
-## Exercise 2: Omnichannel Inventory
-
-### 2a. Inventory Architecture
-
-```mermaid
-graph TB
-    subgraph Channels
-        ONLINE[Online Store<br/>next.js]
-        POS[POS Terminal<br/>store associate]
-        APP[Mobile App]
-    end
-
-    subgraph Core
-        INVAPI[Inventory API<br/>Spring Boot]
-        INVDB[(PostgreSQL<br/>Source of Truth)]
-        CACHE[(Redis Cache<br/>Read Replica TTL: 30s)]
-    end
-
-    subgraph Events
-        KAFKA[Kafka<br/>StockUpdated events]
-        SEARCH[Search Index<br/>Elasticsearch]
-        ANAL[Analytics<br/>BigQuery]
-    end
-
-    ONLINE -->|read stock| CACHE
-    APP -->|read stock| CACHE
-    POS -->|sell item| INVAPI
-
-    INVAPI -->|write| INVDB
-    INVDB -->|DB change stream via CDC and Debezium| KAFKA
-    KAFKA -->|update| CACHE
-    KAFKA -->|index| SEARCH
-    KAFKA -->|stream| ANAL
-
-    CACHE -.->|miss fallback| INVDB
-```
-
-### 2b. Stock Reservation State Machine
-
-```mermaid
-stateDiagram-v2
-    [*] --> Available: product created
-
-    Available --> SoftHeld: reserve(qty, TTL=15min)
-    SoftHeld --> Available: TTL expired / released
-    SoftHeld --> Committed: payment captured
-    Committed --> Available: order cancelled (return qty)
-    Committed --> Shipped: fulfillment confirmed
-    Shipped --> Delivered: delivery confirmed
-    Delivered --> Available: return processed (restock)
-    Delivered --> [*]: no return
-
-    note right of SoftHeld
-        Prevents overselling:
-        online stock = physical - soft holds
-    end note
-
-    note right of Committed
-        Hard reservation:
-        stock decremented in DB
-    end note
-```
-
-### 2c. Cache Invalidation Strategy
+An **outbox** stores the event in the same transaction as the order change.
+The relay may publish twice when it cannot record that the first publish
+succeeded. The consumer must recognize the event ID and avoid repeating its
+business effect.
 
 ```mermaid
 sequenceDiagram
-    participant POS as POS Terminal
-    participant API as Inventory API
-    participant DB as PostgreSQL
-    participant CDC as Debezium<br/>DB change stream
-    participant MQ as Kafka
-    participant Cache as Redis Cache
-    participant Web as Web Store
+    participant App as Order use case
+    participant DB as Order database
+    participant Relay as Outbox relay
+    participant Broker as Message broker
+    participant Worker as Fulfillment worker
 
-    POS->>API: POST /inventory/{sku}/sell {qty: 1}
-    API->>DB: UPDATE stock SET qty = qty - 1 WHERE sku = ?
-    DB-->>API: OK
-    API-->>POS: 200 OK
-
-    DB->>CDC: committed database change from WAL
-    CDC->>MQ: StockUpdated {sku, newQty, storeId}
-    MQ->>Cache: INVALIDATE stock:{sku}
-    Note over Cache: Next read will miss → fallback to DB
-
-    Web->>Cache: GET stock:J001
-    Cache-->>Web: MISS
-    Web->>DB: SELECT qty FROM inventory WHERE sku = 'J001'
-    DB-->>Web: {qty: 249}
-    Web->>Cache: SET stock:J001 249 EX 30
-    Cache-->>Web: OK
+    App->>DB: transaction: confirm O1 + outbox event E1
+    DB-->>App: committed
+    Relay->>DB: read unpublished E1
+    Relay->>Broker: publish E1
+    Broker-->>Relay: acknowledged
+    Broker->>Worker: deliver E1
+    Worker->>Worker: claim E1 atomically with local work record
+    Note over Relay: Crashes before marking E1 published
+    Relay->>DB: restart; read unpublished E1
+    Relay->>Broker: publish E1 again
+    Broker->>Worker: deliver E1
+    Worker->>Worker: E1 already applied; no second work record
 ```
 
-### 2d. Interface Fit Note
+The outbox protects local commit to publication; the worker still needs its
+own duplicate handling. Calling an external warehouse adds another retry and
+reconciliation boundary. See [workflow recovery](../architecture/03-distributed-transactions-and-events.md).
 
-Use this pattern when:
+## Why can “one left” lead to an unavailable result?
 
-- public and gateway-facing traffic should stay `HTTP/REST`
-- the current backend is still one main deployable unit
-- `gRPC` would only become interesting if the backend later splits into several
-  internal services and the gateway or `BFF` has to call several of them for
-  one frontend request
-
-Practical implementation direction if that split ever happens:
-
-- keep `REST` at the public edge
-- add `gRPC` only for internal service-to-service contracts
-- let the gateway or BFF aggregate `gRPC` calls and return one HTTP response to
-  the frontend
-
----
-
-## Exercise 3: Order Lifecycle
-
-### 3a. Order State Machine
-
-```mermaid
-stateDiagram-v2
-    [*] --> Created: checkout submitted
-
-    Created --> Confirmed: payment authorized
-    Created --> Cancelled: user cancels / timeout
-
-    Confirmed --> PaymentCaptured: payment captured
-    Confirmed --> Cancelled: payment capture fails
-
-    PaymentCaptured --> PickingStarted: warehouse system (`WMS`) picks up order
-    PaymentCaptured --> Cancelled: fraud review fails
-
-    PickingStarted --> Packed: items packed
-    Packed --> Shipped: carrier picks up
-
-    Shipped --> Delivered: delivery confirmed
-    Shipped --> Lost: carrier reports lost
-
-    Delivered --> ReturnRequested: customer requests return
-    Delivered --> [*]: 30-day return window closed
-
-    ReturnRequested --> Returned: return received
-    Returned --> Refunded: payment refunded
-    Refunded --> [*]
-
-    Lost --> Refunded: investigation complete
-    Cancelled --> [*]
-```
-
-### 3b. Order Service Architecture
-
-```mermaid
-graph LR
-    subgraph Commands
-        API[Order API<br/>POST /orders]
-    end
-
-    subgraph Domain
-        ORDER_SVC[Order Service<br/>state machine]
-        SAGA[Saga Orchestrator<br/>compensating txns]
-    end
-
-    subgraph Storage
-        PG[(PostgreSQL<br/>orders + events)]
-        OUTBOX[(Outbox Table<br/>transactional publish)]
-    end
-
-    subgraph Events
-        KAFKA[Kafka]
-        INV_SVC[Inventory Service]
-        PAY_SVC[Payment Service]
-        SHIP_SVC[Fulfillment Service]
-        NOTIF[Notification Service]
-    end
-
-    API --> ORDER_SVC
-    ORDER_SVC --> PG
-    ORDER_SVC --> OUTBOX
-
-    OUTBOX -->|Outbox Pattern| KAFKA
-
-    KAFKA --> INV_SVC
-    KAFKA --> PAY_SVC
-    KAFKA --> SHIP_SVC
-    KAFKA --> NOTIF
-
-    INV_SVC -->|StockReleased| KAFKA
-    PAY_SVC -->|PaymentRefunded| KAFKA
-```
-
-### 3c. Idempotency Pattern (Prevent Double Processing)
+A browse projection may be stale. Only a guarded write at the inventory owner
+can reserve the final unit; the product page cannot make that promise.
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant API as Order API
-    participant DB as PostgreSQL
-    participant PAY as Payment Service
+    actor BuyerA as Buyer A
+    actor BuyerB as Buyer B
+    participant Read as Browse projection
+    participant Stock as Inventory owner
 
-    Note over Client,API: Client generates idempotency key before request
-
-    Client->>API: POST /checkout<br/>X-Idempotency-Key: uuid-abc123
-    API->>DB: SELECT * FROM idempotency_keys WHERE key = 'uuid-abc123'
-    DB-->>API: NOT FOUND
-
-    API->>DB: INSERT idempotency_keys (key, status=PROCESSING)
-    API->>PAY: charge(amount)
-    PAY-->>API: txnId-xyz
-
-    API->>DB: UPDATE idempotency_keys SET status=DONE, response={orderId}
-    API-->>Client: 201 Created {orderId: O-001}
-
-    Note over Client,API: Network drops — client retries with SAME key
-
-    Client->>API: POST /checkout<br/>X-Idempotency-Key: uuid-abc123
-    API->>DB: SELECT * FROM idempotency_keys WHERE key = 'uuid-abc123'
-    DB-->>API: {status: DONE, response: {orderId: O-001}}
-    API-->>Client: 201 Created {orderId: O-001}
-    Note over API: Returns cached response — NO duplicate charge
+    BuyerA->>Read: view SKU
+    Read-->>BuyerA: one unit appears available
+    BuyerB->>Read: view SKU
+    Read-->>BuyerB: one unit appears available
+    BuyerA->>Stock: reserve SKU, operation A
+    Stock->>Stock: guarded write; one unit remains
+    Stock-->>BuyerA: reservation A accepted
+    BuyerB->>Stock: reserve SKU, operation B
+    Stock->>Stock: guarded write; no sellable unit remains
+    Stock-->>BuyerB: unavailable
 ```
 
----
-
-## Quick Reference: The Four Questions
-
-Every system design answer must address:
-
-```mermaid
-mindmap
-  root((System Design))
-    What fails first?
-      Single points of failure
-      DB connections exhausted
-      External API timeouts
-    What scales first?
-      Read traffic → cache + read replicas
-      Write traffic → sharding or CQRS
-      Message processing → Kafka partitions
-    What must never be cached?
-      Current stock during checkout
-      Payment status
-      Security tokens
-    Where is the source of truth?
-      Orders → PostgreSQL
-      Stock → PostgreSQL + Redis read cache
-      Prices → Config / Lua scripts in S3
-      Sessions → Redis
-```
+The design must tell Buyer B the truth and later refresh the browse view.
+See [inventory and fulfillment](../architecture/15-retail-inventory-and-fulfillment-systems.md).

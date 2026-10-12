@@ -1,207 +1,71 @@
-# Retail Inventory, Fulfillment, and Logistics Systems
-
-Use this note when you want the retail version of backend and system-design
-judgment, not only generic ecommerce vocabulary.
-
----
-
-## Why This Matters
-
-Retail systems are where many backend assumptions become more concrete:
-
-- stock is physical
-- fulfillment is slow and expensive
-- checkout correctness has a real warehouse consequence
-- returns and pickup flows create awkward cross-system state changes
-
-This matters because a retail backend is not only "website plus orders."
-It is a coordination system across inventory truth, payment state, routing, and
-physical execution.
-
----
-
-## Smallest Useful Mental Model
-
-Treat retail architecture as three connected problems:
-
-- what inventory truth you trust
-- how the order moves from checkout to fulfillment
-- how much delay or inconsistency each customer-facing flow can tolerate
-
-Practical translation:
-
-- browse can often tolerate stale stock for a short time
-- final stock commit cannot
-- warehouse and store operations usually force asynchronous processing later
-
----
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- retail is just normal ecommerce plus a warehouse integration
-- if the product page says "in stock," the hard problem is solved
-- fulfillment is only an after-checkout implementation detail
-
-Better mental model:
-
-- retail is a correctness and coordination problem across physical and digital state
-- inventory visibility and final stock commitment are different problems
-- fulfillment location, batching, and returns shape the backend design from the start
-
-Small concrete example:
-
-- weak approach: treat Redis stock count as final truth for the whole system
-- better approach: use fast cache or projections for browse, but keep final stock truth in the protected transactional write path
-
----
-
-## 1. Omnichannel Means Shared Flow, Not Shared UI
-
-`Omnichannel` means the customer journey is treated as one connected system across:
-
-- ecommerce site
-- mobile app
-- physical stores
-- warehouses
-- returns, pickup, and fulfillment flows
-
-In practice, it means the backend should support flows like:
-
-- buy online, pick up in store
-- ship from store
-- return store-bought and online-bought items through a consistent process
-- keep stock, order, and customer state coherent across channels
-
-Short rule:
-
-> omnichannel usually means the same business truth must survive several operational paths, not just several frontends
-
----
-
-## 2. Inventory Is A Truth Problem
-
-The most important question is not only:
-
-- how many units exist physically
-
-It is:
-
-- how many units are truly available for sale right now
-
-Useful split:
-
-- `physical`: what exists on shelf or in warehouse
-- `allocated`: what is reserved for carts, paid orders, or in-flight operational work
-- `available for sale`: `physical - allocated`
-
-### Strong vs Eventual Consistency
-
-- stronger consistency belongs on the final checkout and stock-commit path
-- eventual consistency is often acceptable for browse, search, or product-listing views
-
-Real tradeoff:
-
-- if you force the final stock rule onto every browse request, you usually hurt scale and latency badly
-
----
-
-## 3. OMS and WMS Have Different Jobs
-
-`OMS` means `Order Management System`.
-It decides how the order moves through business state.
-
-`WMS` means `Warehouse Management System`.
-It coordinates physical warehouse execution such as pick, pack, and dispatch.
-
-Smallest practical flow:
-
-1. order is placed
-2. payment is authorized or confirmed
-3. stock is reserved or committed
-4. the `OMS` decides where fulfillment should happen
-5. the `WMS` or store operations receive the work
-
-Why this matters:
-
-- the `OMS` owns business orchestration
-- the `WMS` owns physical execution
-- mixing those responsibilities carelessly makes change harder and recovery messier
-
----
-
-## 4. Fulfillment Logic Is A Routing Problem
-
-Typical choices:
-
-- ship from warehouse
-- ship from store
-- customer pickup
-
-The real design question is:
-
-- where should this order be fulfilled from, given stock, distance, cost, and operational constraints
-
-That routing decision affects:
-
-- inventory reservation shape
-- failure handling
-- later customer updates
-
-Short rule:
-
-> fulfillment routing is not a small afterthought; it is one of the business decisions the backend must protect clearly
-
----
-
-## 5. Warehouse Work Is Usually Async
-
-Warehouse and logistics work is slow compared with API response time.
-
-That means:
-
-- pick and pack commands should usually be asynchronous
-- batching may be the right operational choice
-- retries and replay safety matter because physical work is expensive
-
-Examples:
-
-- waiting for several picks in one aisle to improve robot path efficiency
-- retrying a pick request safely without duplicating warehouse work
-
-Good default:
-
-- use async messaging or commands for warehouse execution
-- keep user-facing checkout separate from long-running physical operations
-
----
-
-## 6. Flash Sales Expose The Real Limits
-
-During large sales events, the system is really tested on:
-
-- critical write-path protection
-- admission control
-- inventory hotspot handling
-- graceful degradation
-
-Common strategies:
-
-- queueing or waiting-room control to smooth checkout load
-- hot-counter coordination to reduce pressure on the relational write path
-- read scaling for browse and stock visibility
-
-Bad example:
-
-- letting all traffic hit the final stock write path at once and hoping horizontal app replicas solve it
-
-Better example:
-
-- controlling admission, protecting the critical write path, and scaling browse separately from final stock commitment
-
----
-
-## Reusable Takeaway
-
-> Retail backends work best when browse, checkout, fulfillment, and returns are treated as one coordination system, with explicit inventory truth, asynchronous warehouse execution, and protected final stock and order state.
+# Inventory and Fulfillment: Separate Promise From Physical Work
+
+Retail is a useful system-design example because a digital promise must match
+physical stock and work. The central rule is: do not promise the same limited
+unit to two orders. Apply the [general design method](../system-design/00-general-system-design-method.md)
+first; this note focuses on the decisions that physical inventory adds.
+
+## Identify Each Source of Truth
+
+Ask who owns these facts before designing APIs or queues:
+
+| Fact | Typical owner | Why it matters |
+| --- | --- | --- |
+| Physical count or movement | Warehouse or store operation | Receipts, picks, damage, and recounts change reality. |
+| Sellable availability | Inventory capability | It combines stock, reservations, buffers, and policy. |
+| Customer order state | Order capability | It records what was promised and what remains pending. |
+| Pick, pack, and dispatch state | Fulfillment operation | Physical work may finish long after checkout. |
+
+The exact owners vary. If two systems can change the same sellable quantity
+without coordination, a cache or extra application replicas will not make the
+promise reliable.
+
+Availability is a policy-derived number, not simply the count on a shelf. A
+system might subtract active reservations and a safety buffer from eligible
+stock. Returns, damaged units, store pickup, and stock in transit may each
+have different eligibility rules. Make those rules explicit.
+
+## Separate Visibility From Commitment
+
+A product page can show a recent availability projection. Its job is to help
+customers browse; it may be stale. The final reservation or stock commitment
+must check the current sellable state with a guarded write in the inventory
+owner. Define what the buyer sees when that check fails.
+
+For example, two customers may both see “one left.” Only one reservation can
+succeed. The other receives a clear unavailable result instead of an order
+that silently cannot be fulfilled. A reservation needs an ID, a lifetime or
+release rule, and a safe retry path. Expired or cancelled reservations must be
+released without releasing stock already committed to another order.
+
+## Route and Track Physical Work
+
+After checkout accepts an order, choose a fulfillment location from eligible
+stock, delivery promise, cost, and operating capacity. Send the work to a
+warehouse or store and track acceptance, picking, dispatch, and exceptions.
+The order owner records the customer-facing promise; the fulfillment owner
+records the physical progress.
+
+A timeout does not prove that a pick request failed. Use a stable work ID,
+query or reconcile an unknown result, and make repeated commands safe. The
+[checkout case study](../system-design/checkout-to-fulfillment-end-to-end.md)
+covers the wider payment and order flow; the [cross-service workflow guide](./03-distributed-transactions-and-events.md)
+covers recovery mechanics.
+
+## Design for Physical Exceptions
+
+A warehouse may report a missing unit after an order was confirmed. Decide
+whether to reroute, backorder, substitute, cancel, or ask the customer. The
+order must show that exception; retries should not create a second pick.
+Returns add another state transition: a received item is not necessarily
+sellable until inspection or another policy check.
+
+During a flash sale, browse traffic and reservation writes have different
+limits. Scale read projections independently, control admission to the scarce
+write path, and measure reservation contention, stale availability, pending
+orders, and fulfillment backlog. The goal is to protect the stock promise
+under load, not merely return fast product pages.
+
+**Reusable lesson:** Whenever a system promises a scarce or slow-to-deliver
+resource, separate discovery from commitment, name the final decision owner,
+and model the work that can fail after the promise is made.

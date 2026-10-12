@@ -1,138 +1,60 @@
-# Consistent Hashing
+# Distributing Keys When Nodes Change
 
-## The Problem: Naive Modulo Sharding Breaks on Resize
+When a cache or storage system has several nodes, it needs a rule that maps
+each key to an owner. A good rule balances work and limits how many keys move
+when nodes join or leave. Moving too many keys at once can cause misses,
+network transfer, and extra load on the source of truth.
 
-Imagine you have 3 cache nodes and use the formula `node = hash(key) % 3` to decide where to store data.
+## Why Simple Modulo Is Awkward
 
-- `hash("product:123") % 3 = 1` → Node 1
-- `hash("cart:abc")    % 3 = 2` → Node 2
+With `hash(key) % nodeCount`, changing `nodeCount` changes the calculation
+for many keys. Adding one node can therefore remap far more data than the
+new node needs. This is a distribution problem, separate from cache TTL or
+invalidation.
 
-This works until you add a 4th node. Now `% 4` produces completely different results. Effectively **every key maps to a new node** — your entire cache becomes invalid simultaneously. For a retail platform with millions of sessions and product caches, this means a thundering herd of cache misses hitting the database all at once.
+## The Consistent-Hashing Ring
 
-**Consistent hashing solves this.** When you add or remove a node, only the keys that were assigned to that specific node need to be remapped.
+Place node positions and key positions on a logical ring. Assign each key to
+the next node clockwise. When a node joins, it takes a section of keys from
+its successor; other sections keep their owners. When a node leaves, its
+keys move to its successor. The exact amount moved depends on node placement
+and capacity; it is not a fixed promise for every resize.
 
----
+One physical node can hold several **virtual nodes** (positions) on the
+ring. This spreads ownership more evenly and lets a larger node take more
+positions. It does not solve a single hot key: one key can still receive far
+more requests than its neighbors.
 
-## How It Works
+Consistent hashing chooses placement. It does not provide replication,
+failover, consistency, or a migration protocol by itself. Those need separate
+design and operational checks.
 
-### The Hash Ring
+## Do Not Confuse It With Redis Cluster
 
-Imagine a circle (ring) from 0 to 2³² − 1. Both nodes and keys are hashed to a position on this ring.
+Redis Cluster uses **16,384 hash slots**, not the classic consistent-hashing
+ring. A key maps to a slot, and nodes own sets of slots. During a resize,
+the cluster moves selected slots between nodes. Both approaches let an
+operator move part of the keyspace, but their placement and migration rules
+are different.
 
-```
-                    0 / 2^32
-                      *
-             *                 *
-     Node A (12%)         Node C (58%)
-                   ring
-             *                 *
-          Node B (35%)       (empty)
-                      *
-```
+If several Redis keys must participate in one supported multi-key operation,
+check whether they need the same slot. Do not group unrelated hot keys under
+one hash tag merely to make them colocate: that can create a hotspot.
 
-**Lookup rule:** To find which node owns a key, hash the key to a ring position, then walk **clockwise** until you hit a node. That node owns the key.
+## Decide Whether You Need to Own Placement
 
-### Adding a Node
+Before implementing a ring, ask:
 
-When you add Node D at position 45%:
-- Only the keys between 35% (Node B) and 45% (Node D) move from Node C to Node D.
-- All other keys are unaffected.
-- **Fraction of keys remapped = 1 / (n+1)** on average.
+- Does the chosen datastore or cache already manage key placement and
+  migration? Use its model rather than layering a second one blindly.
+- How will clients learn the current owners during a change?
+- What happens to reads and writes while keys move?
+- How are replicas and failures handled separately from placement?
+- Will a few hot keys dominate traffic despite an even key count?
 
-### Removing a Node
+For cache freshness and miss behavior, see [cache strategy](./07-caching-strategies.md).
 
-When Node B fails:
-- Only the keys owned by Node B move to the next clockwise node (Node D or Node C).
-- All other keys stay put.
+## Further Reading
 
----
-
-## Virtual Nodes (vnodes) — The Critical Detail
-
-Plain consistent hashing has a problem: with 3 nodes, each node gets roughly 33% of the ring, but hash functions are not perfectly uniform. One node might get 50%, another 15% — **hotspot**.
-
-**Virtual nodes** fix this. Instead of placing each physical node once on the ring, you place it **many times** (e.g., 150 virtual positions per node). The virtual nodes are distributed across the ring, so the load is statistically even.
-
-```
-Ring positions (example with 3 nodes, 3 vnodes each):
-A1  B2  C1  A2  C3  B1  A3  C2  B3
-```
-
-- Node A owns keys that land between B3→A1, A2→C3 (non-contiguous but balanced).
-- When Node B is removed, its load is spread across A and C proportionally — not all dumped onto one node.
-
-**Interview answer:** "We use virtual nodes to ensure even load distribution even when nodes have different capacities. A larger node gets more virtual nodes."
-
----
-
-## Where It's Used in Practice
-
-### Redis Cluster
-
-Redis Cluster divides the key space into **16,384 hash slots** (not a continuous ring, but the same principle). Each master node owns a range of slots. `CLUSTER KEYSLOT mykey` tells you which slot a key maps to.
-
-When you add a Redis node, it imports a subset of hash slots from existing nodes — only those keys migrate. Sessions, carts, rate-limit counters: only the affected keys move.
-
-```
-Node A: slots 0–5460
-Node B: slots 5461–10922
-Node C: slots 10923–16383
-
-Add Node D → redistribute some slots from A, B, C to D
-```
-
-**Multi-key operations** (MGET, pipeline) require all keys to be in the same slot. Force this with hash tags: `{user:123}:cart` and `{user:123}:session` both hash on `user:123` → same slot.
-
-### Cassandra
-
-Cassandra uses consistent hashing on the partition key of each row. Each node owns a token range on the ring. The replication factor (e.g., RF=3) means each partition is stored on 3 consecutive nodes clockwise.
-
-```kotlin
-// In a Cassandra table:
-// PRIMARY KEY (store_id, product_sku)
-// store_id is the partition key → hashed to a ring position
-// product_sku is the clustering key → sorted within the partition
-```
-
-### Load Balancers (Sticky Sessions)
-
-L7 load balancers (HAProxy, Nginx, AWS ALB) can use consistent hashing on a session cookie or user ID to route requests to the same backend node. This is important for:
-- In-memory session stores (if you're not using external Redis)
-- Websocket connections that must stay on the same instance
-- Stateful streaming processes
-
----
-
-## Practical Scenario
-
-**Question:** "How would you design the caching layer for a very large product catalog, with zero downtime during cache node scaling?"
-
-**Answer using consistent hashing:**
-
-> We'd use Redis Cluster with consistent hashing across, say, 6 master nodes with RF=1 (plus 6 replicas). Product data is partitioned by SKU using hash tags grouped by category: `{outerwear}:product:UT-WHITE-M`, so related products hash to the same slot enabling multi-key pipeline reads.
->
-> When we need to add capacity (say, before a major sale campaign), we add 2 new nodes. Redis Cluster migrates only the ~25% of hash slots assigned to the new nodes — no full cache invalidation. During migration, reads are served from the old nodes for unmigrated slots and from new nodes for migrated ones. No downtime.
->
-> For hot SKUs during a major launch, we'd use a local in-process cache (Caffeine) as L1 with a 1-second TTL to absorb the spike, falling back to Redis Cluster as L2.
-
----
-
-## Quick Reference
-
-| Aspect | Value |
-|---|---|
-| Keys remapped on resize | 1/n on average (vs 100% with modulo) |
-| Virtual nodes purpose | Even load distribution |
-| Redis Cluster hash slots | 16,384 |
-| Multi-key operation trick | Hash tags `{prefix}:key` |
-| Cassandra equivalent | Token ranges, partition key hashing |
-| Load balancer use case | Sticky sessions by user/session ID |
-
----
-
-## Common Interview Mistakes
-
-- Saying "we use modulo hashing" for distributed caches — always say "consistent hashing" or "Redis Cluster"
-- Forgetting virtual nodes — plain ring is almost never used in production
-- Not mentioning what happens during a node failure (keys owned by failed node → next clockwise node; replicas promote)
-- Confusing hash slots (Redis Cluster) with the continuous ring (Cassandra) — both are consistent hashing, different implementations
+- [Original consistent-hashing paper](https://doi.org/10.1145/258533.258660).
+- [Redis Cluster scaling model](https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/).

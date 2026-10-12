@@ -1,4 +1,4 @@
-# Kotlin Coroutines for Backend Engineers
+# Kotlin Coroutines in Services
 
 Use this note when you want the backend version of coroutines, not the Android
 or UI-first explanation.
@@ -264,30 +264,9 @@ Short rule:
 
 ## 8. Coroutines vs Virtual Threads
 
-This comparison is worth keeping clean:
-
-- coroutines are a language-level async model with structured concurrency and explicit suspension
-- virtual threads are a JVM runtime model that makes blocking code cheaper to run
-
-Prefer coroutines when:
-
-- the service is Kotlin-heavy
-- the libraries and team already support coroutine-style orchestration
-- structured cancellation and async composition matter a lot
-
-Prefer virtual threads when:
-
-- the stack is still mostly blocking
-- the codebase is Java-heavy or Spring MVC / JDBC heavy
-- you want a lower-migration-cost concurrency improvement on Java 21+
-
-Do not explain them as:
-
-- "the same thing in different syntax"
-
-Reusable takeaway:
-
-> coroutines are strongest when I want clear async composition and structured cancellation in a Kotlin stack. Virtual threads are strongest when I want blocking-style JVM code to scale better without a larger async rewrite.
+This note owns Kotlin's suspension, cancellation, and blocking boundaries.
+For when coroutines, virtual threads, or another task model fit a workload,
+see [concurrency models](../architecture/08-concurrency-models-comparison.md).
 
 ---
 
@@ -307,6 +286,6 @@ already useful for backend work.
 
 - Kotlin coroutines guide: https://kotlinlang.org/docs/coroutines-guide.html
 - Coroutine context and dispatchers: https://kotlinlang.org/docs/coroutine-context-and-dispatchers.html
-- [../../labs/kotlin-basics/06-backend-coroutine-boundaries.kt](../../labs/kotlin-basics/06-backend-coroutine-boundaries.kt)
+- [Kotlin basics lab](../../labs/kotlin-basics/README.md)
 - [../spring-boot/15-kotlin-spring-idioms.md](../spring-boot/15-kotlin-spring-idioms.md)
 - [../architecture/08-concurrency-models-comparison.md](../architecture/08-concurrency-models-comparison.md)

@@ -1,39 +1,13 @@
 # Labs
 
-This folder is for runnable companion material that supports the notes in
-`topics/`.
+These are practice prompts, not finished applications. Read the related topic, try the task yourself, then compare your reasoning with the short guide. Each guide gives a mental model or pseudocode and the cases worth checking; it leaves the implementation to you.
 
-These labs are not meant to become large sample applications.
-They exist to make the ideas in the docs concrete, especially when a concept is
-easier to understand by running it than by reading one more paragraph about it.
+- [Algorithm and backend coding drills](./algorithms-live-coding/README.md): selected coding and backend cases.
+- [Java modern features](./java-modern-features/README.md): finite outcomes and request budgets.
+- [Kotlin basics](./kotlin-basics/README.md): language and coroutine exercises.
+- [Kotlin backend boundaries](./kotlin-backend-examples/README.md): correctness, messaging, caching, and integration.
+- [Spring Boot service slice](./spring-boot-sample/README.md): a small request flow with clear framework boundaries.
+- [SQL query review](./sql-query-review/README.md): plans, indexes, and pagination.
+- [System design exercises](./system-design-exercises/README.md): requirements to a defensible design.
 
-Why this folder matters:
-
-- some topics only really stick once you see runtime behavior
-- small labs are better for reopen and repetition than one giant demo app
-- the goal is reinforcement, not framework tourism
-
-The preferred shape is:
-
-- small enough to understand in one sitting
-- easy to run locally without heavy setup
-- focused on one concept or one business flow at a time
-- useful as a learning aid, not just a dump of example code
-- Java-first for general JVM backend comparisons, with Kotlin added when contrast helps or when the lab is intentionally Kotlin-specific
-
-Smallest mental model:
-
-- read the topic note first
-- run the lab second
-- use the lab to verify one specific mental model, not to explore everything at once
-
-Current labs include:
-
-- Java modern language and runtime examples
-- Kotlin basics
-- Spring Boot sample code
-- SQL query review with PostgreSQL plans and index changes
-- algorithm practice companions in Java and Kotlin
-- Kotlin backend examples for correctness, async boundaries, Kafka-style delivery, caching, and JVM behavior
-- [interactive system-design exercises](./system-design-exercises/README.md)
-  that preserve the initial model, decisions, failures, and refined design
+For each lab, state the invariant, try the normal and failure paths, and explain the tradeoff before reading the guide.

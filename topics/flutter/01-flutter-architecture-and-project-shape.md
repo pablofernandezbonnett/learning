@@ -1,282 +1,52 @@
-# Flutter Architecture and Project Shape
+# Flutter Architecture and State Ownership
 
-Flutter architecture gets messy for the same reason backend architecture gets
-messy:
+Start with the flow a user needs, then decide who owns each state change and external call. A state-management package can carry that design, but choosing the package does not define the design.
 
-- boundaries are unclear
-- state leaks
-- one layer starts doing everyone else's job
+## A small feature split
 
-This note keeps the first practical decisions visible.
+| Part | Owns | Keep out |
+| --- | --- | --- |
+| View or widget | Rendering, input, local visual state | HTTP, raw JSON, token refresh, business decisions |
+| Feature state/controller | Loading, success, error, and actions for one flow | Transport details and platform plugin calls |
+| Repository | Data the feature uses, mapping and freshness rules | Widget navigation |
+| Service/client | HTTP, storage, or plugin interaction | Screen-specific display decisions |
 
----
+For example, a checkout page shows the current state and sends `placeOrder` to its feature controller. The controller prevents duplicate taps and records the pending or final outcome. A repository calls the API and maps its response. The backend remains the source of truth for whether the order was accepted.
 
-## Why This Matters
+## Put state near its owner
 
-A Flutter codebase gets painful when:
+- Widget-local: a selected tab, focus, or an animation.
+- Feature-local: checkout progress, order history, or a retryable fetch.
+- Shared: session and other facts several features truly need.
 
-- UI widgets call HTTP directly everywhere
-- one giant state class grows across the whole app
-- navigation, state, and business rules blur together
-- backend contract changes ripple through random UI files
+Move state upward only when another feature needs the same fact. A single global object for every screen makes change impact hard to see.
 
-This matters because the real goal is not "use the modern package".
-It is to keep app behavior understandable while screens, APIs, and flows change.
-
----
-
-## Smallest Useful Mental Model
-
-Use this split:
-
-- **presentation**: widgets, routes, loading, error, and user interaction
-- **application / feature logic**: use cases and state changes for a feature flow
-- **data / integration**: API calls, local storage, and mapping
-
-Short rule:
-
-> Keep UI concerns near widgets, keep contract and state transitions in feature logic, and keep transport details at the edge.
-
----
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- Flutter architecture means choosing one state package first
-- every screen can fetch its own data however it wants
-- project structure is just personal style
-
-Better mental model:
-
-- architecture is mainly about making feature boundaries, state ownership, and contracts visible
-- state management is a tool, not the architecture itself
-- the project shape should make change impact predictable
-
-Small concrete example:
-
-- weak approach: `CheckoutPage` calls HTTP, parses JSON, stores token state, and
-  decides retry behavior
-- better approach: `CheckoutPage` renders state, a feature controller or
-  notifier owns checkout behavior, and a repository or client handles transport
-
----
-
-## 1. Package By Feature Is Usually The Stronger Default
-
-Weak shape:
-
-```text
-screens/
-widgets/
-services/
-models/
-```
-
-This often becomes:
-
-- all screens know too much
-- all services become giant shared buckets
-- feature ownership stays blurry
-
-Stronger shape:
+Group code by feature when it helps people find one flow together. Add shared `core` code only for a genuinely shared contract or service:
 
 ```text
 lib/
   features/
     checkout/
-      presentation/
-      application/
-      data/
-    account/
-      presentation/
-      application/
-      data/
+      checkout_page.dart
+      checkout_controller.dart
+      checkout_repository.dart
   core/
-    networking/
-    auth/
-    design_system/
+    api_client.dart
 ```
 
-Why this is stronger:
+The exact folders are less important than the dependency direction: widgets use feature behavior; feature behavior uses data boundaries; transport and platform details stay at the edge.
 
-- feature boundaries stay visible
-- backend-facing contracts are easier to track
-- mobile and backend engineers can reason about one feature at a time
+## Decide what the UI model needs
 
----
+An API response may contain more fields than one screen needs. Map it near the data boundary to a typed model the feature can use. Keep raw maps and transport errors out of widgets. See [Dart data boundaries](../dart/03-tooling-json-and-boundaries.md) for parsing details.
 
-## 2. What State Should Live Where
+Before adding a new layer, ask what change it isolates. If it only forwards one call and has no rule, it may add ceremony. If it owns mapping, caching, retry, or a business decision, make that responsibility explicit.
 
-### Widget-local state
+## Review check
 
-Use for:
+- Who owns the user's action and its result?
+- Which state is local, feature-wide, or truly shared?
+- Can the feature be tested with a fake data boundary?
+- Would an API field change affect one adapter or many widgets?
 
-- animation toggles
-- selected tab
-- temporary form visibility
-
-Good fit:
-
-- state that matters only to one small UI area
-
-### Feature state
-
-Use for:
-
-- loading order history
-- applying a coupon
-- confirming checkout
-- retrying a failed fetch
-
-Good fit:
-
-- state that belongs to one user-facing flow
-
-### App-wide state
-
-Use for:
-
-- auth session
-- theme or locale
-- top-level feature flags
-
-Good fit:
-
-- state that several features really need
-
-Short rule:
-
-> Make state as local as you can, and as shared as you must.
-
----
-
-## 3. State Management Choice: What Actually Matters
-
-The repo does not need one ideology here.
-
-What matters more than the package name:
-
-- where state is owned
-- how side effects are triggered
-- whether loading and error states are explicit
-- whether tests can drive the state without pumping the whole app
-
-Bad sign:
-
-- state tool chosen first
-- architecture explained second
-
-Better sign:
-
-- feature boundary clear first
-- state tool chosen to fit that boundary
-
----
-
-## 4. Repositories And Clients
-
-A Flutter feature should usually not know:
-
-- HTTP details
-- token header assembly
-- raw JSON shapes
-
-That belongs closer to repositories or API clients.
-
-Why:
-
-- contract changes stay more localized
-- tests can focus on feature behavior
-- UI logic stops depending on transport trivia
-
----
-
-## 5. DTOs vs Domain-ish Models In Flutter
-
-You do not need rich DDD everywhere in Flutter.
-But you do need to avoid leaking raw transport shapes through the whole app.
-
-Useful split:
-
-- DTO or response model: what the API returned
-- feature model: what the screen or flow really needs
-
-Example:
-
-- API returns ten fields for an order
-- order card screen only needs id, total, status, and ETA
-
-That screen should not depend on every backend field by accident.
-
----
-
-## 6. Concrete Example
-
-Imagine a checkout feature.
-
-Good practical shape:
-
-```text
-features/checkout/
-  presentation/
-    checkout_page.dart
-    checkout_state.dart
-    checkout_notifier.dart
-  application/
-    place_order.dart
-  data/
-    checkout_repository.dart
-    checkout_api_client.dart
-    checkout_dto.dart
-```
-
-What each part owns:
-
-- page: rendering and user interaction
-- notifier/controller: feature state transitions
-- use case: checkout action intent
-- repository/client: transport and mapping
-
----
-
-## 7. Strong Default
-
-For most product apps:
-
-- package by feature
-- keep state feature-local unless it is genuinely global
-- keep API transport details out of widgets
-- model loading, success, and failure states explicitly
-
-That default is usually stronger than:
-
-- one giant shared services folder
-- UI-driven networking everywhere
-
----
-
-## 8. Big Traps
-
-1. **Package by layer only**
-   Example: feature boundaries disappear into huge shared folders.
-
-2. **Global state too early**
-   Example: small screen state becomes app-wide complexity.
-
-3. **Widgets owning transport logic**
-   Example: retry and auth behavior leak into UI code.
-
-4. **Raw backend shapes leaking everywhere**
-   Example: one API field rename breaks many screens.
-
-5. **Choosing a state library before naming the state boundary**
-   Example: tool choice hides the actual design problem.
-
----
-
-## 9. Practical Summary
-
-Practical summary:
-
-> In Flutter, I prefer package-by-feature, keep state as local as possible, and keep API and storage details out of widgets. The architecture matters less as a pattern name and more as a way to keep feature boundaries, state ownership, and backend contract changes understandable.
+Further reading: [Flutter app architecture](https://docs.flutter.dev/app-architecture/guide).

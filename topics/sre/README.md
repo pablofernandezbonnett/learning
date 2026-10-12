@@ -1,79 +1,22 @@
-# Site Reliability Engineering for Backend Engineers
+# Reliability and Operations
 
-Use this folder when you want to learn `SRE` from the point of view of someone
-who already understands backend systems.
-For the current repo direction, this is an adjacent awareness lane, not the
-main specialization target.
+Use this block to keep a live system useful when traffic, dependencies,
+deployments, and people behave imperfectly. The same questions apply to
+services, applications, data pipelines, and other systems: what matters to
+users, how will failure be noticed, what can reduce impact, and what must
+change afterward?
 
-The goal is not to turn reliability into abstract ops vocabulary.
-The goal is to understand how live systems fail, how teams detect the failure,
-how they reduce user impact, and how they keep future changes safer.
+## Work Through the Operating Loop
 
-Focus:
+1. [Measure reliability](./02-sli-slo-and-error-budgets.md): define a user-facing indicator, target, and acceptable failure budget.
+2. [Alert and respond](./03-alerting-and-on-call.md): page only when timely human action can reduce impact.
+3. [Handle an incident](./04-incident-response-and-triage.md): assess scope, mitigate, communicate, and confirm recovery.
+4. [Protect capacity](./05-capacity-planning-and-load-shedding.md): find bottlenecks and decide what to reject or degrade under pressure.
+5. [Learn from failure](./06-postmortems-and-operational-review.md): turn incidents and near misses into specific improvements.
 
-- what changes when you move from building services to operating them
-- `SLI` and `SLO`, meaning the measured reliability signal and the target you operate against, plus error budget and the difference between measuring and promising
-- alerting, on-call judgment, and how to avoid paging people for noise
-- incident triage, mitigation, and service recovery under pressure
-- capacity planning, load shedding, and safe degradation
-- postmortems and operational review habits that actually improve systems
+## Related Decisions
 
-Working style:
-
-- explain reliability jargon before relying on it
-- keep examples close to APIs, queues, databases, and user-facing product flows
-- prefer "how it fails, how you detect it, and how you respond" over vendor or tool memorization
-
-Decision boundary for SRE material:
-
-- use this folder to collaborate better with `SRE` and operate services more responsibly, not to become an `SRE` by default
-- use `01` and `04` when you want the clearest bridge from backend ownership to live-incident behavior
-- use `02` and `03` when `SLI` / `SLO`, alerting, or on-call conversations become part of current work
-- use `05` and `06` as optional growth once production ownership becomes more direct or frequent
-
-## Recommended Order
-
-1. [01-backend-engineer-vs-sre.md](./01-backend-engineer-vs-sre.md): what changes when code ownership becomes runtime ownership
-2. [02-sli-slo-and-error-budgets.md](./02-sli-slo-and-error-budgets.md): how reliability targets are defined and used in practice
-3. [03-alerting-and-on-call.md](./03-alerting-and-on-call.md): what should page, what should not, and how on-call should work
-4. [04-incident-response-and-triage.md](./04-incident-response-and-triage.md): how to diagnose, mitigate, communicate, and recover during incidents
-5. [05-capacity-planning-and-load-shedding.md](./05-capacity-planning-and-load-shedding.md): how systems stay stable under growth, spikes, and saturation
-6. [06-postmortems-and-operational-review.md](./06-postmortems-and-operational-review.md): how to learn from incidents without blame and turn them into real improvements
-
-## Refresh
-
-- [01-backend-engineer-vs-sre.md](./01-backend-engineer-vs-sre.md)
-- [02-sli-slo-and-error-budgets.md](./02-sli-slo-and-error-budgets.md)
-- [03-alerting-and-on-call.md](./03-alerting-and-on-call.md)
-
-## Required
-
-- [04-incident-response-and-triage.md](./04-incident-response-and-triage.md)
-
-## Growth
-
-- [02-sli-slo-and-error-budgets.md](./02-sli-slo-and-error-budgets.md)
-- [03-alerting-and-on-call.md](./03-alerting-and-on-call.md)
-- [05-capacity-planning-and-load-shedding.md](./05-capacity-planning-and-load-shedding.md)
-- [06-postmortems-and-operational-review.md](./06-postmortems-and-operational-review.md)
-
-## Related Path
-
-If your goal is the role transition from backend engineer to `SRE`, start with:
-
-- [../../paths/adjacent/sre-from-backend-engineers.md](../../paths/adjacent/sre-from-backend-engineers.md)
-
-## Related Internal Topics
-
-- [../devops/03-observability-and-monitoring.md](../devops/03-observability-and-monitoring.md): logs, metrics, traces, and baseline `SLI` / `SLO` vocabulary for reliability measurement and targets
-- [../devops/02-zero-downtime-deployments.md](../devops/02-zero-downtime-deployments.md): rollout safety and backward compatibility
-- [../devops/04-kubernetes-crash-course.md](../devops/04-kubernetes-crash-course.md): probes, scaling, and runtime behavior
-- [../architecture/02-resiliency-patterns.md](../architecture/02-resiliency-patterns.md): retries, timeouts, circuit breakers, and graceful degradation
-- [../cloud/04-container-sizing-and-observability.md](../cloud/04-container-sizing-and-observability.md): sizing, saturation, and runtime limits
-
-## Core Rule
-
-- reliability is not separate from software behavior
-- a good `SRE` explanation connects symptoms, causes, blast radius, and mitigation
-- the goal is not zero failure; the goal is fast detection, controlled impact, and safer recovery
-- use this folder as adjacent reliability awareness unless current work is pulling you deeper into direct runtime ownership
+- [Observability](../devops/03-observability-and-monitoring.md): collect logs, metrics, and traces to explain what happened.
+- [Resilience patterns](../architecture/02-resiliency-patterns.md): timeouts, retries, isolation, and fallback in the design.
+- [Safe deployments](../devops/02-zero-downtime-deployments.md): release and rollback behavior.
+- [Container sizing](../cloud/04-container-sizing.md): runtime resource limits.

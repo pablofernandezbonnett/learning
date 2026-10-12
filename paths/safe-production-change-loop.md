@@ -1,6 +1,6 @@
 # Safe Production Change Loop
 
-Use this note when a backend change is more than a local refactor: it changes a
+Use this note when a production change is more than a local refactor: it changes a
 business rule, API, schema, integration, runtime limit, or production behavior.
 
 This is not another delivery process to follow mechanically. It is one short
@@ -147,6 +147,6 @@ mode, verification, rollout, and recovery are proportionate to its risk.
 
 ## Reusable Takeaway
 
-> A senior backend change is not finished at merge. I define the invariant,
+> A production change is not finished at merge. Define the invariant,
 > verify the boundary that can fail, keep the rollout compatible, watch the
 > production signal, and know the first recovery action.

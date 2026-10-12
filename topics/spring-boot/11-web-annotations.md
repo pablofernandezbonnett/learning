@@ -1,280 +1,75 @@
-# Advanced Web Annotations
+# Spring MVC HTTP Boundaries
 
-> Primary fit: `Platform / Growth lane`
+A controller translates between HTTP and an application operation. It reads
+route and body input, validates request shape, calls the service, and returns
+a stable response. Keep business rules, persistence entities, and retry
+policy outside that boundary.
 
-Quick REST refresher: `@GetMapping` reads, `@PostMapping` creates,
-`@PutMapping` replaces, `@PatchMapping` partially updates, and
-`@DeleteMapping` removes.
-
-This note stays focused on higher-value Spring MVC annotations that shape the
-HTTP boundary directly.
-
-Use the dedicated notes for adjacent concerns:
-
-- [02-exception-handling.md](./02-exception-handling.md): central error mapping with `@RestControllerAdvice` and `ProblemDetail`
-- [24-spring-security-actuator-and-testing-baseline.md](./24-spring-security-actuator-and-testing-baseline.md): route policy, actuator exposure, and service-boundary verification
-
-This note uses Java and Kotlin side by side only where controller, validation,
-and response-shape wiring are genuinely easier to compare directly.
-
-## Controller Boundary Rule
-
-Good controller responsibilities:
-
-- parse HTTP input
-- validate request shape
-- call the service or use-case boundary
-- return a stable response shape and status
-
-Bad controller responsibilities:
-
-- business rules
-- transaction orchestration
-- direct entity exposure
-- persistence decisions
-- ad hoc retry or cache logic
-
-Short rule:
-
-> a Spring controller is an HTTP boundary, not the place where business or
-> persistence policy should accumulate
-
-## 1. Validation: `@Validated` and `@Valid`
-
-Use `@Valid` on request body DTOs.
-Use `@Validated` on the controller when you also want Bean Validation on
-`@PathVariable` or `@RequestParam`.
-
-```kotlin
-data class CreateUserRequest(
-    @field:NotBlank(message = "name is required")
-    val name: String,
-
-    @field:Email(message = "email must be valid")
-    val email: String,
-
-    @field:Size(min = 8, message = "password must have at least 8 characters")
-    val password: String,
-)
-
-@RestController
-@Validated
-@RequestMapping("/users")
-class UserController(private val userService: UserService) {
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createUser(@Valid @RequestBody request: CreateUserRequest): UserDto {
-        return userService.create(request)
-    }
-
-    @GetMapping("/{id}")
-    fun getUser(@PathVariable @Min(1) id: Long): UserDto {
-        return userService.getById(id)
-    }
-}
-```
-
-<details>
-<summary>Java version</summary>
+## Validate Input at the Edge
 
 ```java
-public record CreateUserRequest(
-    @NotBlank(message = "name is required")
-    String name,
-
-    @Email(message = "email must be valid")
-    String email,
-
-    @Size(min = 8, message = "password must have at least 8 characters")
-    String password
-) {
-}
+record CreateOrderRequest(
+    @NotNull Long productId,
+    @Min(1) int quantity
+) {}
 
 @RestController
-@Validated
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/orders")
+class OrderController {
+    private final OrderService orders;
 
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
+    OrderController(OrderService orders) {
+        this.orders = orders;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@Valid @RequestBody CreateUserRequest request) {
-        return userService.create(request);
+    OrderResponse create(@Valid @RequestBody CreateOrderRequest request) {
+        return orders.create(request.productId(), request.quantity());
     }
 
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable @Min(1) Long id) {
-        return userService.getById(id);
+    OrderResponse get(@PathVariable @Min(1) long id) {
+        return orders.get(id);
     }
 }
 ```
 
-</details>
+`@RequestBody` reads the JSON body; with Bean Validation configured,
+`@Valid` checks constraints on its DTO. A direct constraint such as `@Min`
+on a route parameter invokes method validation. In Spring Framework 6.1 and
+later, MVC supports that directly.
+Adding class-level `@Validated` instead routes method validation through an
+AOP proxy, so use it only when that is the intended setup.
 
-Strong default:
+Request validation catches malformed or out-of-range input. The service
+still owns business invariants such as stock availability or an allowed state
+transition. Depending on the method signature, Spring MVC can raise
+`MethodArgumentNotValidException` or `HandlerMethodValidationException`;
+map those consistently in [error responses](./02-exception-handling.md).
 
-- validate request DTOs explicitly
-- validate simple route and query parameters when they carry real constraints
-- keep validation failures part of the API contract, not only an internal concern
+## Choose the Response Contract
 
-## 2. Selective Serialization: `@JsonView`
+`@ResponseStatus(HttpStatus.CREATED)` sets a fixed success status. Return a
+`ResponseEntity` when the response needs headers or a status chosen from the
+result, for example a `Location` header for a newly created resource.
+Keep API response DTOs separate from persistence entities so internal mapping
+changes do not silently change the JSON contract.
 
-`@JsonView` can help when one DTO needs a small and a detailed response shape
-without multiplying types too early.
+`@JsonView` can select a small serialization variant of one response DTO.
+It does not change what the database fetched. If two endpoints need materially
+different fields or queries, separate response shapes and choose each read
+explicitly; see [JPA and Hibernate](./04-jpa-hibernate-performance-traps.md).
 
-```kotlin
-object Views {
-    interface Summary
-    interface Details : Summary
-}
+## Check One Endpoint
 
-data class UserDto(
-    @field:JsonView(Views.Summary::class)
-    val id: Long,
+Verify the accepted input, validation failure, success status, response
+fields, and any headers clients rely on. Include the case where the request
+is valid but the business operation fails; its status and body belong to the
+[error contract](./02-exception-handling.md). For route security and service
+tests, use the [Spring baseline](./24-spring-security-actuator-and-testing-baseline.md).
 
-    @field:JsonView(Views.Summary::class)
-    val name: String,
+## Further Reading
 
-    @field:JsonView(Views.Details::class)
-    val email: String,
-)
-
-@RestController
-@RequestMapping("/users")
-class UserController(private val userService: UserService) {
-
-    @JsonView(Views.Summary::class)
-    @GetMapping("/{id}/summary")
-    fun getSummary(@PathVariable id: Long): UserDto = userService.getById(id)
-
-    @JsonView(Views.Details::class)
-    @GetMapping("/{id}")
-    fun getDetails(@PathVariable id: Long): UserDto = userService.getById(id)
-}
-```
-
-<details>
-<summary>Java version</summary>
-
-```java
-public final class Views {
-    public interface Summary {
-    }
-
-    public interface Details extends Summary {
-    }
-}
-
-public record UserDto(
-    @JsonView(Views.Summary.class) Long id,
-    @JsonView(Views.Summary.class) String name,
-    @JsonView(Views.Details.class) String email
-) {
-}
-
-@RestController
-@RequestMapping("/users")
-public class UserController {
-
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @JsonView(Views.Summary.class)
-    @GetMapping("/{id}/summary")
-    public UserDto getSummary(@PathVariable Long id) {
-        return userService.getById(id);
-    }
-
-    @JsonView(Views.Details.class)
-    @GetMapping("/{id}")
-    public UserDto getDetails(@PathVariable Long id) {
-        return userService.getById(id);
-    }
-}
-```
-
-</details>
-
-Use this with restraint.
-If the read shapes keep diverging, separate DTOs are often clearer.
-
-## 3. Fixed Status Mapping: `@ResponseStatus`
-
-Use `@ResponseStatus` when the status is simple and stable.
-If you need dynamic headers or dynamic status selection, use `ResponseEntity`
-instead.
-
-```kotlin
-@ResponseStatus(HttpStatus.NOT_FOUND)
-class UserNotFoundException(message: String) : RuntimeException(message)
-
-@RestController
-@RequestMapping("/users")
-class UserController(private val userService: UserService) {
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createUser(@Valid @RequestBody request: CreateUserRequest): UserDto {
-        return userService.create(request)
-    }
-}
-```
-
-<details>
-<summary>Java version</summary>
-
-```java
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(String message) {
-        super(message);
-    }
-}
-
-@RestController
-@RequestMapping("/users")
-public class UserController {
-
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@Valid @RequestBody CreateUserRequest request) {
-        return userService.create(request);
-    }
-}
-```
-
-</details>
-
-## 4. Boundary Reminder About `@Async`
-
-`@Async` is useful, but it is not mainly a web-annotation topic.
-Treat it as a service-execution concern that a controller may trigger, not as
-part of the core HTTP boundary model.
-
-Strong default:
-
-- keep controllers synchronous in structure unless the real workflow needs more
-- use `@Async` for bounded fire-and-forget work only when the delivery
-  consequences are acceptable
-- do not confuse `@Async` with reactive end-to-end request handling
-
-## Reusable Takeaway
-
-> The useful Spring MVC annotations are the ones that keep the HTTP boundary
-> explicit: validate input clearly, control the response shape deliberately, and
-> keep business and persistence policy outside the controller.
+- [Spring MVC validation](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-validation.html)
+- [Spring MVC response entities](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/responseentity.html)

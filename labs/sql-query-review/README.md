@@ -1,66 +1,22 @@
 # SQL Query Review Lab
 
-This lab is the runnable companion for fast SQL performance review.
+Use this after [query optimization](../../topics/databases/08-query-optimization.md). Create your own small PostgreSQL dataset: customers, orders, and order items across several tenants. Include enough rows that a plan choice is visible. The exercise is to explain the plan before and after each change, not to guess which index is best.
 
-Why this lab matters:
+## Tasks
 
-- query tuning is easier to retain when you can run the query, inspect the
-  plan, add the index, and compare the result
-- this lab stays small enough to reopen in one sitting
-- it supports the repo goal of stronger backend SQL judgment without turning
-  the repo into a DBA playground
+1. Query the newest 50 paid orders for one tenant. Capture `EXPLAIN (ANALYZE, BUFFERS)` and identify filtering, sorting, row estimates, and actual work.
+2. Add an index matching the filter and sort path. Run the same query and compare plans, time, and write cost.
+3. Join those orders to customers. Check whether the join changes the bottleneck.
+4. Compare a deep offset page with a page starting after the last seen `(created_at, id)` tuple. Keep the sort order stable.
 
-Use it after:
+## Guide
 
-- [../../topics/databases/13-explain-indexes-and-query-review-baseline.md](../../topics/databases/13-explain-indexes-and-query-review-baseline.md)
-- [../../topics/databases/08-query-optimization.md](../../topics/databases/08-query-optimization.md)
-- [../../topics/databases/10-postgres-in-depth.md](../../topics/databases/10-postgres-in-depth.md)
-
-## What This Lab Covers
-
-- a filtered-and-sorted list query with no supporting composite index
-- `EXPLAIN (ANALYZE, BUFFERS)` before and after the index
-- offset pagination versus seek pagination
-- a small join query worth checking in a plan
-
-## Files
-
-- [01-schema-and-seed.sql](./01-schema-and-seed.sql): schema plus sample data
-- [02-explain-baseline.sql](./02-explain-baseline.sql): first plan checks before tuning
-- [03-index-and-recheck.sql](./03-index-and-recheck.sql): composite index plus the same plan again
-- [04-pagination-comparison.sql](./04-pagination-comparison.sql): offset versus seek pagination
-
-## How To Run
-
-Strong default:
-
-1. use any local PostgreSQL instance you already have
-2. create a disposable database
-3. run the files in order with `psql`
-
-Example shape:
-
-```bash
-createdb learning_sql_lab
-psql learning_sql_lab -f 01-schema-and-seed.sql
-psql learning_sql_lab -f 02-explain-baseline.sql
-psql learning_sql_lab -f 03-index-and-recheck.sql
-psql learning_sql_lab -f 04-pagination-comparison.sql
+```text
+baseline plan -> name expensive operation -> propose one change
+             -> rerun same workload -> compare actual evidence
+             -> keep or revert the change
 ```
 
-If you prefer Docker and already use it, a temporary local database is also
-fine. The lab does not require any repo-local wrapper or build tool.
+For the list query, a candidate index starts with equality-filtered columns and then the sort columns, including a tie-breaker. Seek pagination carries the last seen tuple from the prior page; it does not first calculate that tuple with a deep offset query. Indexes speed selected reads but add storage and write work.
 
-## What To Look For
-
-- did the first list query sort too many rows or scan too widely?
-- does the composite index match the real filter and sort path?
-- does deep offset pagination keep doing work that seek pagination avoids?
-- does the join plan look reasonable for the row counts involved?
-
-## Strong Default
-
-- run one file at a time
-- read the plan before changing the schema
-- after adding the index, ask what write cost you just accepted
-- keep the mental model on evidence, not on optimizer mythology
+Record the query, row counts, plan before and after, and one reason the result might differ with other data distributions. Never infer a production win from a tiny synthetic dataset alone.

@@ -1,9 +1,6 @@
-# Kotlin for Backend Engineers Coming from Java
+# Kotlin Compared With Java
 
-> Primary fit: `Shared core`
-
-
-Kotlin should not feel like a language reset for a Java backend engineer.
+Kotlin builds on familiar JVM and service design decisions.
 
 The useful question is:
 
@@ -189,30 +186,7 @@ That is both more accurate and more useful in practice.
 
 ---
 
-## 8. 20-Second Answer
-
-> My Java backend experience transfers directly to Kotlin. The main improvements are
-> explicit null safety, less DTO ceremony with data classes, and stronger workflow modeling
-> with sealed classes. I see coroutines as a useful concurrency tool when they simplify
-> async orchestration, not as a reason to force every backend path into async style.
-
----
-
-## 9. 1-Minute Answer
-
-> Kotlin does not replace backend engineering judgment; it changes how clearly and safely I
-> express it. The biggest practical gains over Java are null safety in the type system,
-> lighter DTO and state modeling with data classes, and very strong sealed-class modeling
-> for validation or payment outcomes. In Spring, Kotlin works well, but I still remember
-> the framework rules like `plugin.spring`, `plugin.jpa`, `@field:` validation targets,
-> and Jackson Kotlin support. I also treat coroutines pragmatically: they are excellent
-> when they simplify coordination of independent I/O work, but I do not use them just to
-> look modern. My framing is that I am a JVM backend engineer extending strong Java and
-> Spring instincts into Kotlin, not starting over in a new ecosystem.
-
----
-
-## 10. Further Reading
+## 8. Further Reading
 
 - Kotlin null safety:
   https://kotlinlang.org/docs/null-safety.html

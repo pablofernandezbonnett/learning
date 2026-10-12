@@ -1,8 +1,5 @@
 # 16. Flyway and Schema Migrations
 
-> Primary fit: `Shared core`
-
-
 If a Spring Boot service owns a relational schema, schema evolution is part of
 the backend job. Flyway is one of the most common ways to make those changes
 versioned, repeatable, and reviewable.
@@ -294,41 +291,7 @@ Short rule:
 
 ---
 
-## 8. Interview Lines
-
-These lines are stronger if you know what they actually mean:
-
-1. "I prefer Flyway for Spring Boot services because it keeps schema evolution explicit, versioned, and reviewable."
-
-What you mean:
-
-- schema changes live in Git as ordered migration files
-- reviewers can inspect exactly what will hit the database
-- every environment can move forward using the same steps
-
-2. "For production changes, the key idea is not just the migration tool. It is pairing Flyway with expand-and-contract so old and new versions can coexist safely."
-
-What you mean:
-
-- the migration tool alone does not make deployments safe
-- safety comes from sequencing schema and app changes so multiple versions can run at the same time
-- this matters in rolling deploys, blue-green deploys, and any environment where not all instances switch at once
-
-3. "Hibernate maps the model, but I do not want Hibernate inventing production schema changes for me."
-
-What you mean:
-
-- object-relational mapping (ORM) and production schema evolution are different responsibilities
-- Hibernate is good at mapping entities to tables
-- Flyway is better for explicit, reviewable, operationally safe database changes
-
-Interview-safe combined answer:
-
-> I use Flyway so schema changes are explicit, versioned, and reviewable. For production releases, I pair it with expand-and-contract so old and new app versions can coexist safely. Hibernate can map the model, but I do not want automatic ORM-driven schema changes deciding production rollout behavior for me.
-
----
-
-## 9. Further Reading
+## 8. Further Reading
 
 - Spring Boot database initialization:
   https://docs.spring.io/spring-boot/how-to/data-initialization.html

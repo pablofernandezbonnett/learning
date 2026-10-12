@@ -1,131 +1,26 @@
-# Live Coding Companion (Java and Kotlin)
+# Algorithm and Backend Coding Drills
 
-> Role: `Companion support for the algorithm refresh notes`
+The [coding drills](../../topics/algorithms/02-coding-round-drills.md) own the problem statements, examples, and general pattern hints. Solve them in any language. This page adds a small backend practice set; it does not repeat the full algorithm catalog.
 
-This folder is not a new study path.
-It is the runnable companion for the highest-return live-coding exercises that
-support:
+## Practice loop
 
-- [01-core-patterns.md](../../topics/algorithms/01-core-patterns.md)
-- [02-coding-round-drills.md](../../topics/algorithms/02-coding-round-drills.md)
+1. Choose a problem and restate its input, output, and edge cases.
+2. Name the rule your data structure must keep true.
+3. Implement it yourself, then test empty input, repeats, boundaries, and invalid input where relevant.
+4. Explain time and space cost and how the design changes under concurrency or persistence.
 
-Use it after reading the notes, not instead of them.
+## Selected coding problems
 
----
+Use the [nine coding drills](../../topics/algorithms/02-coding-round-drills.md) for maps, windows, search, stacks, heaps, graphs, caches, limits, and idempotency. Read the [core patterns](../../topics/algorithms/01-core-patterns.md) when you need the general rule behind a solution.
 
-## Why This Exists
+## Backend extensions
 
-The docs are good for fast refresh.
-This folder exists so you can also run the exact problem shapes that matter most
-for practical coding practice:
+| Task | What to implement | Guide to the invariant | Check |
+| --- | --- | --- | --- |
+| Cache aside | Serve reads through a TTL cache and update the source of truth. | Read cache → on miss read store → cache only a valid value. After a write, invalidate the affected key. | Expiry, stale reads, simultaneous misses. |
+| Event deduplication | Consume events that may be delivered again. | Atomically record event ID with its local effect; repeated IDs do no new work. | Crash before commit, crash after commit, reordered events. |
+| Retry with backoff | Retry a transient remote failure inside one deadline. | Classify error → if retryable and budget remains, wait with capped backoff and jitter → retry with the same idempotency key. | Permanent error, exhausted budget, duplicate remote effect. |
+| Page merge | Merge two sorted pages into one ordered page. | Compare current heads, emit the next item, and track stable identity to avoid duplicates. | Empty page, equal sort keys, repeated item across pages. |
+| Producer–consumer | Bound work accepted faster than it is processed. | Producer waits or rejects when queue is full; consumer acknowledges only after processing. | Slow consumer, shutdown, failed work. |
 
-- time-boxed problem solving
-- `heap + stream` questions where you need to keep one clear rule true while data keeps arriving
-- `calculator / parser` exercises where edge cases matter more than speed
-- `data-structure design` questions that need tradeoff discussion
-- `mini machine-coding` exercises that feel closer to backend work than puzzles
-
-The same curated set is implemented in:
-
-- plain `Kotlin`
-- plain `Java`
-
-No framework is required.
-
----
-
-## How To Run
-
-List the available exercises:
-
-```bash
-./run-kotlin.sh list
-./run-java.sh list
-```
-
-Run one exercise:
-
-```bash
-./run-kotlin.sh median-stream
-./run-java.sh lru-cache
-```
-
-Run the full curated set:
-
-```bash
-./run-kotlin.sh all
-./run-java.sh all
-```
-
----
-
-## Exercise Set
-
-### Focused working set (`highest return now`)
-
-1. `longest-substring` -> sliding window on strings without turning practice into puzzle hunting
-2. `top-k-frequent` -> hash map plus heap for counting and ordering
-3. `number-of-islands` -> grid traversal with DFS/BFS shape
-4. `calculator-ii` -> stack discipline and operator-precedence follow-up
-5. `lru-cache` -> map plus doubly linked list
-6. `rate-limiter` -> sliding-window queue and system tradeoffs
-7. `wallet-ledger` -> idempotent state changes by request ID
-8. `cache-aside` -> TTL, invalidation, and hot-read behavior
-9. `event-dedup` -> hash-set dedup for at-least-once delivery
-10. `retry-backoff` -> transient vs permanent failure handling
-11. `pagination-merge` -> two pointers on sorted pages plus duplicate filtering
-12. `producer-consumer` -> blocking queue, FIFO processing, and natural slowdown when consumers cannot keep up
-
-### Supporting hedge (`keep available, not primary`)
-
-13. `ascii-pyramid` -> nested loops, spacing arithmetic, and centered rendering
-14. `container-queries` -> `HashSet` vs frequency-map judgment for `ADD` / `EXISTS` / `REMOVE`
-15. `rotated-search` -> keeping the "one half is still sorted" rule straight under pressure
-16. `median-stream` -> two heaps and the balancing rule that keeps median lookup cheap
-17. `basic-calculator` -> parentheses, sign handling, state stack
-18. `coin-change` -> bottom-up dynamic programming
-19. `payment-priority` -> prioritized payment-source allocation
-
-### Concept follow-ups kept in the docs
-
-These are worth rehearsing aloud, but they do not need more runnable examples:
-
-- `linked list vs array`
-- `how HashMap works`
-- time and space complexity talk tracks
-
----
-
-## Recommended Mock Rounds
-
-### Mock A (`time-boxed baseline`)
-
-- `longest-substring`
-- `top-k-frequent`
-- `number-of-islands`
-- `calculator-ii`
-
-### Mock B (`live-coding core`)
-
-- `lru-cache`
-- `rate-limiter`
-- `wallet-ledger`
-- `cache-aside`
-
-### Mock C (`backend practical`)
-
-- `event-dedup`
-- `retry-backoff`
-- `pagination-merge`
-- `producer-consumer`
-
----
-
-## Rule
-
-For each exercise:
-
-1. solve it yourself first
-2. say the invariant or state model aloud, meaning the rule your current data structure must keep true
-3. explain the time and space tradeoff
-4. only then compare with the runnable version
+These guides describe the rule to preserve, not a ready-made implementation.

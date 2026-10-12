@@ -135,4 +135,4 @@ If the answer is unclear, the flow probably needs to be drawn and reviewed, not 
 ## 10. Internal Repo Links
 
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): extends the discussion of cookie-based browser auth and why CSRF appears in that model
-- [../spring-boot/01-spring-boot-fast-review.md](../spring-boot/01-spring-boot-fast-review.md): practical Spring-specific notes on CSRF tokens, CORS, and secure browser-session setup
+- [../security/03-spring-and-jvm-appsec.md](../security/03-spring-and-jvm-appsec.md): Spring security boundaries, CORS, and CSRF checks

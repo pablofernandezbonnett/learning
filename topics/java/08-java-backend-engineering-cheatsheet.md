@@ -348,7 +348,7 @@ Use these when needed:
 
 - [01-jvm-memory-and-gc.md](./01-jvm-memory-and-gc.md)
 - [06-jit-profiling-and-memory-leaks.md](./06-jit-profiling-and-memory-leaks.md)
-- [../databases/13-explain-indexes-and-query-review-baseline.md](../databases/13-explain-indexes-and-query-review-baseline.md)
+- [../databases/08-query-optimization.md](../databases/08-query-optimization.md)
 
 ---
 

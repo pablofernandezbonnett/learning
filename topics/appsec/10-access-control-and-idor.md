@@ -138,6 +138,6 @@ If you cannot point to the exact line or function that enforces the rule, the im
 
 ## 10. Internal Repo Links
 
-- [../security/02-web-and-api-security.md](../security/02-web-and-api-security.md): broader repo treatment of broken access control, BOLA, and workflow abuse in product systems
+- [Web and API security](../security/02-web-and-api-security.md): system-level request and workflow controls
 - [../spring-boot/16-appsec-authz-lab.md](../spring-boot/16-appsec-authz-lab.md): concrete lab on object-level authorization in a Spring API
 - [../security/03-spring-and-jvm-appsec.md](../security/03-spring-and-jvm-appsec.md): framework-oriented follow-up on request security, method security, and permission checks in Spring

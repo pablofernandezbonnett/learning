@@ -1,7 +1,5 @@
 # Spring Batch Jobs That Can Fail Safely
 
-> Primary fit: `Growth / Backend platforms with imports, settlement, reporting, or scheduled work`
-
 Spring Batch is useful when a backend must process a bounded set of records
 reliably: a daily settlement file, a supplier import, a backfill, or a report.
 It is not a reason to turn every asynchronous action into a batch job.
@@ -563,15 +561,6 @@ Before shipping a job, can the team answer:
 - What source count, output count, and business total prove completion?
 - What is the safe action if the job crashes halfway through?
 - Which measured bottleneck would justify partitioning?
-
-## Interview Framing
-
-> I use Spring Batch for bounded, auditable work such as imports and
-> settlements. I model the business input with stable job parameters, use a
-> persistent job repository for execution state, and make the writer idempotent
-> with business-level uniqueness. I distinguish retryable transient failures
-> from rejected data, and I only restart after checking the failed step,
-> committed counts, source identity, and reconciliation result.
 
 ## Related Reading
 

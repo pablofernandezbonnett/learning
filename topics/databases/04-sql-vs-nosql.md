@@ -1,408 +1,72 @@
-# Databases: SQL vs NoSQL
-
-> Primary fit: `Shared core`
-
-Saying only "I would use a database" is not enough.
-You need to explain which store fits the problem and what tradeoff you are accepting.
-
-This note keeps the question practical:
-
-- what each option is good at
-- the smallest concrete examples
-- where correctness matters more than scale
-- the practical decision rule
-
----
-
-## Why This Matters
-
-Database choice is easy to overcomplicate and easy to answer too vaguely. The
-real job is not to praise one family of databases. It is to match the store to
-the shape of the data, the access pattern, and the correctness requirements.
-
-This matters because weak design answers often say "NoSQL for scale" or "SQL for
-structure" without explaining what kind of scale, which correctness rule, or
-which read pattern actually drives the choice.
-
-## Smallest Mental Model
-
-Start from the write path and the main read shape.
-
-Ask:
-
-- do I need cross-entity correctness and transactions
-- do I mostly read one denormalized record at a time
-- is this a source of truth or a support layer such as cache or coordination
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- SQL and NoSQL are rivals where one modern choice should win
-- NoSQL automatically scales better and is therefore preferable
-- Redis is just another alternative source of truth
-
-Better mental model:
-
-- relational, document, and key-value stores solve different problems
-- correctness, relationship shape, and access pattern matter more than slogans
-- Redis usually complements a primary store instead of replacing it
-
-Small concrete example:
-
-- weak approach: put orders and payments in a document store because joins are
-  annoying
-- better approach: keep correctness-critical order and payment state in SQL, and
-  use a document store only where one denormalized read shape is the real win
-
-Strong default:
-
-- default to SQL for correctness-critical commit paths
-- choose document stores for predictable denormalized reads
-- use Redis as a support layer for cache, counters, sessions, or short-lived
-  coordination
-
-Reusable takeaway:
-
-> I choose the database by business truth and access pattern first: SQL for
-> correctness-critical relational writes, document stores for denormalized read
-> shapes, and Redis as a support layer rather than the main source of truth.
-
----
-
-## 1. Default Rule
-
-Before comparing them, keep one definition straight:
-
-- `SQL` usually means relational databases such as Postgres or MySQL
-- `NoSQL` is a broad family of non-relational stores, not one single model
-- document stores and Redis are both often called `NoSQL`, but they solve very different problems
-
-Start with this:
-
-- `SQL` when correctness, transactions, and relational queries matter
-- document `NoSQL` when one record is read mostly as one document and the shape varies
-- `Redis` when the real need is cache, counter, session, or short-lived shared state
-
-Short rule:
-
-> A relational SQL database such as MySQL or Postgres is usually the source of
-> truth, document stores fit access-pattern-heavy reads, and Redis is usually a
-> support layer, not the final truth
-
----
-
-## 2. The Smallest Concrete Examples
-
-### 2.1 SQL: order plus payment
-
-```sql
-CREATE TABLE orders (
-    id BIGSERIAL PRIMARY KEY,
-    customer_id BIGINT NOT NULL,
-    status TEXT NOT NULL
-);
-
-CREATE TABLE payments (
-    id BIGSERIAL PRIMARY KEY,
-    order_id BIGINT NOT NULL REFERENCES orders(id),
-    amount NUMERIC(12,2) NOT NULL,
-    status TEXT NOT NULL
-);
-
-SELECT o.id, o.status, p.amount, p.status
-FROM orders o
-JOIN payments p ON p.order_id = o.id
-WHERE o.customer_id = 42;
-```
-
-Why SQL fits:
-
-- order and payment are related
-- the relationship matters
-- correctness matters when both change
-
-### 2.2 Document store: product catalog
-
-```json
-{
-  "productId": "sku-123",
-  "name": "Running Jacket",
-  "brand": "GenericBrand",
-  "attributes": {
-    "size": ["S", "M", "L"],
-    "color": ["black", "navy"],
-    "material": "polyester"
-  }
-}
-```
-
-```javascript
-db.products.findOne({ productId: "sku-123" })
-```
-
-Why a document store fits:
-
-- the product shape can vary a lot
-- the client often wants the full record in one read
-- joins are less important than one predictable access pattern
-
-### 2.3 Redis: hot read or counter
-
-```redis
-GET product:sku-123
-SETEX product:sku-123 300 "{...cached json...}"
-INCR rate:user:42
-EXPIRE rate:user:42 60
-```
-
-Why Redis fits:
-
-- extremely fast simple operations
-- ideal for cache and counters
-- not the place for the final order or payment truth
-
----
-
-## 3. When SQL Is The Right Answer
-
-Use SQL when you need:
-
-- transactions across related data
-- clear constraints and relationships
-- joins and flexible queries
-- correctness under concurrent writes
-
-Good examples:
-
-- payments
-- orders
-- inventory truth
-- ledger-like state
-
-Pros:
-
-- strong consistency tools
-- mature query power
-- easy to defend for money-sensitive workflows
-
-Tradeoffs:
-
-- horizontal scaling is harder
-- schema changes need more care
-- very high write scale may need partitioning or extra architecture around it
-
-Practical line:
-
-> I default to SQL for the commit path when the business rule is more important than raw write scale.
-
-### 3.1 Why A Relational Database Is A Reasonable Choice Here
-
-For hotel booking truth, a relational database is a good fit when the system
-needs to change related facts together: claim room capacity, create a
-reservation, and prevent the counter from becoming negative. It gives the
-application transactions, constraints, indexes, and concurrency controls in one
-place whose confirmed data the application trusts.
-
-Small concrete shape:
-
-```text
-relational-database transaction
-  -> conditionally claim room-night inventory
-  -> insert reservation or temporary hold
-  -> commit both, or roll back both
-```
-
-Why not make Redis or a document database the final reservation truth?
-
-- a cache can return an old availability value
-- a separate locking service can expire or be unavailable; it is not durable
-  proof that a room was claimed
-- a document model can work, but the main problem here is changing several
-  related entries safely while customers compete, not flexible document shape
-
-MySQL/InnoDB and PostgreSQL are two concrete relational choices. For this
-problem, the generic decision comes first: choose a transactional relational
-store. The engine decision comes second.
-
-Choose between them using concrete requirements such as existing operational
-skill, supported SQL features, extension needs, hosting constraints, and
-measured performance. Do not choose by the slogan "Postgres is better" or
-"MySQL is simpler." Both can protect this reservation invariant when used with
-the right transaction and conditional claim.
-
-Strong default:
-
-> Keep a transactional relational database as the booking source of truth. If
-> MySQL/InnoDB already fits the team's operational skills, it is a reasonable
-> choice. Add a cache or a separate copy designed for fast searches only when
-> search traffic needs it, never as the final booking decision.
-
----
-
-## 4. When Document NoSQL Fits Better
-
-Use a document store when:
-
-- the record shape varies a lot
-- one object is usually read as one object
-- access patterns are known up front
-- denormalized reads matter more than joins
-
-Good examples:
-
-- product catalog
-- profile or preference documents
-- read-optimized content records
-
-Pros:
-
-- flexible schema
-- easy one-record reads
-- natural fit for embedded data
-
-Tradeoffs:
-
-- duplicated data can drift
-- cross-document transactions are weaker or more expensive
-- ad hoc relational questions are a worse fit
-
-Practical line:
-
-> I choose a document store when the main win is reading one denormalized record cleanly, not when I need cross-entity correctness.
-
----
-
-## 5. Where Redis Fits
-
-Redis is usually not the answer to `SQL vs NoSQL`.
-It usually sits beside them.
-
-Use Redis for:
-
-- cache
-- sessions
-- rate limits
-- simple distributed coordination
-- short-lived shared state
-
-Do not use Redis as the main answer for:
-
-- final payment state
-- final order state
-- complex relational queries
-
-Practical line:
-
-> Redis is a speed layer or coordination layer, not my default source of truth for critical business state.
-
----
-
-## 6. Consistency In Plain English
-
-You do not need a long CAP speech in most practical discussions.
-You usually need one simple distinction:
-
-- some domains must reject ambiguity
-- some domains can tolerate slightly stale reads
-
-Examples:
-
-- checkout, payment, stock commit: prefer strong correctness
-- catalog, recommendations, read-heavy dashboards: some staleness is acceptable
-
-That is the practical meaning behind `ACID` (`atomicity, consistency, isolation, durability`), `eventual consistency`, and related terms.
-
-Short rule:
-
-> use strong correctness where duplicate or inconsistent writes hurt the business; accept staleness where the read path matters more than the latest millisecond of truth
-
----
-
-## 7. Quick Comparison
-
-| Question | SQL | Document NoSQL | Redis |
-|---|---|---|---|
-| Data shape | Structured and relational | Flexible, document-shaped | Key-value or simple shared state |
-| Best for | Orders, payments, inventory truth | Catalogs, profiles, content | Cache, sessions, counters, rate limits |
-| Relationships | Strong joins and constraints | Usually denormalized reads | Not a join-oriented store |
-| Consistency | Strong default for critical writes | Varies by model and workflow | Usually not the final truth |
-| Scaling pattern | Start simple, then scale carefully | Often chosen for access-pattern-heavy reads | Added mainly for latency and hot shared state |
-| Main risk | Overusing it for clearly denormalized read models | Using it for cross-entity correctness without enough care | Letting it become accidental source of truth |
-
-Short reading of the table:
-
-- SQL is usually the safest default for business-critical state
-- document NoSQL fits when one whole record is the main unit of read and write
-- Redis usually supports the system rather than owning the main business data
-
----
-
-## 8. Choice By Use Case
-
-### Checkout, orders, or payments
-
-- SQL: yes
-- document store: usually no
-- Redis: maybe, as support only
-  Why: this is mainly a correctness problem.
-
-### Product catalog with many variable attributes
-
-- SQL: maybe
-- document store: yes
-- Redis: maybe, for hot read cache
-  Why: the main win is flexible shape and one-record reads.
-
-### User-facing hot read path
-
-- SQL: source of truth, maybe yes
-- document store: maybe
-- Redis: yes, often
-  Why: this is a latency and read-load problem.
-
-### Analytics or event ingestion
-
-- SQL: maybe
-- document store: maybe
-- Redis: maybe
-  Why: the right answer depends on write volume, retention, and query shape.
-
----
-
-## 9. The Big Traps
-
-1. **Choosing NoSQL just because scale sounds impressive**
-   Example: a normal order system loses useful constraints and joins for no real gain.
-
-2. **Using SQL everywhere even when the read shape is clearly denormalized**
-   Example: a product page needs five joins for one object the client always reads together.
-
-3. **Treating Redis as a primary database by accident**
-   Example: final payment or order truth lives only in cache-like storage.
-
-4. **Talking about CAP as a slogan**
-   Example: saying "this is AP" without connecting it to the business effect of stale reads or rejected writes.
-
----
-
-## 10. 20-Second Answer
-
-> I choose storage by the business rule first. For payments, orders, and inventory truth I usually start with SQL because transactions, constraints, and concurrency safety matter most. For highly variable records that are usually read as one object, a document store can fit better. Redis is usually a support layer for cache, sessions, counters, or short-lived coordination, not my main source of truth.
-
----
-
-## 11. What To Internalize
-
-- SQL is usually the default for correctness-sensitive write paths
-- document NoSQL fits access-pattern-heavy, denormalized records
-- Redis usually supports the system rather than owning the final truth
-- the real question is not "which database is better?" but "which tradeoff is correct for this domain?"
-
-In practice, many modern systems are hybrid:
-
-- SQL for the transactional core
-- document storage where flexible read shape is the main win
-- Redis for cache, sessions, counters, or other fast shared state
-
-That is often a stronger design than trying to force one store to do every job.
+# Choose a Data Store From the Workload
+
+The useful question is which store can protect the business rules and serve
+the required reads and writes at an acceptable cost. "SQL vs NoSQL" is only a
+starting label: NoSQL includes different models with different guarantees.
+
+## Describe the Work Before Choosing
+
+Write down:
+
+1. **Business truth:** which facts must survive failure, and who may change them?
+2. **Write rules:** which records must change together? What must a concurrent
+   or repeated request never do?
+3. **Reads:** which lookups, filters, joins, sorts, and reports are required?
+   How fresh must each result be?
+4. **Load and growth:** expected reads and writes, record size, retention, hot
+   keys, and likely changes to query shape.
+5. **Operations:** backup, restore, migration, access control, and the team's
+   ability to run the store.
+
+An attractive read model is insufficient if the store cannot protect the
+critical write. A fast key lookup is insufficient if the product needs
+unplanned filters across related data.
+
+## Match the Model to Those Operations
+
+| Model | Good starting point when | Main question to test |
+|---|---|---|
+| Relational SQL | Related facts need constraints, transactions, and flexible queries | Can one database own the write and meet the measured load? |
+| Document | A bounded document is usually read or changed together; its shape varies | What happens when embedded data grows or related documents change together? |
+| Key-value | Important operations are known by key and can be modeled directly | Can every required query and invariant use an efficient, safe key path? |
+| In-memory shared state | Short-lived lookup, counter, or coordination needs low latency | What happens when a key expires, is evicted, or is lost? |
+
+These are starting fits, not guarantees. A relational database can store JSON;
+document and key-value stores can offer transactional operations. Compare the
+specific engine and workload before choosing. See [PostgreSQL](./10-postgres-in-depth.md),
+[MongoDB](./07-mongodb-in-depth.md), [DynamoDB](./09-dynamodb.md), and
+[Redis](./06-redis-in-depth.md) for their mechanisms and limits.
+
+## Apply It to Common Cases
+
+**Booking or checkout.** A reservation must not claim the same capacity twice,
+and an order transition must remain valid under retries. Start with a store
+that can enforce the relevant invariant in one owned write or transaction.
+A relational database is a practical default for several related facts. A
+key-based store can also work when the invariant maps cleanly to its atomic
+operations. A cached availability read never decides the final claim.
+
+**Product catalog.** Products may have different attributes and are often read
+as complete records. A document model may simplify that read. A relational
+model with JSON fields may also be enough. Check the real filters, updates,
+document size, and indexing before adding a new store.
+
+**Notification inbox.** Reads by user and time can suit a key-based model.
+Before choosing one, account for lookups by external event ID, unread counts,
+and whether those views may lag. Each extra read path has a cost.
+
+**Hot product page.** Keep an owner for product facts and add a cache only if
+measured latency or read load calls for it. Define acceptable staleness and
+invalidation; see [Caching strategies](../architecture/07-caching-strategies.md).
+
+## Avoid Accidental Extra Owners
+
+One system may use several stores, but each business fact still needs an
+authoritative owner. A search index, cache, or reporting copy can serve reads
+without becoming another place to approve a payment or reserve stock. Define
+how copies update, how far they may lag, and how they are rebuilt. See
+[cross-domain read models](../architecture/19-database-per-service-and-read-model-migration.md).
+
+Choose the simplest model that meets the current write and read requirements.
+Add another store when a concrete access pattern, scale limit, or isolation
+need justifies the synchronization and operational work.

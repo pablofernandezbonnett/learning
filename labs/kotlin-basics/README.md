@@ -1,46 +1,21 @@
 # Kotlin Basics Lab
 
-This folder contains small standalone Kotlin files for quick refresh.
+Use these prompts after the [Kotlin topic](../../topics/kotlin/README.md). Write small programs yourself; compare each result with the guide after attempting it.
 
-Why this lab matters:
+| Exercise | Task | Guide and checks |
+| --- | --- | --- |
+| Values and control flow | Map an order status to a user-facing message. | Use immutable values by default and an exhaustive `when` where possible. Check every status. |
+| Data classes | Model an order summary and create a revised copy. | Put equality-bearing values in the primary constructor. Check `copy` and equality. |
+| Null safety | Look up a customer that may be absent. | Represent absence in the type, handle it at the boundary, and avoid `!!`. Check missing and present customers. |
+| Collections | Group paid orders by customer and total each group. | Filter → group → transform; keep side effects out of the chain. Check empty and repeated customers. |
+| Coroutines | Run two independent remote reads under a request deadline. | Start children in one scope, await both within the deadline, and let failure cancel related work. Check timeout and cancellation. |
+| Flow and channels | Stream status updates to a slow consumer. | Define who owns the scope, buffer size, and completion. Check backpressure and consumer failure. |
+| Backend boundary | Wrap a blocking dependency inside a suspend-facing service. | Suspending a function does not make blocking I/O safe automatically. Choose the right dispatcher or client and keep the shared request budget. Check overload. |
 
-- it is the fastest way to reopen Kotlin syntax without loading a full project
-- it helps separate language refresh from Spring or architecture complexity
-- it gives coroutines a small on-ramp before the more backend-shaped examples
+One syntax reminder, where code is clearer than prose:
 
-Use it after:
-
-- [../../topics/kotlin/README.md](../../topics/kotlin/README.md)
-- [../../topics/kotlin/03-kotlin-coroutines-for-backend.md](../../topics/kotlin/03-kotlin-coroutines-for-backend.md)
-
-Topics included:
-
-- language basics
-- data classes
-- null safety
-- functional collection operations
-- coroutines
-- advanced coroutines and flows
-- backend coroutine timeout and blocking-boundary practice
-
-## How To Run
-
-Run any file directly with `kotlinc`:
-
-```bash
-kotlinc 00-basics.kt -include-runtime -d out.jar && java -jar out.jar
+```kotlin
+val label = status?.let { it.uppercase() } ?: "UNKNOWN"
 ```
 
-Use one file at a time.
-The goal is to reopen the language quickly, not to build a large project.
-
-Recommended coroutine order:
-
-1. `04-coroutines.kt`
-2. `05-coroutines-advanced.kt`
-3. `06-backend-coroutine-boundaries.kt`
-
-Rule:
-
-- use this folder for language reopen
-- use `labs/kotlin-backend-examples` when you want backend-shaped runtime behavior
+For structured concurrency, dispatchers, and cancellation, use [coroutines for backend](../../topics/kotlin/03-kotlin-coroutines-for-backend.md).

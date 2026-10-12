@@ -1,713 +1,85 @@
-# Domain-Driven Design (DDD)
-
-> Primary fit: `Shared core`
-
-DDD is a software design approach that models code around the **business domain** — not
-around database tables, REST endpoints, or technical layers. Coined by Eric Evans (2003).
-
-The core idea: the hardest part of software is understanding the business problem. If your
-code reflects the business language and rules accurately, it becomes easier to change when
-the business changes.
-
-Important clarification:
-
-- `DDD` is **not** the same thing as microservices
-- `DDD` is a way to model the domain and its boundaries
-- you can apply it inside a modular monolith, not only in a distributed system
-
-Short rule:
-
-> DDD is about domain boundaries, not deployment style.
-
-If you want the Spring Boot follow-up on how these ideas land in a real codebase,
-see [`../spring-boot/21-practical-ddd-in-spring.md`](../spring-boot/21-practical-ddd-in-spring.md).
-
----
-
-## Why This Matters
-
-DDD matters because many backend systems become hard to change not because the
-framework is wrong, but because the code model no longer matches the business
-rules and language.
-
-This topic helps with practical problems such as:
-
-- one word meaning different things in different parts of the system
-- service boundaries chosen by technical layer instead of business capability
-- business rules leaking across modules or services
-- data models shaped around tables instead of around invariants
-
-Good DDD use makes change cheaper by making the code speak the real domain more
-clearly.
-
-## Smallest Mental Model
-
-DDD is mainly about two things:
-
-- use the business language clearly inside one domain boundary
-- keep different domain models separate when the same word means different things
-
-That is why the two highest-value ideas are:
-
-- ubiquitous language
-- bounded context
-
-Strong default:
-
-- use DDD where the business rules are rich and changing
-- keep it lighter for thin CRUD or generic support domains
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- DDD means heavy ceremony and lots of tactical patterns everywhere
-- every service should use full textbook DDD
-- DDD is mostly a microservices topic
-
-Better mental model:
-
-- DDD is mainly about boundary clarity and business language
-- tactical patterns matter only when they help protect real rules
-- DDD works inside a modular monolith just as well as across services
-
-Small concrete example:
-
-- weak approach: one `Product` model is shared across catalogue, inventory, and order history even though each context needs different meaning
-- stronger approach: each context owns its own model and translates across boundaries
-
-Reusable takeaway:
-
-> I use DDD mainly to keep domain language and boundaries honest. The biggest
-> value is not ceremony. It is stopping one shared technical model from leaking
-> across different business contexts.
-
----
-
-## 1. Ubiquitous Language — The Foundation
-
-Before writing a single class, DDD demands a **shared vocabulary** between developers and
-domain experts (product managers, business analysts, operations teams).
-
-**The problem without it:**
-- Business says "cancel the order". Dev says "update status to VOID".
-- Business says "reserve stock". Dev says "decrement inventory count".
-- In a payment flow, business says "cancel the payment" or "refund the payment". Dev says "set status to VOID" or "reverse transaction".
-- In a payment flow, business says "authorize" vs "capture". Dev treats both as "mark paid", and the real money-state distinction gets lost.
-- Mismatch between business intent and code causes bugs and miscommunication.
-
-**With ubiquitous language:**
-The same words appear in requirements, code, database, and conversations.
-`cancelOrder()`, `reserveStock()`, `OrderStatus.CANCELLED` — the code reads like the domain.
-
-**Practical signal:** If a product manager can read your class names and method names and
-roughly understand what they do, you are using ubiquitous language.
-
----
-
-## 2. Bounded Context — The Most Important Concept
-
-A **Bounded Context** is an explicit boundary within which a specific domain model applies.
-The same word can mean different things in different contexts.
-
-**Retail example:**
-The word **"Product"** means something different in each context:
-
-```
-┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐
-│  Product Catalogue  │   │  Inventory Context  │   │   Order Context     │
-│  Context            │   │                     │   │                     │
-│  Product = {        │   │  Product = {        │   │  OrderItem = {      │
-│    sku,             │   │    sku,             │   │    sku,             │
-│    name,            │   │    warehouseQty,    │   │    priceAtPurchase, │
-│    description,     │   │    reservedQty,     │   │    quantity         │
-│    images,          │   │    location         │   │  }                  │
-│    category         │   │  }                  │   │  (snapshot — never  │
-│  }                  │   │                     │   │   changes after     │
-└─────────────────────┘   └─────────────────────┘   │   order placed)     │
-                                                    └─────────────────────┘
-```
-
-Each context owns its model. The Inventory team does not use the Catalogue's `Product`
-class — it defines its own. Communication between contexts happens through events or APIs,
-not shared database tables or shared classes.
-
-**Payments example:**
-The word **"Payment"** also means different things in different contexts:
-
-```
-┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐
-│  Checkout Context   │   │  Payment Context    │   │ Settlement / Ledger │
-│                     │   │                     │   │ Context             │
-│  Payment = {        │   │  PaymentAttempt = { │   │  LedgerEntry = {    │
-│    paymentMethod,   │   │    paymentIntentId, │   │    entryType,       │
-│    amount,          │   │    providerRef,     │   │    amount,          │
-│    customerChoice   │   │    status,          │   │    currency,        │
-│  }                  │   │    authorizedAt,    │   │    bookingDate      │
-│                     │   │    capturedAt       │   │  }                  │
-│                     │   │  }                  │   │                     │
-└─────────────────────┘   └─────────────────────┘   └─────────────────────┘
-```
-
-Here the same broad business word points to different models:
-
-- checkout cares about user intent and payment method choice
-- payment execution cares about authorization, capture, retry, and provider references
-- settlement or ledger cares about accounting records, booked amounts, and reconciliation
-
-**Why this matters for microservices:**
-A Bounded Context is the natural boundary for a microservice. Each service owns its own
-data model and database. This is *exactly why* microservices work — and why merging the
-databases of two microservices breaks the boundary and creates coupling.
-
-**Practical tip:** "Our microservices follow Bounded Context boundaries from DDD. The Order
-Service has its own model of a product (price at purchase time, quantity ordered). It never
-shares a database with the Catalogue Service. If the Catalogue changes a product's name,
-the Order history is unaffected — it captured the name at order time."
-
----
-
-## 3. The Building Blocks (Tactical DDD)
-
-### Entity — Identity Matters
-
-An object with a **unique identity** that persists through state changes.
-
-```kotlin
-// An Order is an Entity — it has an ID, and its state changes over time
-// (PENDING → PAID → SHIPPED → DELIVERED). It is still the same Order.
-@Entity
-class Order(
-    @Id val id: UUID = UUID.randomUUID(),
-    val customerId: UUID,
-    var status: OrderStatus = OrderStatus.PENDING,
-    val items: MutableList<OrderItem> = mutableListOf()
-) {
-    fun pay() {
-        check(status == OrderStatus.PENDING) { "Only pending orders can be paid" }
-        status = OrderStatus.PAID
-    }
-
-    fun cancel() {
-        check(status != OrderStatus.SHIPPED) { "Cannot cancel a shipped order" }
-        status = OrderStatus.CANCELLED
-    }
-}
-```
-
-### Value Object — Defined by Its Attributes
-
-An object with **no identity** — two instances with the same attributes are equal.
-Value Objects are **immutable**.
-
-```kotlin
-// Money is a Value Object. ¥2,990 is ¥2,990 regardless of which instance it is.
-// You don't "change" money — you create a new amount.
-data class Money(val amount: BigDecimal, val currency: Currency) {
-    operator fun plus(other: Money): Money {
-        require(currency == other.currency) { "Cannot add different currencies" }
-        return Money(amount + other.amount, currency)
-    }
-}
-
-// Address is a Value Object. You don't "update" an address — you replace it.
-data class Address(val postalCode: String, val prefecture: String, val street: String)
-```
-
-**Why Value Objects matter:** They encode domain rules (can't add JPY to USD) and eliminate
-primitive obsession (storing money as a `Double` loses precision and meaning).
-
-### Aggregate — The Consistency Boundary
-
-An **Aggregate** is a cluster of Entities and Value Objects that must be consistent together.
-One Entity is the **Aggregate Root** — all access to the aggregate goes through it.
-
-```kotlin
-// Order is the Aggregate Root.
-// OrderItem is part of the aggregate — it has no life outside an Order.
-// You never directly modify an OrderItem — you go through Order.
-class Order(val id: UUID, ...) {
-    private val _items: MutableList<OrderItem> = mutableListOf()
-    val items: List<OrderItem> get() = _items.toList() // immutable view
-
-    fun addItem(sku: String, quantity: Int, price: Money) {
-        check(status == OrderStatus.PENDING) { "Cannot add items to a non-pending order" }
-        _items.add(OrderItem(sku, quantity, price))
-    }
-
-    fun totalAmount(): Money = items.fold(Money(BigDecimal.ZERO, JPY)) { acc, item ->
-        acc + item.subtotal()
-    }
-}
-```
-
-**Rules for aggregates:**
-- Only persist through the root (one `OrderRepository`, not an `OrderItemRepository`)
-- Keep aggregates small — large aggregates cause lock contention under concurrent writes
-- One aggregate per transaction — if you need to update two aggregates atomically, use Domain Events
-
-**Fintech example:**
-
-- `Money` is still a **Value Object**
-- `PaymentAttempt` is an **Entity** because one attempt has identity and changes state over time
-- `PaymentIntent` can be the **Aggregate Root** that decides whether a new attempt can be created or captured
-
-```kotlin
-data class Money(
-    val amount: BigDecimal,
-    val currency: Currency,
-)
-
-class PaymentAttempt(
-    val id: UUID,
-    val amount: Money,
-    var status: PaymentStatus = PaymentStatus.INITIATED,
-    private var providerReference: String? = null,
-) {
-    fun markAuthorized(ref: String) {
-        check(status == PaymentStatus.INITIATED) { "Only initiated attempts can be authorized" }
-        status = PaymentStatus.AUTHORIZED
-        providerReference = ref
-    }
-
-    fun capture() {
-        check(status == PaymentStatus.AUTHORIZED) { "Only authorized attempts can be captured" }
-        status = PaymentStatus.CAPTURED
-    }
-}
-
-class PaymentIntent(
-    val id: UUID,
-    val amount: Money,
-) {
-    private val attempts: MutableList<PaymentAttempt> = mutableListOf()
-
-    fun startAttempt(): PaymentAttempt {
-        check(attempts.none { it.status == PaymentStatus.CAPTURED }) {
-            "Cannot start a new attempt after capture"
-        }
-        return PaymentAttempt(UUID.randomUUID(), amount).also { attempts.add(it) }
-    }
-}
-```
-
-This is the same idea in a payment domain:
-
-- `Money` carries domain rules as a Value Object
-- `PaymentAttempt` is an Entity with identity and state transitions
-- `PaymentIntent` is the Aggregate Root protecting payment-level invariants
-
-### Domain Event — Something That Happened
-
-A **Domain Event** captures that something meaningful happened in the domain.
-It is immutable (it happened — you cannot un-happen it).
-
-```kotlin
-// Past tense — it already happened
-data class OrderPaid(
-    val orderId: UUID,
-    val customerId: UUID,
-    val amount: Money,
-    val occurredAt: Instant = Instant.now()
-)
-
-// In the aggregate root — collect events, publish after transaction commits
-class Order(...) {
-    private val events: MutableList<Any> = mutableListOf()
-
-    fun pay() {
-        check(status == OrderStatus.PENDING)
-        status = OrderStatus.PAID
-        events.add(OrderPaid(id, customerId, totalAmount())) // record the event
-    }
-
-    fun pullEvents(): List<Any> = events.toList().also { events.clear() }
-}
-```
-
-**Fintech example:**
-
-```kotlin
-data class PaymentAuthorized(
-    val paymentIntentId: UUID,
-    val paymentAttemptId: UUID,
-    val amount: Money,
-    val providerReference: String,
-    val occurredAt: Instant = Instant.now()
-)
-```
-
-The same rule applies:
-
-- the name is in past tense because it already happened
-- the event carries business meaning, not just technical logging
-- other contexts can react without sharing the same database
-
-Typical reactions:
-
-- ledger or settlement records the financial side
-- notification service tells the user the authorization succeeded
-- risk or analytics systems observe the payment lifecycle
-
-After the `@Transactional` method commits, the application service publishes these events
-to Kafka. Other contexts (Inventory, Warehouse, Notification) react independently.
-This is the basis of the **Outbox Pattern** (see [Idempotency and Transaction Safety](../databases/01-idempotency-and-transaction-safety.md)).
-
-### Repository — Abstraction Over Persistence
-
-A **Repository** provides a collection-like interface for accessing aggregates.
-It hides whether data comes from Postgres, MongoDB, or cache.
-
-```kotlin
-// Domain-level interface — no Spring, no JPA here
-interface OrderRepository {
-    fun findById(id: UUID): Order?
-    fun save(order: Order)
-    fun findPendingByCustomer(customerId: UUID): List<Order>
-}
-
-// Infrastructure implementation with Spring Data JPA
-@Repository
-class JpaOrderRepository(private val jpa: OrderJpaRepository) : OrderRepository {
-    override fun findById(id: UUID) = jpa.findById(id).orElse(null)?.toDomain()
-    override fun save(order: Order) = jpa.save(order.toEntity())
-    override fun findPendingByCustomer(customerId: UUID) =
-        jpa.findByCustomerIdAndStatus(customerId, "PENDING").map { it.toDomain() }
-}
-```
-
-### Application Service — Orchestrating Use Cases
-
-The Application Service is the entry point for a use case. It is thin — it delegates all
-business logic to the domain. It coordinates: load aggregate, call domain method,
-save aggregate, publish events.
-
-```kotlin
-@Service
-class OrderApplicationService(
-    private val orders: OrderRepository,
-    private val eventPublisher: DomainEventPublisher
-) {
-    @Transactional
-    fun payOrder(orderId: UUID) {
-        val order = orders.findById(orderId) ?: throw OrderNotFoundException(orderId)
-        order.pay()                          // domain logic lives here, not here
-        orders.save(order)
-        order.pullEvents().forEach { eventPublisher.publish(it) }
-    }
-}
-```
-
-### From Requirements To Model
-
-One of the biggest DDD gaps is knowing how to get from a vague product flow to a usable model.
-
-Small checkout example:
-
-- business says: "do not charge twice"
-- business says: "do not oversell final stock"
-- business says: "once shipped, the order cannot be cancelled"
-
-Better modeling path:
-
-1. name the core business actions in business language
-2. separate the parts that clearly speak different languages
-3. choose one aggregate that protects one local rule set
-4. choose events for work that can happen later or in another context
-
-For this flow, a good early split is often:
-
-- `checkout`: confirms intent and request identity
-- `order`: owns order lifecycle and cancellation rules
-- `payment`: owns authorization, capture, retry, provider references
-- `inventory`: owns stock reservation and release
-
-Good early modeling choice:
-
-- `Order` aggregate protects order-state transitions
-- `PaymentIntent` aggregate protects payment-attempt rules
-- `InventoryReservation` or stock-allocation model protects inventory correctness
-
-Possible events:
-
-- `OrderPlaced`
-- `PaymentAuthorized`
-- `InventoryReserved`
-
-The point is not naming every class up front.
-The point is turning business risk into explicit boundaries and explicit rules.
-
-### How To Choose Aggregate Boundaries
-
-This is where many DDD explanations stay too abstract.
-
-Bad mental model:
-
-- one aggregate per table group
-- one giant aggregate so everything stays "consistent"
-- any two related entities must be updated in the same transaction
-
-Better mental model:
-
-- one aggregate protects one consistency boundary
-- keep the aggregate only as large as the rule set that truly must change together
-- if coordination can happen later, prefer events over one giant transaction
-
-Useful heuristics:
-
-- if one invariant must hold immediately after commit, keep that rule inside one aggregate
-- if two parts can tolerate short-lived delay, they probably do not belong in the same aggregate
-- if one write path keeps loading a huge object graph, the aggregate may be too large
-- if several unrelated actions keep fighting over the same root lock, the boundary may be too broad
-
-Commerce example:
-
-- `Order` should usually protect rules like "cannot cancel after shipment"
-- `Payment` should usually protect rules like "cannot capture before authorization"
-- updating both in one giant aggregate often creates coupling that is more technical than business-driven
-
-Short rule:
-
-> If the reason for one large aggregate is "the database makes it easy," the boundary is probably too broad.
-
-### Domain Service vs Application Service
-
-These two names sound similar, but they solve different problems.
-
-An **Application Service** coordinates the use case:
-
-- starts the transaction
-- loads aggregates
-- calls domain behavior
-- persists changes
-- records or publishes events
-
-A **Domain Service** holds domain logic that belongs to the business model but does
-not fit naturally on one entity or value object.
-
-Example:
-
-```kotlin
-data class CustomerTier(val name: String, val discountRate: BigDecimal)
-
-class PricingDomainService {
-    fun totalFor(items: List<OrderItem>, tier: CustomerTier): Money {
-        val subtotal = items.fold(Money(BigDecimal.ZERO, Currency.getInstance("JPY"))) { acc, item ->
-            acc + item.subtotal()
-        }
-        return Money(
-            amount = subtotal.amount.multiply(BigDecimal.ONE - tier.discountRate),
-            currency = subtotal.currency,
-        )
-    }
-}
-
-@Service
-class PlaceOrderService(
-    private val orders: OrderRepository,
-    private val pricing: PricingDomainService,
-) {
-    @Transactional
-    fun place(customerId: UUID, items: List<OrderItem>, tier: CustomerTier): UUID {
-        val total = pricing.totalFor(items, tier)
-        val order = Order.place(customerId, items, total)
-        orders.save(order)
-        return order.id
-    }
-}
-```
-
-Good practical test:
-
-- if the logic is mostly workflow and coordination, it is probably application-service logic
-- if the logic is a business rule but does not belong cleanly on one aggregate, it may be domain-service logic
-
-### How To Test A DDD Model
-
-DDD coverage is weaker if it never shows how the model should be verified.
-
-Strong default:
-
-- test aggregate rules without Spring
-- test application services with fakes or mocks for repositories and publishers
-- test persistence adapters separately from the domain model
-
-Small example:
-
-```kotlin
-class OrderTest {
-    @Test
-    fun `shipped order cannot be cancelled`() {
-        val order = Order.shipped(UUID.randomUUID())
-
-        assertThrows<IllegalStateException> {
-            order.cancel()
-        }
-    }
-}
-```
-
-Why this matters:
-
-- fast tests protect domain rules directly
-- you do not need the container just to verify one invariant
-- persistence and HTTP concerns can change without breaking domain tests unless the business rule changed
-
-Short rule:
-
-> If the business rule needs Spring to be testable, the boundary is probably blurred.
-
----
-
-## 4. Strategic vs Tactical DDD
-
-| Level | Focus | Key concepts |
-|---|---|---|
-| **Strategic** | How to divide the system | Bounded Contexts, Context Map, Ubiquitous Language |
-| **Tactical** | How to implement within a context | Aggregates, Entities, Value Objects, Domain Events, Repositories |
-
-Most developers encounter tactical patterns first. Strategic DDD is where the real
-architectural value is — deciding the boundaries between services.
-
----
-
-## 5. Context Map — How Bounded Contexts Relate
-
-When two Bounded Contexts need to communicate, the relationship type matters:
-
-First, the two words that confuse almost everyone:
-
-- **Upstream** = the side that publishes, owns, or defines something the other side depends on
-- **Downstream** = the side that consumes it and has to live with that dependency
-
-Plain-language version:
-
-- upstream is the side saying "this is the model / contract / data I provide"
-- downstream is the side saying "I need that, so I either align with it or translate it"
-
-Small concrete example:
-
-- Catalogue publishes product data
-- Order Service consumes product data
-- so Catalogue is **upstream**
-- Order Service is **downstream**
-
-This is not about network direction or who calls whom first.
-It is about **dependency and influence**: whose model sets the terms, and who has to adapt.
-
-| Relationship | Meaning | Example |
-|---|---|---|
-| **Shared Kernel** | Two teams intentionally share a small common model | Two services sharing a `Money` value object library |
-| **Customer/Supplier** | The downstream side depends on the upstream side, but can still influence the contract | Order Service (customer) depends on Catalogue Service (supplier) |
-| **Conformist** | The downstream side just accepts the upstream model as-is | Your service consuming a third-party payment API |
-| **Anti-Corruption Layer (ACL)** | The downstream side protects itself by translating the upstream model into its own language | Wrapping SAP/Hybris in a facade so internal code stays clean |
-
-Good business-friendly explanation:
-
-- `Customer/Supplier` = "we depend on your data, but we can still ask you to shape it better for our needs"
-- `Conformist` = "we depend on your data and we do not really get to negotiate, so we adapt"
-- `ACL` = "we still depend on your system, but we keep a translation layer so your language does not pollute ours"
-
-The **ACL** is the most common pattern when integrating with legacy systems or external APIs.
-See [Enterprise Integration Patterns](./13-enterprise-integration-patterns.md) for implementation details.
-
-This is why `ACL` fits naturally with `DDD`:
-
-- `DDD` defines the Bounded Context and its own language
-- the `ACL` protects that context when another system uses a different model
-
-Short rule:
-
-> DDD defines the boundary; the ACL protects it from model leakage.
-
----
-
-## 6. When to Use DDD — and When Not To
-
-### Use DDD when:
-- The domain is **complex** with rich business rules (e-commerce, fintech, logistics)
-- Multiple **teams** work on related domains — Bounded Contexts prevent coupling
-- The **business changes frequently** — DDD makes change cheaper because the code reflects
-  the business
-- You need to decide **microservice boundaries** — Bounded Contexts are the answer
-
-### Do NOT use DDD when:
-- The application is **CRUD-heavy with no real business logic** (admin panels, simple content
-  management, internal tools) — the abstraction adds cost without benefit
-- **Small teams / early startups** where the domain is still being discovered — DDD structure
-  requires upfront investment
-- **Data pipelines / ETL / analytics services** — the domain model doesn't apply
-- You are under extreme **time pressure** for an MVP — apply DDD selectively to the core
-  domain, not the entire system
-
-**The pragmatic rule:** Apply DDD to your **core domain** (the part that makes your product
-unique and valuable). For generic subdomains (email sending, PDF generation, auth), use
-simpler approaches or third-party services.
-
----
-
-## 7. DDD + Microservices — The Connection
-
-This is why DDD appears so often in backend and platform role descriptions.
-
-The hardest question in microservices is: "Where do I draw the service boundary?" DDD
-answers it: **one Bounded Context = one microservice** (or a small cluster of microservices
-within the same context).
-
-```
-Commerce example:
-
-Bounded Context    →    Microservice          →    Database
-─────────────────────────────────────────────────────────────
-Product Catalogue  →    catalogue-service     →    MongoDB (flexible schema)
-Inventory          →    inventory-service     →    Postgres (ACID stock counts)
-Order Management   →    order-service         →    Postgres (ACID transactions)
-Customer           →    customer-service      →    Postgres
-Notifications      →    notification-service  →    No persistent state
-```
-
-Each service owns its data. Communication across boundaries happens via events (Kafka)
-or APIs — never shared databases. This is DDD's Bounded Context principle applied to
-infrastructure.
-
-```
-Payments / fintech-style example:
-
-Bounded Context      →    Microservice              →    Database
-────────────────────────────────────────────────────────────────────
-Payment Intent       →    payment-service           →    Postgres
-Ledger / Balance     →    ledger-service            →    Postgres
-Fraud / Risk         →    risk-service              →    own data store
-Notification         →    notification-service      →    No critical write state
-Reconciliation       →    reconciliation-service    →    Postgres
-```
-
-Here the same word should not mean the same thing everywhere:
-
-- `payment` in `Payment Intent` means a user-facing payment attempt and status
-- `payment` in `Ledger` means a durable money movement record
-- `payment` in `Reconciliation` means matching internal state against a `PSP` (`payment service provider`) or settlement evidence
-
----
-
-## 8. The Interview Answer
-
-**"Are you familiar with DDD? How have you applied it?"**
-
-*"Yes, I’m familiar with DDD, mainly as a way to think about domain boundaries and
-language. I would not claim I have applied textbook DDD everywhere, but I do use the
-core ideas in complex domains: for example, separating Inventory, Orders, and Catalogue
-because they speak different business languages. Inside a domain, I would use patterns
-like Aggregates, Value Objects such as Money, and Domain Events when they help protect
-real business rules. I would not force DDD onto simple CRUD or thin integration services
-where the overhead is not justified."*
-
----
-
-## What To Internalize
-
-- DDD is mostly about domain language and boundaries
-- bounded context is the highest-value strategic concept
-- tactical patterns matter when they protect real invariants, not as ceremony
-- one shared model across different business meanings usually creates confusion and coupling
-- DDD is strongest in complex, changing domains and optional in thin CRUD domains
+# Domain-Driven Design: Model the Business Boundary
+
+Domain-driven design (DDD) helps when business rules, vocabulary, and ownership
+are harder to understand than the code that stores them. Start with the work the
+system must do; add patterns only where they protect a real rule.
+
+For Spring implementation details, see [Practical DDD in Spring Boot](../spring-boot/21-practical-ddd-in-spring.md).
+
+## Start With Language and Decisions
+
+Ask people who do the work what each action means. Record the terms they use,
+the state changes they expect, and the cases they reject. Use those terms in
+requirements, tests, and code within the relevant part of the system.
+
+For example, *reserve stock* and *ship stock* are different decisions. A single
+`updateQuantity()` method hides that distinction and makes its rules harder to
+find.
+
+## Find Bounded Contexts
+
+A **bounded context** is the boundary within which one model and vocabulary
+have a consistent meaning. The same word may mean different things elsewhere:
+
+| Context | What it owns | Meaning of a product |
+| --- | --- | --- |
+| Catalogue | Descriptions and discoverability | An item customers can browse |
+| Inventory | Available and reserved units | Stock tracked by SKU and location |
+| Orders | What a customer agreed to buy | An item snapshot with price and quantity |
+
+Do not force one shared `Product` class across these contexts. Give each context
+the data and rules it needs, then translate at the boundary. A context can be a
+module in one application or be deployed separately. It does not automatically
+require a microservice or a separate physical database. See [service boundaries](./01-monolith-vs-microservices.md)
+and [data ownership during a split](./18-shared-db-and-independent-deployments.md).
+
+## Protect Rules That Must Hold Together
+
+DDD has a few useful modeling tools:
+
+| Tool | Use it when |
+| --- | --- |
+| Entity | Identity matters across changes, as with an order. |
+| Value object | A value is defined by its attributes, as with money in a currency. |
+| Aggregate | Several state changes must preserve one immediate business rule. |
+| Repository | A use case needs to load or save an aggregate without owning storage details. |
+| Domain event | Something meaningful happened in the model and another action may follow. |
+
+An aggregate exposes operations that enforce its invariants. For example,
+`order.cancel()` can reject cancellation after shipment. Callers should not
+change the order status directly and bypass that rule. Keep an aggregate small
+enough to update and reason about. Its boundary follows an invariant, not a
+table, endpoint, or fixed rule that every transaction may touch only one
+aggregate.
+
+A domain event can stay inside one process. If other services must observe a
+change, define an integration contract separately and plan for reliable
+publication. See [distributed workflows and outbox](./03-distributed-transactions-and-events.md).
+
+## Work From Requirement to Model
+
+1. Write a few real scenarios, including rejected actions and failures.
+2. Name the business decisions and the people or teams that own them.
+3. Identify words whose meaning changes between parts of the system; draw the
+   bounded contexts around those models.
+4. Find rules that must hold immediately. Put each rule at the smallest useful
+   consistency boundary and test it through domain behavior.
+5. Define what crosses each context boundary: command, query, or event. State
+   who owns the fact and where translation happens.
+6. Revisit the model when a new rule exposes a misplaced responsibility.
+
+When one context consumes another's model, translate only what it needs rather
+than importing a shared mutable model. See [integration boundaries](./13-enterprise-integration-patterns.md).
+
+For a context map, record each relationship in one line: who owns the fact,
+who consumes it, how updates arrive, and who translates differences in meaning.
+For example, Inventory owns available stock; Orders consumes a reservation
+result and does not edit Inventory's stock model. This map exposes hidden
+coupling before choosing APIs, events, or service boundaries.
+
+## When to Keep It Light
+
+Use richer domain modeling for changing rules, important state transitions,
+and vocabulary that differs across teams. For straightforward CRUD, clear
+ownership and a simple use case may be enough. The goal is a model that makes
+business decisions visible, not a prescribed set of classes.

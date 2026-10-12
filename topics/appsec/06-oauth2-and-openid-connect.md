@@ -147,5 +147,5 @@ It is a good diagnostic: this topic becomes much easier once the sequence is vis
 
 ## 10. Internal Repo Links
 
-- [../security/04-advanced-auth-and-sso.md](../security/04-advanced-auth-and-sso.md): deeper repo coverage of OIDC login flows, BFF patterns, API keys, and enterprise SSO
+- [Service identity and SSO](../security/04-advanced-auth-and-sso.md): organizational choices around workload identity and enterprise login
 - [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): practical comparison of token and session models before you go deeper into OAuth and OIDC

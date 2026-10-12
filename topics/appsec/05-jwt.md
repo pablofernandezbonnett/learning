@@ -136,5 +136,5 @@ If you can explain that scenario clearly, you already understand more than many 
 
 ## 10. Internal Repo Links
 
-- [../security/01-auth-sessions-vs-jwt.md](../security/01-auth-sessions-vs-jwt.md): longer repo note comparing session auth and JWT-based auth with web and mobile tradeoffs
-- [../security/04-advanced-auth-and-sso.md](../security/04-advanced-auth-and-sso.md): extends JWT usage into OIDC, BFF flows, and service-to-service auth
+- [Authentication choices](../security/01-auth-sessions-vs-jwt.md): choose between server sessions and tokens
+- [Service identity and SSO](../security/04-advanced-auth-and-sso.md): decide how workloads and enterprise users authenticate

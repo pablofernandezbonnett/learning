@@ -1,7 +1,4 @@
-# JVM Memory and GC for Backend Engineers
-
-> Primary fit: `Shared core`
-
+# JVM Memory and GC
 
 This is the memory refresher that matters most for real backend work and
 production work.

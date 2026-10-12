@@ -3,7 +3,7 @@
 Use this note when the question is not "what is the API?" but "what is the
 right default in normal backend code?"
 
-This is the level that matters in reviews, interviews, and day-to-day design:
+This is the level that matters in reviews and day-to-day design:
 
 - which collection shape matches the access pattern
 - when mutability is a bug magnet
@@ -231,7 +231,7 @@ Use stack behavior when:
 - the newest nested context should be processed first
 - parsing or backtracking needs last-in-first-out behavior
 
-The interview-level version and the practical version are the same here:
+The practical rule is:
 
 > choose by retrieval rule, not by class name familiarity.
 

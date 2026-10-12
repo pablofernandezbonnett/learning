@@ -1,42 +1,9 @@
 # Algorithms for Practical Problem Solving
 
-Use this folder to reopen the algorithm patterns that are most useful in timed
-coding, debugging, and data-structure reasoning.
+Use this block to recognize a problem pattern, name the rule a solution must preserve, and practise a small set of cases. It covers data structures and algorithms used in timed coding and everyday data processing.
 
-This is not meant to become a full puzzle bank.
-The goal is a small repeatable set with Java and Kotlin awareness.
+1. [Core patterns](./01-core-patterns.md): choose a structure from the problem shape and invariant.
+2. [Coding drills](./02-coding-round-drills.md): solve nine prompts, then compare the guides and edge cases.
+3. [Backend extensions](../../labs/algorithms-live-coding/README.md): practise retries, caching, deduplication, and queues.
 
-Why this folder matters:
-
-- interview pressure often exposes weak explanation quality more than missing syntax
-- the right reusable patterns beat a huge random problem list
-- this folder exists to keep pattern recognition warm without turning the repo into a coding-site clone
-
-Focus:
-
-- the highest-value data structures and algorithms (`DSA`) patterns
-- invariants, meaning the rule your current state must keep true while the algorithm runs
-- explanation quality under time pressure, not only getting to a working answer
-
-One term that appears often in this folder is `invariant`.
-Here it simply means the rule your current state must keep true after every
-step, such as "the sliding window never contains duplicates" or "the left heap
-never ends up smaller than the right heap by more than one item."
-
-## Recommended Order
-
-1. [01-core-patterns.md](./01-core-patterns.md): the highest-value `DSA` patterns with backend-flavored examples
-2. [02-coding-round-drills.md](./02-coding-round-drills.md): worked drills, edge cases, and complexity discussion
-
-## Working Loop
-
-1. read one pattern family
-2. solve 2-3 drills without looking
-3. explain the invariant, meaning the rule your pointers, window, stack, or heap keeps true, and then explain the complexity
-4. repeat the same set instead of sampling too widely
-
-## Core Rule
-
-- pattern recognition matters more than collecting many problems
-- edge cases and explanation quality matter as much as the main idea
-- one small repeatable set beats a wide but shallow problem bank
+Repeat a few drills until you can explain why each step stays correct. Collecting more problems is less useful than understanding where one pattern stops applying.

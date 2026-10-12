@@ -1,281 +1,89 @@
-# Git Practical Baseline for Backend Engineers
+# Practical Git Guide
 
-You do not need every Git feature in active memory.
+Git records snapshots as commits. A branch is a movable name pointing to one commit; that commit links to its parents. This model explains why a merge joins histories and a rebase creates new commits on a different base.
 
-You do need a mental model strong enough to answer:
+## Know which state you are changing
 
-- what state is local vs remote
-- what happens when you commit
-- what a branch pointer really is
-- when to merge
-- when to rebase
-- how to recover without panic
+| State | Meaning | Inspect with |
+| --- | --- | --- |
+| Working tree | Files currently on disk | `git status`, `git diff` |
+| Staging area | Changes selected for the next commit | `git diff --staged` |
+| Local branch | Your current commit pointer and its history | `git log --oneline --graph` |
+| Remote-tracking branch | Your last fetched view of a remote branch | `git fetch`, then inspect `origin/main` |
 
----
+`git fetch` updates the remote view; it does not merge or rebase your current branch. `git push` asks the remote to update a branch reference to include your commits.
 
-## 1. Why This Matters
+## Make a reviewable change
 
-Weak Git understanding does not usually fail during the happy path.
-It fails when:
-
-- your branch is behind `main`
-- a pull request became a pile of noisy commits
-- you rewrote history that somebody else already pulled
-- you need to recover from a bad reset, bad rebase, or wrong checkout
-
-The job is not "know many commands".
-The job is "match the command to the collaboration boundary".
-
----
-
-## 2. Smallest Useful Mental Model
-
-Keep these pieces separate:
-
-- `working tree`: files on disk that you are editing now
-- `staging area` / `index`: the next snapshot you intend to commit
-- `commit`: an immutable snapshot plus metadata and parent links
-- `branch`: a movable pointer to a commit
-- `remote`: another repository, usually `origin`
-
-Plain-English version:
-
-> Git is mostly snapshots plus pointers. A branch is not a folder of changes. It
-> is a name pointing at one commit, and that commit points backward through its
-> parents.
-
-That one idea makes `merge`, `rebase`, `reset`, and `reflog` much easier to
-reason about.
-
----
-
-## 3. Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-> My branch contains files, and Git somehow mixes them together.
-
-Better mental model:
-
-> My branch points to a line of commits. `merge` joins histories. `rebase`
-> replays my commits onto a different base.
-
-Bad mental model:
-
-> A conflict means I used the wrong command.
-
-Better mental model:
-
-> A conflict means two histories changed the same area differently. The command
-> changes when and how I resolve it, not whether the underlying change overlaps.
-
-Bad mental model:
-
-> `push` sends my files.
-
-Better mental model:
-
-> `push` updates a remote branch reference so it points at my local commit
-> history.
-
----
-
-## 4. The Daily Workflow That Usually Scales Well
-
-Strong default:
-
-1. create a short-lived feature branch
-2. make small commits that each preserve a sensible state
-3. sync with `main` before the branch drifts too far
-4. clean noisy local history before review if needed
-5. do not rewrite history on a shared branch unless the team deliberately allows it
-
-Minimal command loop:
+1. Create a branch from the agreed base.
+2. Check `git status` before and after editing.
+3. Stage only the intended changes; inspect `git diff --staged`.
+4. Commit one coherent intention with its relevant validation.
+5. Review the branch diff before sharing it.
 
 ```bash
 git switch -c feature/order-idempotency
 git status
-git add path/to/files
-git commit -m "Add idempotency key validation to checkout"
-git fetch origin
-git rebase origin/main
-git push -u origin feature/order-idempotency
+git add path/to/changed-file
+git diff --staged
+git commit -m "Reject duplicate checkout requests"
 ```
 
-Why this works:
+A useful commit lets a reviewer state what changed and why. Do not mix unrelated formatting or cleanup with a behavioral fix just to reduce the number of commits.
 
-- `fetch` updates your view of the remote without changing your branch
-- `rebase origin/main` makes the history easy to read before review
-- small commits reduce the blast radius of conflicts and review comments
+## Update your branch
 
----
+First fetch the latest remote state. Then choose how to incorporate it:
 
-## 5. What Good Commits Look Like
-
-A good commit is not "small" in the abstract.
-It is one that a reviewer can explain in one sentence.
-
-Good commit shape:
-
-- one intention
-- clear message
-- tests or validation close to the change
-- no unrelated formatting or drive-by edits mixed in
-
-Weak commit messages:
-
-- `fix stuff`
-- `changes`
-- `wip`
-
-Stronger commit messages:
-
-- `Reject duplicate checkout requests by idempotency key`
-- `Split payment authorization from order persistence`
-- `Use List.copyOf for immutable API response snapshot`
-
-Short rule:
-
-> Optimize commits for review and rollback, not only for local convenience.
-
----
-
-## 6. Updating Your Branch Without Making A Mess
-
-The safest learning-friendly update flow is:
+| Situation | Typical choice | Why |
+| --- | --- | --- |
+| Your own unpublished feature commits | `git rebase origin/main` | Replays them on the new base and keeps a linear branch history |
+| A branch others have based work on | `git merge origin/main` | Preserves existing commit IDs and shared history |
+| Team has an explicit integration policy | Follow that policy | Review and automation may depend on it |
 
 ```bash
 git fetch origin
 git rebase origin/main
 ```
 
-Why this is a good default:
+Rebase creates new commit IDs. It does not prevent conflicts: if two changes overlap, you still need to decide the final content. Avoid rewriting a published branch that collaborators use unless you coordinate it.
 
-- network access and history rewriting stay separate
-- you can inspect `origin/main` before changing your branch
-- the command makes the intent explicit
+## Resolve a conflict
 
-If your team prefers merge-on-branch:
-
-```bash
-git fetch origin
-git merge origin/main
-```
-
-That is also valid.
-The important question is not style purity.
-It is whether the branch is still local-only or already shared widely.
-
----
-
-## 7. Merge vs Rebase In One Page
-
-`merge`:
-
-- combines histories
-- usually preserves the real branch structure
-- may create a merge commit
-- is safer for shared branches because it does not rewrite existing commit IDs
-
-`rebase`:
-
-- replays your commits onto a new base
-- gives a more linear history
-- rewrites commit IDs
-- is best treated as a local cleanup and branch-refresh tool
-
-Strong default:
-
-> Use `rebase` while shaping your own branch. Use `merge` when preserving shared
-> published history is the safer collaboration move.
-
----
-
-## 8. What To Keep Ready During Conflict Resolution
-
-When a rebase or merge stops on a conflict:
-
-1. read the conflict in terms of intent, not only markers
-2. decide what the final code should mean
-3. run tests or at least the nearest validation
-4. continue the operation
-
-Useful commands:
+Read the two intentions, edit the file to its desired final state, and run the nearest useful validation. Then stage the resolution and continue the operation in progress.
 
 ```bash
 git status
 git diff
 git add path/to/resolved-file
 git rebase --continue
-git merge --continue
-git rebase --abort
-git merge --abort
 ```
 
-Important reminder:
+Use `git merge --continue` during a merge. If the chosen operation is no longer appropriate, `git rebase --abort` or `git merge --abort` returns to its pre-operation state. Check `git status` before choosing a command; do not run both continue commands.
 
-- `rebase` may make you resolve related conflicts commit by commit
-- `merge` usually makes you resolve them in one merge step
+## Clean only your own history
 
-Neither command makes overlapping edits disappear.
+Use `git rebase -i origin/main` when several local commits obscure one change. `reword` changes a message; `squash` combines a commit with the previous one; `drop` removes it. Inspect the resulting diff and rerun relevant checks because the rewritten history is new.
 
----
+If that branch already exists remotely and you intentionally rewrote it, `git push --force-with-lease` checks that the remote reference still matches your local expectation before updating it. It still rewrites the remote branch; coordinate when others may depend on it.
 
-## 9. Recovery Tools Worth Remembering
+## Recover before discarding
 
-The first recovery tool to remember is not force push.
-It is `reflog`.
-
-Why:
-
-- it shows where your branch tip and `HEAD` used to point
-- it often lets you recover from a bad `reset`, bad `rebase`, or wrong checkout
-
-Useful commands:
+`git reflog` shows recent positions of `HEAD` and branch references, including positions before many resets and rebases. Inspect the commit you need before moving any pointer. Create a recovery branch if you want to preserve both the current state and the old commit:
 
 ```bash
 git reflog
-git reset --hard HEAD@{1}
-git switch -
+git branch recovery/my-work abc1234
 ```
 
-Use `reset --hard` only when you truly want to throw away current uncommitted
-state.
-The important point here is not the exact recovery recipe.
-It is knowing that your lost-looking commit often still exists in the reflog.
+Avoid using `git reset --hard` as a generic recovery step: it can discard uncommitted work in the working tree and staging area. If you are unsure what changed, inspect `git status`, `git diff`, and the relevant reflog entry first.
 
----
+## Quick decision check
 
-## 10. Practical Rules For Shared Repos
+- Are my working-tree and staged changes safe before I change history?
+- Is this branch private or already shared?
+- Do I need to preserve existing commit IDs?
+- Have I checked the final diff and relevant tests after resolving conflicts?
+- If recovery is needed, can I point to the exact commit I want to keep?
 
-- do not work directly on `main`
-- keep branches short-lived when possible
-- avoid giant "final cleanup" commits that hide many unrelated decisions
-- prefer reviewable commit scope over perfect local diary history
-- do not rebase a branch that other engineers are actively basing work on unless the team explicitly coordinates it
-- treat force push as a deliberate branch-maintenance step, not as a normal reflex
-
-What usually goes wrong:
-
-- branch lives too long and conflicts become expensive
-- unrelated changes get mixed into one commit
-- someone rewrites a shared branch without warning
-- engineer panics after a history edit and forgets `reflog` exists
-
----
-
-## 11. Short Takeaways
-
-- a branch is a pointer, not a container
-- `fetch` updates your remote view without touching your branch
-- `merge` joins histories; `rebase` replays commits onto a new base
-- conflicts come from overlapping changes, not from moral failure
-- local cleanup is good; rewriting shared history casually is not
-- `reflog` is the recovery tool worth remembering
-
-## 12. Further Reading
-
-- Git `rebase` documentation: https://git-scm.com/docs/git-rebase
-- Git `merge` documentation: https://git-scm.com/docs/git-merge
-- Git `pull` documentation: https://git-scm.com/docs/git-pull
-- Git `reflog` documentation: https://git-scm.com/docs/git-reflog
+Official references: [rebase](https://git-scm.com/docs/git-rebase), [merge](https://git-scm.com/docs/git-merge), [push and force-with-lease](https://git-scm.com/docs/git-push), [reflog](https://git-scm.com/docs/git-reflog).

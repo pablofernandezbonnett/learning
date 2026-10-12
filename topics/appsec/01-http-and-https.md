@@ -145,4 +145,4 @@ The goal is to get used to seeing web security as real traffic with concrete fie
 
 ## 10. Internal Repo Links
 
-- [../architecture/04-networking-fundamentals.md](../architecture/04-networking-fundamentals.md): longer refresher on HTTP structure, headers, cookies, and TLS at a backend level
+- [../architecture/04-networking-fundamentals.md](../architecture/04-networking-fundamentals.md): how DNS, connections, TLS, routing, and the application fit into one request path

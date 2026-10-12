@@ -1,212 +1,46 @@
 # React, APIs, and Forms with TypeScript
 
-Use this note to connect TypeScript types to a real browser UI: functional
-components, state, asynchronous requests, forms, and the failure states users
-actually see.
+A browser feature owns what users see while a request is pending, succeeds, fails, or needs a safe retry. Keep rendering, request coordination, and response validation easy to find.
 
-## Why This Matters
+## Give each concern an owner
 
-A frontend is not a collection of screens that happen to call endpoints. It is
-the client-side state machine for an API: inputs are edited, requests are sent,
-responses succeed or fail, and users retry or navigate away.
+| Concern | Useful owner |
+| --- | --- |
+| Input and local interaction | Component or small feature hook |
+| Request timing and visible state | Feature hook, route loader, or query layer |
+| HTTP and response parsing | API client |
+| Authorization and final business rule | Backend |
 
-## Smallest Useful Mental Model
+The client can disable a forbidden-looking action for usability; the server must still enforce the rule. Use [runtime boundary checks](./01-types-and-runtime-boundaries.md) before returning API data to the feature.
 
-- a component is a function from props and state to UI
-- `useState` owns data that changes and must cause a re-render
-- `useEffect` synchronizes with something outside React, not general-purpose
-  "run code after render"
-- API responses and form values are untrusted at their boundary
-- show loading, error, empty, and success states deliberately
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-> Put fetch logic, mutable form fields, API parsing, and every UI branch in one
-component, then add `useEffect` until it appears to work.
-
-Better mental model:
-
-> Keep a typed API client, a small feature hook or state owner, and a component
-that renders explicit UI states. Use an effect only to synchronize with an
-external system.
-
-## 1. Functional Components and State
-
-```tsx
-import { useState, type FormEvent } from "react";
-
-type Props = { initialQuantity: number; onSubmit(quantity: number): void };
-
-export function QuantityForm({ initialQuantity, onSubmit }: Props) {
-  const [quantity, setQuantity] = useState(initialQuantity);
-
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (quantity > 0) onSubmit(quantity);
-  }
-
-  return (
-    <form onSubmit={submit}>
-      <input
-        type="number"
-        min="1"
-        value={quantity}
-        onChange={(event) => setQuantity(Number(event.target.value))}
-      />
-      <button type="submit">Reserve</button>
-    </form>
-  );
-}
-```
-
-Do not use a class component to reproduce a Java service object. A functional
-component plus hooks is the normal React unit of UI behavior.
-
-## 2. Give API Calls an Owner
-
-Keep HTTP and JSON details out of rendering code. Return a typed result that
-does not confuse a failed request with a successful one.
+## Show distinct states
 
 ```typescript
-type ApiResult<T> =
-  | { ok: true; value: T }
-  | { ok: false; status: number; message: string };
-
-type ReserveResponse = { reservationId: string };
-
-export async function reserveStock(
-  sku: string,
-  quantity: number,
-): Promise<ApiResult<ReserveResponse>> {
-  const response = await fetch("/api/reservations", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sku, quantity }),
-  });
-
-  if (!response.ok) {
-    return { ok: false, status: response.status, message: "Reservation failed" };
-  }
-
-  return { ok: true, value: await response.json() as ReserveResponse };
-}
-```
-
-The `as ReserveResponse` is acceptable only as a compact example. In a
-production boundary, validate the JSON at runtime before returning it, as
-explained in `01`.
-
-## 3. Model the User-Visible States
-
-```tsx
-type LoadState<T> =
-  | { kind: "idle" }
+type ScreenState<T> =
   | { kind: "loading" }
-  | { kind: "success"; data: T }
-  | { kind: "failure"; message: string };
-
-function ReservationStatus({ state }: { state: LoadState<ReserveResponse> }) {
-  if (state.kind === "loading") return <p>Reserving stock…</p>;
-  if (state.kind === "failure") return <p role="alert">{state.message}</p>;
-  if (state.kind === "success") return <p>Reserved: {state.data.reservationId}</p>;
-  return null;
-}
+  | { kind: "ready"; data: T }
+  | { kind: "empty" }
+  | { kind: "error"; message: string }
+  | { kind: "pending"; operationId: string };
 ```
 
-The important frontend capability is not issuing `fetch`; it is correctly
-handling cancellation, duplicate submits, server validation errors, and a
-request that fails after the user presses a button.
+Use only states the product needs. A failed read may leave previous data visible with an inline retry; a timed-out write may have an unknown outcome and needs reconciliation before resubmission. Do not turn both into the same generic error screen.
 
-## 4. Forms: Client Validation Helps, Server Validation Decides
+## Forms protect the interaction, not the server
 
-Use the browser and TypeScript to give quick feedback. The backend remains the
-authority because a client can be modified, bypassed, or stale.
+Validate locally for prompt feedback, show field errors near their inputs, preserve values after a server rejection, and prevent accidental duplicate taps while a write is in progress. Send a narrow request body, not all component state.
 
-Good default:
+Client validation is not authorization. A caller can bypass the form, and a request can arrive after the UI state becomes stale. The backend decides whether the command is allowed and whether a retry could duplicate an effect.
 
-- disable or ignore duplicate submissions while a request is pending
-- render field errors accessibly near the relevant input
-- preserve values when a server validation error is returned
-- send a narrow request DTO, not the whole component state
-- let Spring own authorization and final business validation
+## Use effects for external synchronization
 
-## 5. Use Effects for External Synchronization
+`useEffect` is for work tied to a component lifecycle, such as a subscription or synchronizing with an external system. Do not use it to calculate data that can be derived during render or to handle a button click that belongs in the event handler.
 
-An effect is appropriate for a subscription, browser API, or request whose
-lifecycle must follow a component's lifecycle. It needs cleanup or cancellation
-when relevant.
+When an effect starts a request, clean it up or ignore a late result after its inputs change. A route loader or query layer may own fetching instead; the same stale-result risk still needs a clear owner. See the [official effect guide](https://react.dev/reference/react/useEffect).
 
-```tsx
-import { useEffect, useState } from "react";
+## Review check
 
-type OrderTitle = { title: string };
-
-function isOrderTitle(value: unknown): value is OrderTitle {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "title" in value &&
-    typeof value.title === "string"
-  );
-}
-
-async function loadOrderTitle(
-  orderId: string,
-  signal: AbortSignal,
-): Promise<ApiResult<OrderTitle>> {
-  const response = await fetch(`/api/orders/${orderId}`, { signal });
-  if (!response.ok) {
-    return { ok: false, status: response.status, message: "Could not load order" };
-  }
-
-  const payload: unknown = await response.json();
-  if (!isOrderTitle(payload)) {
-    return { ok: false, status: 502, message: "Order response was invalid" };
-  }
-  return { ok: true, value: payload };
-}
-
-function OrderTitle({ orderId }: { orderId: string }) {
-  const [state, setState] = useState<LoadState<OrderTitle>>({ kind: "loading" });
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void loadOrderTitle(orderId, controller.signal)
-      .then((result) => {
-        if (controller.signal.aborted) return;
-        setState(
-          result.ok
-            ? { kind: "success", data: result.value }
-            : { kind: "failure", message: result.message },
-        );
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setState({ kind: "failure", message: "Could not load order" });
-        }
-      });
-    return () => controller.abort();
-  }, [orderId]);
-
-  if (state.kind === "failure") return <p role="alert">{state.message}</p>;
-  if (state.kind !== "success") return <p>Loading order…</p>;
-  return <h1>{state.data.title}</h1>;
-}
-```
-
-For complex server state, a purpose-built query library can reduce repeated
-cache and loading code. Learn the state and failure model first; do not add a
-library only to avoid understanding it.
-
-## Practical Rule
-
-> Components render state. A narrow client owns HTTP. The backend owns trust,
-> authorization, and business decisions.
-
-## Further Reading
-
-- [React `useState`](https://react.dev/reference/react/useState)
-- [React `useEffect`](https://react.dev/reference/react/useEffect)
-- [React forms](https://react.dev/reference/react-dom/components/form)
+- Can users tell loading, empty, error, success, and unknown write outcome apart?
+- Who prevents or reconciles duplicate submissions?
+- Is external data validated outside the component?
+- Is an effect synchronizing with something external, with cleanup where needed?

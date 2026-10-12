@@ -1,7 +1,4 @@
-# Modern Java for Backend Engineers
-
-> Primary fit: `Shared core`
-
+# Modern Java in Services
 
 You do not need an exhaustive Java language tour.
 
@@ -266,30 +263,7 @@ Practical comparison:
 
 ---
 
-## 7. 20-Second Answer
-
-> The practical modern-Java baseline for backend work is records, sealed types, pattern
-> matching, and virtual threads. Records improve DTO and projection modeling, sealed types
-> plus pattern matching improve workflow and result modeling, and virtual threads make
-> blocking-style concurrency much more attractive without forcing a reactive rewrite.
-
----
-
-## 8. 1-Minute Answer
-
-> For backend work I do not try to memorize every recent Java feature. I keep a practical
-> baseline: records for immutable data carriers, sealed types and pattern matching for safer
-> workflow modeling, and virtual threads for scaling blocking-style concurrency more cleanly.
-> Records are great for request/response DTOs and projections, but I would not force them
-> into richer mutable domains. Sealed types help make payment, validation, or order states
-> explicit instead of hiding them in flags. Virtual threads are the biggest operational shift
-> because they improve the economics of blocking I/O, but they do not remove the need to
-> think about locks, contention, or downstream latency. My general rule is that modern Java
-> should reduce ceremony and improve clarity, not become feature collecting.
-
----
-
-## 9. Further Reading
+## 7. Further Reading
 
 - Java Records: https://openjdk.org/jeps/395
 - Sealed Classes: https://openjdk.org/jeps/409

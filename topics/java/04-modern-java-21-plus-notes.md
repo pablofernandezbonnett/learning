@@ -1,4 +1,4 @@
-# Modern Java 21+ Notes for Backend Engineers
+# Java 21 and Later
 
 You do not need to sound like a Java release-notes reader.
 

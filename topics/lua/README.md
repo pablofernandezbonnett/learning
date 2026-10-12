@@ -1,41 +1,8 @@
-# Lua for Embedded Business Rules
+# Lua and Embedded Rules
 
-Use this folder for one narrow architecture move: a small Lua rule layer inside
-a Java or Kotlin service. It is not a general Lua or alternative-backend path.
+Lua is useful when an application needs a small rule that changes independently of the main release. The application still owns inputs, side effects, final state, execution limits, and rule publication. A script only returns a bounded decision.
 
-Typical fit:
+1. [Lua essentials](./01-language-basics.md): the language features needed to read a small rule.
+2. [Embedded rule design](./02-embedded-rules.md): when to use scripts, how to contain them, and a guided pricing exercise.
 
-- pricing and promotions
-- discount eligibility
-- regional rule variations
-- narrowly scoped rules that change more often than the host service should be redeployed
-
-## Smallest Useful Mental Model
-
-The JVM service owns authentication, transactions, input validation, execution
-limits, publication, rollback, and the final business state. Lua evaluates one
-narrow rule and returns a simple result.
-
-Weak approach:
-
-> Lua lets us patch production business logic freely.
-
-Better approach:
-
-> A sandboxed script evaluates a bounded rule; the host service keeps control of
-> every sensitive capability and operational decision.
-
-## Recommended Order
-
-1. [lua-for-jvm-backend-engineers.md](./lua-for-jvm-backend-engineers.md): the architecture decision, safety model, and JVM integration shape
-2. [examples/01-tables.lua](./examples/01-tables.lua): Lua's one core data structure
-3. [examples/03-retail-rules.lua](./examples/03-retail-rules.lua): a pricing-rule example
-4. [examples/04-sandbox-security.lua](./examples/04-sandbox-security.lua): sandboxing, governance, and rollback before trusting the approach
-5. [examples/02-metatables.lua](./examples/02-metatables.lua): useful later, not required for the rule-engine use case
-
-Run examples with `lua examples/<file>.lua` from this folder.
-
-## Core Rule
-
-> Use embedded scripting only when faster rule iteration has more value than the
-> lost typing and added governance cost. The host owns the trust boundary.
+This pattern can live in any host application with a suitable Lua runtime. Use ordinary application code when a rule is stable, tightly coupled to transactions, or needs broad system access.

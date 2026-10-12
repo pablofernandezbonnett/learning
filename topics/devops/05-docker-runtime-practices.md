@@ -1,282 +1,60 @@
-# Docker Runtime Practices for Backend Engineers
-
-> Primary fit: `Shared core`
-
-
-This is the "beyond Compose" Docker refresher.
-
-The goal is not to memorize every Docker flag.
-
-The goal is to understand the practices that matter when packaging and running
-backend services in a way that scales cleanly into Kubernetes and cloud
-environments.
-
----
-
-## Why This Matters
-
-Docker is easy to reduce to "it runs on my machine," but the real value is
-making build, runtime, packaging, and environment assumptions explicit before
-the service reaches Kubernetes or production.
-
-This matters because weak container habits create larger images, noisier
-security posture, brittle config handling, and confusing runtime behavior later.
-
-## Smallest Mental Model
-
-Treat a container as a packaged runtime boundary:
-
-- build artifacts go in
-- only the runtime dependencies stay
-- config arrives from outside
-- the process should run with minimal privilege and clear lifecycle behavior
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- Docker is mainly for local startup convenience
-- if the container launches, the image is good enough
-- the runtime and the build environment can be mixed freely
-
-Better mental model:
-
-- Docker is part of the production contract
-- image size, privilege level, config injection, and lifecycle behavior all
-  affect operability and security
-- good container discipline makes later platform work much simpler
-
-Small concrete example:
-
-- weak approach: one large image builds and runs as root with hardcoded
-  environment values
-- better approach: multi-stage build, slim runtime image, non-root user, and
-  environment-specific config injected at runtime
-
-Strong default:
-
-- separate build from runtime, run as non-root, keep config external, and
-  understand networking and persistence boundaries clearly
-
-Reusable takeaway:
-
-> I treat Docker as part of the production runtime contract, not just local
-> tooling. I care about build/runtime separation, non-root execution, config
-> discipline, and clear networking and persistence behavior.
-
----
-
-## 1. Multi-Stage Builds
-
-This is one of the highest-value Docker skills for Java and Spring Boot.
-
-The problem:
-
-- build tools and source code are needed during image build
-- they are not needed in the final runtime image
-- keeping them in the final image makes the image larger and noisier
-
-The solution:
-
-- use one stage to build the application
-- use another, smaller stage to run it
-
-Example shape:
-
-```dockerfile
-FROM gradle:8.10-jdk21 AS build
-WORKDIR /app
-COPY . .
-RUN gradle bootJar --no-daemon
-
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-COPY --from=build /app/build/libs/app.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-Why it matters:
-
-- smaller images
-- faster pushes and pulls
-- lower attack surface
-- cleaner separation between build and runtime concerns
-
-For Spring Boot specifically, this is often the difference between a reasonable
-image and a bloated one.
-
----
-
-## 2. Layering and Caching
-
-Docker builds in layers.
-
-If a layer does not change, Docker reuses it from cache.
-
-That is why Dockerfiles should be ordered carefully.
-
-Good idea:
-
-- copy dependency descriptors first
-- resolve dependencies
-- copy application code later
-
-This reduces rebuild time when only application code changes.
-
-Related practices:
-
-- use `.dockerignore`
-- avoid copying the whole repository if not needed
-- prefer slim runtime images
-
----
-
-## 3. Do Not Run as Root
-
-Running the application as `root` inside the container is a bad default.
-
-It increases the blast radius if the process is compromised.
-
-Prefer:
-
-- create a dedicated application user
-- switch with `USER`
-- ensure the app only has the permissions it needs
-
-Example:
-
-```dockerfile
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-RUN useradd -r -u 10001 appuser
-COPY app.jar app.jar
-RUN chown appuser:appuser /app/app.jar
-USER appuser
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-This is a simple but valuable production habit.
-
----
-
-## 4. Networks
-
-Containers do not magically know how to talk to each other.
-
-Docker networks provide that communication boundary.
-
-Important practical ideas:
-
-- containers on the same network can resolve each other by service/container name
-- ports exposed to the host are different from ports used inside the network
-- internal service-to-service calls should usually use the internal network
-
-Example mental model:
-
-- app container talks to `postgres:5432`
-- your laptop talks to `localhost:8080`
-
-Those are different paths.
-
-In Compose, service names become a simple DNS layer.
-
-That is why `SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app` works
-inside the network even when the host uses another port mapping.
-
----
-
-## 5. Volumes
-
-Containers are ephemeral.
-
-If the container dies, its writable layer dies with it.
-
-Volumes exist so data can outlive the container.
-
-Use cases:
-
-- Postgres data persistence
-- local development files
-- mounted config or certificates
-
-Important distinction:
-
-- bind mount: uses a path from your machine
-- named volume: managed by Docker
-
-Rule of thumb:
-
-- bind mounts are convenient in development
-- named volumes are cleaner for container-managed state like databases
-
----
-
-## 6. Environment and Config Discipline
-
-Do not bake environment-specific values into the image.
-
-The same image should run in different environments with different config.
-
-Use:
-
-- environment variables
-- mounted config files
-- secret injection
-
-This is one of the big bridges from Docker to Kubernetes and cloud platforms.
-
----
-
-## 7. Health and Lifecycle
-
-A container being "running" does not always mean the application is actually
-ready.
-
-For backend services, you should think about:
-
-- startup time
-- health endpoints
-- graceful shutdown
-
-This matters even more later in Kubernetes where readiness and liveness probes
-depend on it.
-
----
-
-## 8. Practical Minimums For You
-
-If you are building a cloud lab, make sure your Docker side includes:
-
-1. a multi-stage Dockerfile
-2. a non-root runtime user
-3. sane environment/config handling
-4. at least one named volume for persistent data
-5. clear network understanding between services
-
-That is already a strong foundation.
-
----
-
-## Interview Framing
-
-You can say something like:
-
-> For me, Docker is not just a way to start a service locally. I care about
-> image size, build/runtime separation, running as non-root, and understanding
-> how networking and persistence behave. Those practices make the move from local
-> Compose to Kubernetes much cleaner.
-
----
+# Docker Image and Runtime Practices
+
+An image packages an application with the files it needs to run. A container
+is a running instance of that image. Packaging makes an artifact repeatable,
+but the process still needs correct configuration, permissions, resource
+behavior, and lifecycle handling.
+
+## Build a Small, Reviewable Image
+
+- Separate build tools from runtime files with a multi-stage build when the
+  application needs compilation or asset generation.
+- Copy only required files; use a `.dockerignore` so source secrets, caches,
+  and local artifacts do not enter the build context.
+- Pin or deliberately update base images, then rebuild to receive security
+  fixes. An old image does not update itself.
+- Run the process as a non-root user when it does not need elevated access.
+
+Example: a service needs a compiler to produce a binary, but production only
+needs that binary and its runtime libraries. The final stage copies those
+artifacts and omits the compiler and source tree. The gain is a smaller
+runtime surface; the cost is maintaining the build stages.
+
+## Keep Runtime Inputs Explicit
+
+Use the same image in each environment and supply environment-specific
+configuration at runtime. Do not bake production credentials into the image
+or log them at startup. Decide which writable data is temporary and which
+must persist outside the container. A container filesystem is not a durable
+database.
+
+Publish only the ports that need external access. Containers on one network
+can use service names rather than hard-coded instance addresses. In a local
+stack, [Docker Compose](./07-docker-compose-local-stacks.md) makes those
+dependencies visible.
+
+## Handle the Process Lifecycle
+
+The main process should receive shutdown signals, stop taking new work, and
+finish or safely abandon in-flight work within a known period. Health checks
+should answer a useful operational question; a running process can still be
+unable to serve traffic.
+
+Set resource expectations from the workload. A container can be terminated
+for memory pressure or become slow under CPU limits even if the application
+code itself has not changed. See
+[container sizing](../cloud/04-container-sizing.md) and
+[Kubernetes runtime basics](./04-kubernetes-crash-course.md).
+
+## Review Questions
+
+- Is the image reproducible and limited to files needed at runtime?
+- Can it run without root privileges?
+- Are secrets and environment settings supplied safely at runtime?
+- What happens to writable data when the container is replaced?
+- Does shutdown preserve or safely retry in-flight work?
 
 ## Further Reading
 
-- Docker overview:
-  https://docs.docker.com/get-started/docker-overview/
-- Multi-stage builds:
-  https://docs.docker.com/build/building/multi-stage/
-- Docker volumes:
-  https://docs.docker.com/engine/storage/volumes/
-- Docker networking:
-  https://docs.docker.com/engine/network/
-- Spring Boot container images:
-  https://docs.spring.io/spring-boot/reference/packaging/container-images/
+- [Docker multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
+- [Docker build best practices](https://docs.docker.com/build/building/best-practices/)

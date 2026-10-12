@@ -1,143 +1,67 @@
-# Database Scaling: Indexing, Replication, and Sharding
+# Scale a Database From the Measured Limit
 
-> Primary fit: `Shared core`
+"The database is slow" does not identify the bottleneck. Locate the cost first:
+the request may wait for a connection, execute one expensive query, issue too
+many small queries, contend on a write, or overload storage. Each cause needs
+a different change.
 
+## Diagnose Before Changing Topology
 
-When the database is getting slow, the useful answer is usually a progression from the easiest fix to the hardest one.
+Capture a representative workload and ask:
 
-Here is the hierarchy of how to scale a database.
+| Signal | Check first | Possible direction |
+|---|---|---|
+| One slow read | Query plan, rows examined, sort, returned fields | Query shape, index, bounded result |
+| Many reads | Total query rate, repeated data, cache hit rate | Cheaper queries, cache, read model, replica |
+| Waiting requests | Connection pool, long transactions, lock waits | Shorter transactions, pool sizing, contention fix |
+| Slow writes | Write rate, indexes, locks, storage saturation | Remove avoidable work, scale resources, partition load |
+| Growing data | Table size, retention, maintenance, backup time | Archive, partition, larger node, or shard |
 
----
+Measure request latency and database load together. A fast SQL statement can
+still sit behind a saturated connection pool; a large server cannot fix a
+missing business invariant or a lock held too long.
 
-## Why This Matters
+## Pick the Smallest Change That Fits
 
-Database scaling questions are dangerous because teams often jump too quickly to
-"we need sharding" when the real problem is still query shape, indexes, or one
-bad hot path.
+1. **Reduce unnecessary work.** Fix the actual query, repeated queries, large
+   results, and missing or redundant indexes. Check the execution plan and
+   compare before and after. [Query optimization](./08-query-optimization.md)
+   owns the detailed method.
+2. **Give the current database room.** More CPU, memory, faster storage, or a
+   correctly sized connection pool may relieve a measured resource limit.
+   More connections can worsen overload if the database is already saturated.
+   Check cost and the next likely limit.
+3. **Separate reads when useful.** A cache can remove repeated hot reads;
+   a projection can serve a specialized view; a read replica can add read
+   capacity. Each introduces a freshness or synchronization decision. Route
+   a read that decides a write to the authoritative path when freshness matters.
+4. **Partition or shard when data placement is the limit.** Partitioning inside
+   one database can improve management and some queries; it does not
+   automatically add write capacity across machines. Sharding splits data
+   across database nodes and requires a routing key, cross-shard query plan,
+   rebalancing, and a way to protect invariants that span shards.
 
-This topic matters because database bottlenecks directly affect:
+These are options, not a mandatory sequence. A sudden hot key needs a different
+response from a large archival table; adding read replicas cannot resolve
+primary write contention.
 
-- request latency
-- write correctness under load
-- operational cost
-- migration complexity when the easy fixes stop working
+## Example: Order List Under Load
 
-The most useful answer is usually not the fanciest one.
-It is the cheapest safe fix that matches the real bottleneck.
+Suppose an order-list endpoint becomes slow. First separate connection wait
+from SQL time and count its queries. If one statement scans and sorts far more
+orders than the page returns, test a bounded query and supporting index. If
+that query is efficient but read traffic still saturates the primary, consider
+a replica or a read model with an explicit lag limit. Keep a stock claim or
+payment decision on the authoritative write path.
 
-## Smallest Mental Model
+If writes later exceed one node's capacity, estimate traffic per proposed
+shard key. A tenant-based split may help when traffic is spread across tenants;
+one very busy tenant can still overload a shard. Decide how cross-tenant
+reports and live rebalancing will work before committing to that split.
 
-Database scaling is usually a progression:
+## Verify the Result
 
-1. make the existing queries cheaper
-2. give the database more room
-3. split reads from writes when reads dominate
-4. shard only when one node truly cannot carry the data or write load
-
-Strong default:
-
-- first fix query and index problems
-- then scale up or add replicas
-- treat sharding as the expensive last step
-
-## Bad Mental Model vs Better Mental Model
-
-Bad mental model:
-
-- slow database means we need sharding
-- replicas solve all database scale problems
-- scaling is mostly an infrastructure purchase
-
-Better mental model:
-
-- many "database scaling" problems are still query-design problems
-- read scale and write scale are different problems
-- every scaling step adds operational and consistency tradeoffs
-
-Small concrete example:
-
-- weak approach: add replicas while one expensive query is still scanning a large table badly
-- stronger approach: fix the query and index first, then add replicas only if read pressure is still the real bottleneck
-
-Reusable takeaway:
-
-> I treat database scaling as a progression from cheapest to most dangerous:
-> query and index fixes first, then vertical scaling or replicas, and only then
-> sharding when one node truly cannot hold the write or data load anymore.
-
----
-
-## Step 1: Indexing (The Easiest Fix)
-
-**What is it?**
-A B-Tree data structure created alongside your table that keeps specific columns sorted. It allows the database to find rows in `O(log N)` time instead of `O(N)` (Full Table Scan).
-
-**When to use it:**
-If queries filtering by a specific column (e.g., `WHERE email = '...'`) are slow.
-
-**The Trade-off:**
-Indexes dramatically speed up **Reads**, but they slow down **Writes**. Every time you `INSERT`, `UPDATE`, or `DELETE` a row, the database must also update the Index. 
-*Do not index every column. Only index columns frequently used in `WHERE`, `JOIN`, or `ORDER BY` clauses.*
-
----
-
-## Step 2: Vertical Scaling (Scaling Up)
-
-**What is it?**
-Throwing money at the problem. Moving your database to a larger AWS/GCP instance with more CPU, Memory, and faster SSDs (NVMe).
-
-**When to use it:**
-When indexing isn't enough, but your dataset isn't unimaginably huge.
-
-**The Trade-off:**
-It is the easiest operational choice (no code changes), but it has a hard physical ceiling. You can only buy a server so big.
-
----
-
-## Step 3: Horizontal Scaling (Read Replicas)
-
-**What is it?**
-Creating copies (Replicas) of your main database (Primary/Master). 
-
-*   **Primary Node:** Handles all `INSERT`, `UPDATE`, `DELETE` operations.
-*   **Replica Nodes:** Handle `SELECT` operations. They asynchronously sync data from the Primary.
-
-**When to use it:**
-When your system is heavily **Read-Biased** (like a social media feed or product catalog). 
-
-**The Trade-off (Eventual Consistency):**
-Because replication takes a few milliseconds, a user might update their profile on the Primary, instantly refresh the page (hitting a Replica), and see old data. You must design your application to tolerate "replication lag" (Eventual Consistency).
-
----
-
-## Step 4: Horizontal Scaling (Sharding / Partitioning)
-
-**What is it?**
-Splitting a single massive table across multiple different database servers. 
-
-*Example:* `Users A-M` live on Database Server 1. `Users N-Z` live on Database Server 2.
-
-**When to use it:**
-When your dataset is so large it cannot fit on a single physical disk, or the **Write** volume is so high that a single Primary node cannot handle the load.
-
-**The Trade-off (The Nightmare Scenario):**
-Sharding is incredibly complex. 
-*   **Joins across shards:** You cannot easily SQL `JOIN` a row from Server 1 and Server 2. You have to do it in application code.
-*   **Resharding:** What happens when Server 1 gets full? Re-balancing the data across a new Server 3 requires migrating live data with zero downtime.
-*   **Celebrity Problem (Hotspotting):** If you shard by UserID, but one User is Justin Bieber and generates 90% of the traffic, Server 1 melts while Server 2 is idle. Shard keys must be chosen perfectly to distribute load evenly.
-
----
-
-## Practical Summary
-
-"If our database was a bottleneck, I would start by analyzing our slowest queries and ensuring we have appropriate **Indexes**. If reads are overwhelming the database, I would introduce **Read Replicas** and route `SELECT` queries to them, accepting eventual consistency. If the issue is **Write Throughput**, we can vertically scale the Primary node. I would only consider **Sharding** as an absolute last resort due to the massive application complexity it introduces around distributed joins and re-balancing."
-
----
-
-## What To Internalize
-
-- most database scale conversations should start with query cost, not with sharding
-- vertical scaling is often the simplest next step after query fixes
-- replicas mainly help read-heavy systems and introduce replication-lag tradeoffs
-- sharding is a write-scale and data-volume answer with serious application complexity
-- scaling the database is still a correctness topic, not only a speed topic
+Repeat the same workload after the change. Compare latency, throughput,
+resource use, lock or connection waits, and error rate. For a cache, replica,
+or projection, also test stale reads and recovery. For sharding, test hot keys,
+cross-shard operations, and moving data while requests continue.

@@ -27,5 +27,5 @@ clear. Components are only useful when they solve a named problem.
 
 ## Related Material
 
-- [System Design Guide](../../topics/system-design/system-design-guide.md)
+- [General System Design Method](../../topics/system-design/00-general-system-design-method.md)
 - [System Design Drills](../../topics/system-design/system-design-drills.md)

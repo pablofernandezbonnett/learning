@@ -1,10 +1,10 @@
 # Learning Repository
 
-Practical backend learning and refresh materials in one place.
+Practical software engineering notes in one place, with many backend examples.
 
 This repo exists for one main reason:
 
-- turn scattered backend, AppSec, architecture, and reliability study into one reusable knowledge base
+- make design, implementation, security, and reliability ideas easy to reopen and apply
 
 It is built for practical reopening, not for textbook-style completeness.
 The goal is to help you answer questions such as:
@@ -19,8 +19,8 @@ What you will find here:
 
 - topic-first notes for fast reopening
 - practical docs that explain failure modes, tradeoffs, and better defaults
-- small runnable labs, with Java as the main backend baseline and Kotlin added where comparison or Kotlin-specific learning helps
-- paths that give you a study order instead of a pile of disconnected notes
+- small labs with prompts, solution guides, and cases to check
+- topic entrypoints that give each area a clear study order
 
 The repo is optimized for practical understanding, tradeoffs, failure modes,
 and reusable mental models, not encyclopedic coverage.
@@ -32,9 +32,9 @@ when they remain practical and deliberately scoped.
 
 Best fit:
 
-- backend engineers who want a durable refresh repo
-- engineers moving toward stronger system design, AppSec, SRE, or solutions-architecture judgment
-- people who prefer plain-language notes with practical examples over abstract theory first
+- software engineers who want to design, build, secure, and operate systems more deliberately
+- readers who prefer plain-language notes and practical examples over abstract theory first
+- engineers using a specific language or framework who want to connect it to general decisions
 
 Less ideal fit:
 
@@ -44,28 +44,27 @@ Less ideal fit:
 
 ## Start Here
 
-Use one main entrypoint, then branch out only if a real work need appears:
+Choose the entrypoint that matches the problem:
 
-- `paths/senior-java-backend-growth-plan-roadmap.md`: the canonical path for a senior Java backend engineer closing practical gaps without leaving the backend lane
-- `paths/safe-production-change-loop.md`: one practical loop that connects a code change to review, rollout, monitoring, rollback, and follow-up
-- `paths/adjacent/README.md`: optional side paths for AppSec, SRE, or wider architecture pressure
-- `topics/`: topic-by-topic entrypoints when you already know what you want to study
-- `labs/`: runnable companion material
+- [System design](./topics/system-design/README.md): a general method for shaping a system
+- [Solution decisions](./topics/solutions-architecture/README.md): requirements, build-vs-buy, data boundaries, migration, and decision records
+- [Safe production change](./paths/safe-production-change-loop.md): connect a code change to review, rollout, monitoring, and recovery
+- [Topics](./topics/README.md): focused notes by subject
+- [Labs](./labs/README.md): practice prompts and reasoning guides
 
 ## How To Use This Repo
 
 Strong default:
 
-1. start with `paths/senior-java-backend-growth-plan-roadmap.md` if you want the main backend path
-2. start with a topic folder if you already know the concept you want to reopen
-3. use labs when the topic benefits from code and runtime behavior
+1. start with the general system design method if the problem is broad
+2. use a topic folder when you know which decision or concept to reopen
+3. use a lab to practise a decision or implementation yourself
 
 Practical rule:
 
-- use `paths/` for study order
 - use `topics/` for the durable source notes
 - use `labs/` for hands-on reinforcement
-- use `paths/adjacent/` only when a focused side lane becomes relevant
+- use `paths/` only for a focused sequence that adds value beyond a topic index
 
 ## Main Topics
 
@@ -79,8 +78,8 @@ Practical rule:
 - [System Design](./topics/system-design/README.md)
 - [Security](./topics/security/README.md)
 - [AppSec Foundations](./topics/appsec/README.md)
-- [SRE](./topics/sre/README.md)
-- [Solutions Architecture](./topics/solutions-architecture/README.md)
+- [Reliability and Operations](./topics/sre/README.md)
+- [Solution Decisions](./topics/solutions-architecture/README.md)
 - [Cloud](./topics/cloud/README.md)
 - [AI](./topics/ai/README.md)
 - [DevOps](./topics/devops/README.md)
@@ -101,7 +100,7 @@ Most topic folders use the same order:
 - `Required`: day-to-day material
 - `Growth`: deeper follow-up study
 
-When a topic has runnable examples, its `README` should point to the matching
+When a topic has practice exercises, its `README` should point to the matching
 lab.
 
 Common note shape:
@@ -117,7 +116,7 @@ Common note shape:
 
 - the repo should help you understand, reopen, and reuse ideas
 - practical topic notes are the main source of truth
-- paths help with order, but should not become the only place where meaning lives
+- entrypoints help with order, but should not become the only place where meaning lives
 - examples matter: use code when code teaches best, and word examples when code would only add noise
 - for JVM topics, prefer Java as the default example language and add Kotlin when the comparison teaches something useful
 
