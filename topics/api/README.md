@@ -7,6 +7,7 @@ that matches the problem.
 ## HTTP Contracts
 
 - [API design](./01-api-design.md): the general method and core decisions.
+- [Hotel offer search case](./10-hotel-offer-search-case.md): apply the contract, pagination, and reservation decisions to one flow.
 - [HTTP caching](./09-http-caching-etag-and-compression.md): freshness, conditional requests, and transfer cost.
 - [Contract testing and evolution](./08-contract-testing-and-api-evolution.md): compatibility and verification across releases.
 - [REST vs GraphQL](./00-rest-vs-graphql.md): choose a client-facing API style.

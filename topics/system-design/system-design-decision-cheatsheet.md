@@ -20,6 +20,48 @@ operating cost.
 | [Runtime model](../cloud/03-serverless-runtime-choice.md) | How long does work run, how often, and what does it need to keep open? | Traffic shape or operating cost justifies changing the runtime model. |
 | [Build or buy](../solutions-architecture/02-build-vs-buy.md) | Is the capability core, and what are integration and exit costs? | A product meets hard requirements at lower total ownership cost. |
 
+## Two decisions that are easy to rush
+
+### A busy read API
+
+Use this order when search, catalogue, or history reads become slow. Stop when
+the measured limit is addressed; the steps are options, not a required stack.
+
+1. **Locate the wait.** Separate application CPU, database execution,
+   connection-pool wait, cache misses, and remote calls. More API replicas help
+   only if request handling is the limit.
+2. **Make one request cheaper.** Bound filters and page size, remove repeated
+   queries, and inspect the actual plan before adding an index. See
+   [query optimization](../databases/08-query-optimization.md).
+3. **Reuse repeated safe answers.** Cache a hot result only when its freshness
+   and access scope are clear. Bound refresh work so expiry does not flood the
+   source. See [caching](../architecture/07-caching-strategies.md).
+4. **Spread broad read pressure.** A replica helps many ordinary reads when
+   lag is acceptable; a projection helps a query whose shape remains costly.
+   Neither makes the final decision for a competing write. See
+   [database scaling](../databases/05-database-scaling.md).
+
+Check database connections after increasing API instances. Multiplying each
+instance's pool can move the bottleneck to the same database.
+
+### A local write starts later work
+
+First decide which fact must be committed before the caller can receive
+success. If the later action can finish after the response, represent its
+pending state durably and give it an owner and recovery path.
+
+| Need | Starting mechanism | Failure to account for |
+| --- | --- | --- |
+| One worker should perform a task | Durable queue or work table | Retry can repeat the task; a stuck item needs inspection. |
+| Several consumers need the same fact | Event with stable identity | Consumers may receive duplicates or lag independently. |
+| A database change must trigger publication | Outbox committed with the change | Relay may publish again after a crash; consumers deduplicate effects. |
+| Caller needs the remote answer now | Bounded synchronous call | Timeout means the remote result may be unknown. |
+
+The mechanism does not replace the business state machine. Record what the
+caller sees after a timeout and how unfinished work is found. See
+[delivery semantics](../api/02-message-brokers-and-delivery-semantics.md)
+and the [checkout case](./checkout-to-fulfillment-end-to-end.md).
+
 Revisit a choice when its assumption changes: the workload, failure target,
 security boundary, ownership, or cost. The [checkout case](./checkout-to-fulfillment-end-to-end.md)
 shows several decisions interacting in one flow.

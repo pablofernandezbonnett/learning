@@ -6,5 +6,6 @@ Use this block when Python is the right tool for a script, data job, or small se
 2. [Project quality](./02-project-quality.md): when a script needs structure, types, tests, and tooling.
 3. [Integration boundaries](./03-integration-boundaries.md): configuration, HTTP clients, errors, and runtime ownership.
 4. [Guided exercises](./04-exercises.md): reconcile inventory data and design a small product API.
+5. [Model boundary snippets](./05-llm-application-boundaries.md): provider contract, parsed output, and a fake test.
 
 Use [API design](../api/README.md) for the general API method. Use [AI](../ai/README.md) for model integration, prompts, retrieval, evaluation, and safety; those concepts are not Python-specific.

@@ -34,6 +34,7 @@ FastAPI can validate request models and shape responses, but the route should st
 Package one deployable artifact with configuration supplied at runtime. Run it with the permissions and resource limits appropriate to the host. The [product API exercise](./04-exercises.md) gives a small contract to apply these rules.
 
 For model providers, treat the model as another external dependency and use the [AI block](../ai/README.md) for the extra questions about output validation, evaluation, retrieval permissions, and consequential actions.
+The [Python model boundary snippets](./05-llm-application-boundaries.md) show a small implementation and test of that boundary.
 
 ## Further Reading
 

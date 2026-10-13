@@ -79,6 +79,9 @@ calls; decide whether a partial result is useful.
 Start with a simple query and measure its cost before adding a separate search
 service or cache.
 
+The [worked hotel offer case](./10-hotel-offer-search-case.md) shows the request,
+response, paging choice, and reservation boundary together.
+
 ## 4. Make Failures Actionable
 
 The client should know whether to fix input, handle a conflict, back off, or

@@ -10,4 +10,7 @@ Use this block to decide where a model helps, what the surrounding application m
 6. [Private AI services](./06-private-ai-services.md): choose local or shared hosting and protect its data boundary.
 7. [AI-assisted development](./07-ai-assisted-development.md): use an assistant on code with explicit intent and verification.
 
+For a worked change from product request through specification, tasks, and
+verification, use the [payment retry case](./09-spec-driven-development-for-ai-assisted-work.md).
+
 The [Python block](../python/README.md) covers Python implementation choices. The [API block](../api/README.md) covers general service contract design. Try the [AI boundary exercise](../../labs/kotlin-backend-examples/README.md) after the serving note.

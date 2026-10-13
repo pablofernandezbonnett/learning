@@ -27,6 +27,10 @@ Open decision: how long may the result remain pending?
 
 Resolve open decisions with the product and system owners. Then map the accepted rules to existing state, storage, provider contracts, tests, rollout, and rollback. Ask the assistant to implement one task at a time. A generated test is useful only if it proves the intended behavior rather than a guess the assistant made.
 
+The [payment retry case](./09-spec-driven-development-for-ai-assisted-work.md)
+shows this progression from a vague request to a reviewed specification and
+small implementation tasks.
+
 ## Tool Access and Review
 
 Give the assistant only the files and external capabilities needed for the task. Review tool side effects and protect secrets in prompts and logs. An assistant's explanation can guide investigation, but source code, current documentation, tests, and runtime evidence decide whether the change is correct.
